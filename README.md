@@ -20,7 +20,7 @@ If you want to try the application, you'll need a number of dependencies install
 
 ## Running EncFSGUi : Installing dependencies on OSX
 
-(this procedure should work on Yosemite and El Capitan, the 2 versions that I am using myself) 
+(this procedure should work on Yosemite and El Capitan, as those are the 2 versions that I am using myself) 
 
 1. Install XCode 7
 
@@ -33,16 +33,15 @@ If you want to try the application, you'll need a number of dependencies install
   xcode-select --install
   ```
 
-  Verify that the command line tools are installed correctly:
-  `xcode-select -p` 	(should print out a path that ends with 'Developer')
-  `gcc -version`		(should print out version information)
+  Verify that the command line tools are installed correctly:<br>
+  `xcode-select -p` 	(should print out a path that ends with 'Developer')<br>
+  `gcc -version`		(should print out version information)<br>
 
 
 3. Install homebrew
 
   ```
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
   brew doctor
   ```
 
@@ -89,7 +88,7 @@ If you want to try the application, you'll need a number of dependencies install
 
 2. Build the wxWidget library binaries for static linking  
 
-  (from within the wxWidgets-latest folder)
+  (Run the following commands from within the wxWidgets-latest folder)
 
   ```
   mkdir build-release-static
@@ -108,6 +107,7 @@ If you want to try the application, you'll need a number of dependencies install
 
 5. run `make` to compile and link
 
+6. If you plan on contributing, please create a new branch first.  Do NOT submit pull requests against the master branch.
 
 
 
