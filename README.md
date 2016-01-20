@@ -80,13 +80,15 @@ If you want to try the application, you'll need a number of dependencies install
 
 ## Development setup
 
-1. Clone the latest version of the wxWidgets repository from github:
+1. Install the depencencies first (procedure listed above)
+
+2. Clone the latest version of the wxWidgets repository from github:
 
   ```
   git clone https://github.com/wxWidgets/wxWidgets.git wxWidgets-latest
   ```
 
-2. Build the wxWidget library binaries for static linking  
+3. Build the wxWidget library binaries for static linking  
 
   (Run the following commands from within the wxWidgets-latest folder)
 
@@ -101,13 +103,13 @@ If you want to try the application, you'll need a number of dependencies install
   cd demos;   make;cd ..
   ```
 
-3. Edit the Makefile and update the WX_BUILD_DIR variable to make it reflect the absolute folder structure/path on your own machine
+4. Edit the Makefile and update the WX_BUILD_DIR variable to make it reflect the absolute folder structure/path on your own machine
 
-4. run `make clean` before compiling/linking
+5. run `make clean` before compiling/linking
 
-5. run `make` to compile and link
+6. run `make` to compile and link
 
-6. If you plan on contributing, please create a new branch first.  Do NOT submit pull requests against the master branch.
+7. If you plan on contributing, please create a new branch first.  Do NOT submit pull requests against the master branch.
 
 
 
