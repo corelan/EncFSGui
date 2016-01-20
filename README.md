@@ -18,66 +18,64 @@ If you want to try the application, you'll need a number of dependencies install
 - OSXFuse
 
 
-## Development setup: Installing dependencies on OSX
+## Running EncFSGUi : Installing dependencies on OSX
 
 (this procedure should work on Yosemite and El Capitan, the 2 versions that I am using myself) 
 
 1. Install XCode 7
 
-(Look for it in the app store yo)
+  (Look for it in the app store yo)
 
 
 2. Install command line tools
 
-```
-xcode-select --install
-```
+  ```
+  xcode-select --install
+  ```
 
-Verify that the command line tools are installed correctly:
-`xcode-select -p` 	(should print out a path that ends with 'Developer')
-`gcc -version`		(should print out version information)
+  Verify that the command line tools are installed correctly:
+  `xcode-select -p` 	(should print out a path that ends with 'Developer')
+  `gcc -version`		(should print out version information)
 
 
 3. Install homebrew
 
-```
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  ```
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
-brew doctor
-```
+  brew doctor
+  ```
 
 4. Install OSXFuse
 
-Download the dmg image from http://sourceforge.net/projects/osxfuse/files/ and install
-
+  Download the dmg image from http://sourceforge.net/projects/osxfuse/files/ and install
 
 
 5. Install encfs
 
-```
-brew update
-```
+  ```
+  brew update
+  ```
 
+  On El Capitan, you may have to overrule some permissions:
 
-On El Capitan, fix permissions:
+  ```
+  sudo chown -R $USER:admin /usr/local/include
+  sudo chown -R $USER:admin /usr/local/lib/pkgconfig
+  brew link xz libtool boost rlog
+  ```
 
-```
-sudo chown -R $USER:admin /usr/local/include
-sudo chown -R $USER:admin /usr/local/lib/pkgconfig
-brew link xz libtool boost rlog
-```
+  Then check if everything is ok and finally install encfs
 
-Then check if everything is ok and finally install encfs
+  ```
+  brew doctor
+  brew install homebrew/fuse/encfs
+  ```
 
-```
-brew doctor
-brew install homebrew/fuse/encfs
-```
-
-Check if encfs works:
-```
-encfs
-```
+  Check if encfs works:
+  ```
+  encfs
+  ```
 
 
 
@@ -85,27 +83,29 @@ encfs
 
 1. Clone the latest version of the wxWidgets repository from github:
 
-```
-git clone https://github.com/wxWidgets/wxWidgets.git wxWidgets-latest
-```
+  ```
+  git clone https://github.com/wxWidgets/wxWidgets.git wxWidgets-latest
+  ```
 
 2. Build the wxWidget library binaries for static linking  
 
-(from within the wxWidgets-latest folder)
+  (from within the wxWidgets-latest folder)
 
-```
-mkdir build-release-static
-cd build-release-static
-export PATH=$(pwd):$PATH
-../configure --enable-optimise --prefix="$(pwd)" --enable-stl --enable-unicode --enable-threads --enable-static --disable-shared --enable-monolithic --enable-graphics_ctx
-make
-# Build the samples and demos (optional)
-cd samples; make;cd ..
-cd demos;   make;cd ..
-```
+  ```
+  mkdir build-release-static
+  cd build-release-static
+  export PATH=$(pwd):$PATH
+  ../configure --enable-optimise --prefix="$(pwd)" --enable-stl --enable-unicode --enable-threads --enable-static --disable-shared --enable-monolithic --enable-graphics_ctx
+  make
+  # Build the samples and demos (optional)
+  cd samples; make;cd ..
+  cd demos;   make;cd ..
+  ```
 
 3. Edit the Makefile and update the WX_BUILD_DIR variable to make it reflect the absolute folder structure/path on your own machine
+
 4. run `make clean` before compiling/linking
+
 5. run `make` to compile and link
 
 
