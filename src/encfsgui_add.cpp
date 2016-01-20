@@ -112,6 +112,10 @@ void frmOpenDialog::ChooseDestinationFolder(wxCommandEvent& WXUNUSED(event))
 {
 	wxString currentdir;
 	currentdir = m_destination_field->GetValue();
+	if (currentdir.IsEmpty())
+	{
+		currentdir = "/Volumes";
+	}
 	wxDirDialog openDirDialog(this, "Select destination mount point folder", currentdir, wxDD_DEFAULT_STYLE);
     if (openDirDialog.ShowModal() == wxID_OK)
     {

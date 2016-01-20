@@ -236,5 +236,12 @@ bool IsVolumeSystemMounted(wxString volpath, wxArrayString mountinfo)
 }
 
 
-
+void BrowseFolder(wxString & mountpath)
+{
+    wxString cmd;
+    cmd.Printf(wxT("open '%s'"), mountpath);
+    //wxLogDebug(cmd);
+    wxExecuteEnv env;
+    wxExecute(cmd, wxEXEC_ASYNC, NULL, &env);
+}
 

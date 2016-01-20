@@ -28,8 +28,11 @@ wxString arrStrTowxStr(wxArrayString&);
 bool IsVolumeSystemMounted(wxString, wxArrayString);
 void createPwFile(wxString&, wxString&);
 void cleanPwFile(wxString&);
+void BrowseFolder(wxString&);
+
 
 //encfsgui_settings.cpp
 void openSettings(wxWindow *);
+
 
 

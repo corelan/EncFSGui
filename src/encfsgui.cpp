@@ -180,6 +180,7 @@ public:
     //void OnMouseEvent(wxMouseEvent& event);
     void OnItemSelected(wxListEvent& event);
     void OnItemDeSelected(wxListEvent& event);
+    void OnItemActivated(wxListEvent& event);
     void SetSelectedIndex(int);
     void LinkToolbar(wxToolBarBase*);
     void UpdateToolBarButtons();
@@ -306,9 +307,9 @@ wxEND_EVENT_TABLE()
 
 // ListCTRL specific events
 wxBEGIN_EVENT_TABLE(mainListCtrl, wxListCtrl)
-    //EVT_LEFT_DOWN(mainListCtrl::OnMouseEvent)
     EVT_LIST_ITEM_SELECTED(ID_List_Ctrl, mainListCtrl::OnItemSelected)
     EVT_LIST_ITEM_DESELECTED(ID_List_Ctrl, mainListCtrl::OnItemDeSelected)
+    EVT_LIST_ITEM_ACTIVATED(ID_List_Ctrl, mainListCtrl::OnItemActivated)    // double-click/enter
 wxEND_EVENT_TABLE()
 
 
@@ -349,7 +350,7 @@ bool encFSGuiApp::OnInit()
     // create the main application window
 	// initial size of window: 840 by 340
 	wxSize frmMainSize;
-	frmMainSize.Set(840,340);
+	frmMainSize.Set(880,340);
 	long framestyle;
 	//framestyle = wxDEFAULT_FRAME_STYLE ^ wxRESIZE_BORDER | wxFRAME_EX_METAL | wxICONIZE | wxMINIMIZE; 
 
@@ -488,7 +489,6 @@ void frmMain::PopulateVolumes()
     wxArrayString mount_output;
     mount_output = ArrRunCMDSync(mountbin);
 
-    //
     v_AllVolumes.clear();
     pConfig->SetPath(wxT("/Volumes"));
     wxString volumename;
@@ -650,19 +650,15 @@ void frmMain::OnAddExistingFolder(wxCommandEvent& WXUNUSED(event))
     RefreshAll();
 }
 
+
+
 void frmMain::OnBrowseFolder(wxCommandEvent& WXUNUSED(event))
 {
-    // get mount path from current selection
-    //wxLogDebug(g_selectedVolume);
     if (not g_selectedVolume.IsEmpty())
     {
-        DBEntry *thisvolume = m_VolumeData[g_selectedVolume];
-        wxString mountpath = thisvolume->getMountPath();
-        wxString cmd;
-        cmd.Printf(wxT("open '%s'"), mountpath);
-        //wxLogDebug(cmd);
-        wxExecuteEnv env;
-        wxExecute(cmd, wxEXEC_ASYNC, NULL, &env);
+        DBEntry * thisvol = m_VolumeData[g_selectedVolume];
+        wxString mountpath = thisvol->getMountPath();
+        BrowseFolder(mountpath);
     }
 }
 
@@ -1294,9 +1290,9 @@ void frmMain::FillListWithVolumes()
     // Volume Name
     m_listCtrl->SetColumnWidth(1,120);
     // EncryptedFolder
-    m_listCtrl->SetColumnWidth(2,280);
+    m_listCtrl->SetColumnWidth(2,300);
     // Mounted At
-    m_listCtrl->SetColumnWidth(3,280);
+    m_listCtrl->SetColumnWidth(3,300);
     // Automount
     m_listCtrl->SetColumnWidth(4,70);
 
@@ -1458,6 +1454,7 @@ void mainListCtrl::OnItemSelected(wxListEvent& WXUNUSED(event))
     }
 }
 
+
 void mainListCtrl::OnItemDeSelected(wxListEvent& WXUNUSED(event))
 {
     // this allows us to disable toolbar buttons again when no selection is active in ListCtrl
@@ -1474,4 +1471,21 @@ void mainListCtrl::OnItemDeSelected(wxListEvent& WXUNUSED(event))
     }
 }
 
-
+void mainListCtrl::OnItemActivated(wxListEvent& WXUNUSED(event))
+{
+    if (g_selectedIndex > -1)
+    {
+        // if volume was mounted, browse the folder
+        DBEntry * thisvol = m_VolumeData[g_selectedVolume];
+        if (thisvol->getMountState())
+        {
+            // open
+            wxString mountpath = thisvol->getMountPath();
+            BrowseFolder(mountpath);
+        }
+        else
+        {
+            // edit
+        }
+    }
+}
