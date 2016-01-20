@@ -11,6 +11,7 @@ EXECUTABLE=encfsgui
 all:	$(SOURCES) $(EXECUTABLE)
 	@echo	[+] Step 3: Creating app bundle
 	@echo	-------------------------------
+	rm -rf $(EXECUTABLE).app
 	SetFile -t APPL $(EXECUTABLE)
 	mkdir -p $(EXECUTABLE).app/Contents
 	mkdir -p $(EXECUTABLE).app/Contents/MacOS
