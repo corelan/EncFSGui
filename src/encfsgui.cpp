@@ -82,6 +82,9 @@ enum Positions
 //Toolbar stuff
 const int ID_TOOLBAR = 500;
 static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
+
+// globals to keep track of what we have selected in the ListCtrl
+// messy, but convenient
 int g_selectedIndex;
 wxString g_selectedVolume;
 
@@ -150,7 +153,7 @@ private:
 };
 
 
-
+// DBENtry constructor
 DBEntry::DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount)
 {
     m_automount = automount;
@@ -161,15 +164,15 @@ DBEntry::DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool 
 
 
 // -----------------------------------------------
-
 // global stuff to manage volumes
 // vector of all volumes, fast lookup
 std::vector<wxString> v_AllVolumes;
 // map of all volumes, using volume name as key
 std::map<wxString, DBEntry*> m_VolumeData;
-
-
+//
 // -----------------------------------------------
+
+
 
 class mainListCtrl: public wxListCtrl
 {
@@ -231,7 +234,9 @@ public:
     void OnUnMount(wxCommandEvent& event);
 
     // generic routine
-    bool unmountFolder(wxString& volumename);
+    bool unmountVolumeAsk(wxString& volumename);   // ask for confirmation
+    // function that does actual unmount is not a member function
+
     int mountFolder(wxString& volumename, wxString& pw);
 
     // override default OnExit handler (so we can run code when user clicks close button on frame)
@@ -242,11 +247,11 @@ public:
 
     // auto mount routine
     void AutoMountVolumes();
+    // FYI -  auto unmount routine is not a member function
+
 
 private:
-
     wxString m_datadir;
-
 	// toolbar stuff
     size_t              m_rows;             // 1
     wxPanel            *m_panel;
@@ -281,7 +286,6 @@ private:
 
     // ListView stuff
     mainListCtrl *m_listCtrl;
-    wxImageList *m_imageListNormal;
 
     // any class wishing to process wxWidgets events must use this macro
     wxDECLARE_EVENT_TABLE();
@@ -341,14 +345,11 @@ bool encFSGuiApp::OnInit()
     g_selectedIndex = -1;
     g_selectedVolume = "";
 
-    wxConfigBase *pConfig = wxConfigBase::Create();
-    
-    //pConfig->SetRecordDefaults();
-     // this will be the default config file, that we can Get() when needed
+    // this will be the default config file, that we can Get() when needed
+    wxConfigBase *pConfig = wxConfigBase::Create();    
     wxConfigBase::Set(pConfig);
    
     // create the main application window
-	// initial size of window: 840 by 340
 	wxSize frmMainSize;
 	frmMainSize.Set(880,340);
 	long framestyle;
@@ -420,22 +421,19 @@ frmMain::frmMain(const wxString& title, const wxPoint &pos, const wxSize &size, 
     RecreateStatusbar();
 
     // Populate vector & map with volume information
-    // We'll do this just once. For the duration of the app
-    // we'll keep updating the vector & map
     PopulateVolumes();
 
     m_rows = 1;
     // Create the toolbar
     CreateToolbar();
     
-
+    // panel to be used as a container for the Toolbar
     m_panel = new wxPanel(this, wxID_ANY);
 
 #if USE_UNMANAGED_TOOLBAR
     m_extraToolBar = new wxToolBar(m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_TEXT|wxTB_FLAT|wxTB_TOP);
     PopulateToolbar(m_extraToolBar);
 #endif
-
 
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
     m_panel->SetSizer(sizer);
@@ -445,24 +443,8 @@ frmMain::frmMain(const wxString& title, const wxPoint &pos, const wxSize &size, 
         sizer->Add(m_extraToolBar, 0, wxEXPAND, 0);
 #endif    
 
-    //sizer->Add(m_textWindow, 1, wxEXPAND, 0);
 
-
-    // create list control, to fit rest of screen, just below toolbar
-    // first create ImageList, to be used in ListView
-
-    m_imageListNormal = new wxImageList(32, 32, true);
-
-#ifdef wxHAS_IMAGES_IN_RESOURCES
-    m_imageListNormal->Add( wxIcon(wxT("iconok"), wxBITMAP_TYPE_ICO_RESOURCE) );
-    m_imageListNormal->Add( wxIcon(wxT("iconnotok"), wxBITMAP_TYPE_ICO_RESOURCE) );
-
-#else
-    m_imageListNormal->Add( wxIcon( ico_ok ) );
-    m_imageListNormal->Add( wxIcon( ico_notok ) );
-#endif
-
-
+    // check if we need to mount volumes at startup
     AutoMountVolumes();
 
     // next, create the actual list control and populate it
@@ -474,7 +456,6 @@ frmMain::frmMain(const wxString& title, const wxPoint &pos, const wxSize &size, 
 
     m_listCtrl->LinkToolbar(GetToolBar());
     m_listCtrl->UpdateToolBarButtons();
-
 
 }
 
@@ -532,6 +513,52 @@ void frmMain::PopulateVolumes()
 }
 
 
+bool unmountVolume(wxString& volumename)
+{
+    DBEntry *thisvol = m_VolumeData[volumename];
+    wxString mountvol = thisvol->getMountPath();
+    wxString umountbin;
+    wxString mountbin;
+    bool beenmounted;
+    mountbin = getMountBinPath();
+    umountbin = getUMountBinPath();
+    wxString cmd;
+    cmd.Printf(wxT("'%s' '%s'"), umountbin, mountvol);
+    wxString cmdoutput;
+    cmdoutput = StrRunCMDSync(cmd);
+    // get info about already mounted volumes
+    wxArrayString mount_output;
+    mount_output = ArrRunCMDSync(mountbin);
+    wxString mountstr;
+    mountstr = arrStrTowxStr(mount_output);
+    
+    beenmounted = IsVolumeSystemMounted(mountvol, mount_output);
+    if (not beenmounted)
+    {
+        // it's gone - reset stuff
+        thisvol->setMountState(false);
+        return true;    // unmount success
+    }
+    return false;
+}
+
+
+
+void AutoUnmountVolumes()
+{
+    // check all volumes
+    for (std::map<wxString, DBEntry*>::iterator it= m_VolumeData.begin(); it != m_VolumeData.end(); it++)
+    {
+        wxString volumename = it->first;
+        DBEntry * thisvol = it->second;
+        if (thisvol->getMountState())
+        {
+            unmountVolume(volumename);
+        }
+
+    }
+}
+
 
 //
 // event handlers
@@ -569,6 +596,10 @@ bool QuitApp(wxWindow * parent)
         // true is to force the frame to close
 
         // if autounmount, dismount volumes first
+        if (autounmount)
+        {
+            AutoUnmountVolumes();
+        }
         return true;
     }
     return false;
@@ -744,14 +775,16 @@ int frmMain::mountFolder(wxString& volumename, wxString& pw)
 }
 
 
+
+
 // unmount folder, generic routine
-bool frmMain::unmountFolder(wxString& volumename)
+bool frmMain::unmountVolumeAsk(wxString& volumename)
 {
     wxString msg;
     wxString title;
     wxString mountvol;
-    bool beenmounted;
-    beenmounted = true;
+    bool unmountok;
+    unmountok = false;
 
     DBEntry *thisvol = m_VolumeData[volumename];
     mountvol = thisvol->getMountPath();
@@ -762,30 +795,10 @@ bool frmMain::unmountFolder(wxString& volumename)
     wxMessageDialog * dlg = new wxMessageDialog(this, msg, title, wxYES_NO|wxCENTRE|wxNO_DEFAULT|wxICON_QUESTION);
     if (dlg->ShowModal() == wxID_YES)
     {
-        wxString umountbin;
-        wxString mountbin;
-        mountbin = getMountBinPath();
-        umountbin = getUMountBinPath();
-        wxString cmd;
-        cmd.Printf(wxT("'%s' '%s'"), umountbin, mountvol);
-        wxString cmdoutput;
-        cmdoutput = StrRunCMDSync(cmd);
-        // get info about already mounted volumes
-        wxArrayString mount_output;
-        mount_output = ArrRunCMDSync(mountbin);
-        wxString mountstr;
-        mountstr = arrStrTowxStr(mount_output);
-        
-        beenmounted = IsVolumeSystemMounted(mountvol, mount_output);
-        if (not beenmounted)
-        {
-            // it's gone - reset stuff
-            thisvol->setMountState(false);
-            return true;    // unmount success
-        }
+        unmountok = unmountVolume(volumename);
     }
     dlg->Destroy();
-    return false; // unmount did not work, or not selected 
+    return unmountok; // unmount did not work, or not selected 
 }
 
 
@@ -894,7 +907,7 @@ void frmMain::AutoMountVolumes()
 void frmMain::OnUnMount(wxCommandEvent& WXUNUSED(event))
 {
     bool beenunmounted;
-    beenunmounted = unmountFolder(g_selectedVolume);
+    beenunmounted = unmountVolumeAsk(g_selectedVolume);
     if (beenunmounted)
     {
         // it's gone - reset stuff
@@ -1261,8 +1274,6 @@ void frmMain::FillListWithVolumes()
     // global font settings
     wxFont font = this->GetFont();
     font.MakeSmaller();
-    // link imagedata
- //   m_listCtrl->SetImageList(m_imageListNormal, wxIMAGE_LIST_NORMAL);
 
     wxString columnHeader;
 
