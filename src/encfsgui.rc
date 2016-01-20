@@ -1,0 +1,11 @@
+aaaaappicon ICON "encfsgui.ico"
+
+addfolder BITMAP "bitmaps/addfolder.bmp"
+removefolder BITMAP "bitmaps/removefolder.bmp"
+lockfolder BITMAP "bitmaps/lockfolder.bmp"
+unlockfolder BITMAP "bitmaps/unlockfolder.bmp"
+editfolder BITMAP "bitmaps/editfolder.bmp"
+settings BITMAP "bitmaps/settings.bmp"
+
+iconok ICON "bitmaps/ico_ok.ico"
+iconnotok ICON "bitmaps/ico_notok.ico"

@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+
+# other stuff to exclude
+.DS_Store
+
