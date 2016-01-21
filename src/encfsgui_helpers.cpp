@@ -192,23 +192,6 @@ wxString getEncFSBinVersion()
 	return version;
 }
 
-void createPwFile(wxString& pwfile, wxString& pw)
-{
-	std::ofstream pfile;
-	pfile.open(pwfile.mb_str());
-	pfile << "echo ";
-	pfile << pw;
-	pfile.close();
-}
-
-void cleanPwFile(wxString& pwfile)
-{
-	std::ofstream pfile;
-	pfile.open(pwfile.mb_str());
-	pfile << "Good luck with that";
-	pfile.close();
-}
-
 
 // Check if volumepath is in "/sbin/mount" output
 // to determine if volume is mounted by encfs already

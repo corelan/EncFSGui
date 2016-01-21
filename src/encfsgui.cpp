@@ -716,38 +716,14 @@ int frmMain::mountFolder(wxString& volumename, wxString& pw)
     wxString cmd;
     wxString cmdoutput;
     wxString encfsbin = getEncFSBinPath();
-    // first, create folder if necessary
+    
+    // first, create mount point if necessary
     cmd.Printf(wxT("mkdir -p '%s'"), mountvol);
     cmdoutput = StrRunCMDSync(cmd);
 
-    // create pw file in user Library/Preferences folder
-    // careful - mkdir needs proper full path, so get it from standardPaths
-    wxString datadir;
-    wxStandardPathsBase& stdp = wxStandardPaths::Get();
-    datadir = stdp.GetUserConfigDir();
-    
-    // make sure datadir exists
-    cmd.Printf(wxT("mkdir -p '%s'"), datadir);
-    cmdoutput = StrRunCMDSync(cmd);
-
-    // create temp pw file
-    wxString datafile;
-    datafile.Printf(wxT("%s/%s"), datadir, ".pw.encfsgui");
-    createPwFile(datafile, pw);
-
-    // set exec permissions on file
-    cmd.Printf(wxT("chmod 700 \"%s\""), datafile);
-    cmdoutput = StrRunCMDSync(cmd);
-
-    // now reset to allow encfs to work in case username has spaces
-    datadir = "~/Library/Preferences";
-    datafile.Printf(wxT("%s/%s"), datadir, ".pw.encfsgui");
-
     // mount
-    cmd.Printf(wxT("%s -v -S -o volname='%s' '%s' '%s' --extpass='%s'"), encfsbin, volumename, encvol, mountvol, datafile);
+    cmd.Printf(wxT("sh -c \"echo %s | %s -v -S -o volname='%s' '%s' '%s'\""), pw, encfsbin, volumename, encvol, mountvol);
     cmdoutput = StrRunCMDSync(cmd);
-
-    cleanPwFile(datafile);
 
     // check if mount was successful
     wxString errmsg;
