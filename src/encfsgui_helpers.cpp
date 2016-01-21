@@ -132,9 +132,9 @@ wxString arrStrTowxStr(wxArrayString & input)
 // run a command (sync) and return output
 wxString StrRunCMDSync(wxString cmd)
 {
-	
+    wxExecuteEnv env;
 	wxArrayString output, errors;
-	wxExecute(cmd, output, errors);
+	wxExecute(cmd, output, errors, 0, &env);
 	wxString returnvalue;
 	
 	// command line output may end up in errors
@@ -159,10 +159,12 @@ wxString StrRunCMDSync(wxString cmd)
 	return returnvalue;
 }
 
+
 wxArrayString ArrRunCMDSync(wxString cmd)
 {
+	wxExecuteEnv env;
 	wxArrayString output, errors;
-	wxExecute(cmd, output, errors);
+	wxExecute(cmd, output, errors, 0, &env);
 	// command line output may end up in errors
 	// depending on the exit code of the called app
 	// so this is not necessarily a problem

@@ -76,6 +76,7 @@ private:
 	wxTextCtrl * m_destination_field;
 	wxTextCtrl * m_volumename_field;
 	wxCheckBox * m_chkbx_automount;
+	wxCheckBox * m_chkbx_prevent_autounmount;
 	wxDECLARE_EVENT_TABLE();
 };
 
@@ -217,6 +218,7 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
 		pConfig->Write(wxT("enc_path"), srcfolder);
 		pConfig->Write(wxT("mount_path"), dstfolder);
 		pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
+		pConfig->Write(wxT("preventautounmount"), m_chkbx_prevent_autounmount->GetValue());
 		Close(true);
 	}
 
@@ -252,16 +254,22 @@ void frmOpenDialog::Create()
 	sizerGlobal->AddSpacer(15);
 
 	// auto mount ?
-	m_chkbx_automount  = new wxCheckBox(this, ID_CHECK_AUTOMOUNT, "Automatically mount this volume when application starts");
+	m_chkbx_automount  = new wxCheckBox(this, wxID_ANY, "Automatically mount this volume when application starts");
 	m_chkbx_automount->SetValue(false);
     sizerGlobal->Add(m_chkbx_automount);
+
+
+    // prevent auto unmount
+	m_chkbx_prevent_autounmount  = new wxCheckBox(this, wxID_ANY, "Prevent auto-unmounting this volume on application exit");
+	m_chkbx_prevent_autounmount->SetValue(false);
+    sizerGlobal->Add(m_chkbx_prevent_autounmount);
+
 
 	// glue together
 	sizerTop->Add(sizerGlobal, wxSizerFlags(1).Expand().Border());
 
 	// Add "Apply" and "Cancel"
-    sizerTop->Add(CreateStdDialogButtonSizer(wxAPPLY | wxCANCEL),
-                  wxSizerFlags().Right().Border());
+    sizerTop->Add(CreateStdDialogButtonSizer(wxAPPLY | wxCANCEL), wxSizerFlags().Right().Border());
 
 	CentreOnScreen();
 

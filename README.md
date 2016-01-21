@@ -103,7 +103,7 @@ If you want to try the application, you'll need a number of dependencies install
   cd demos;   make;cd ..
   ```
 
-4. Edit the Makefile and update the WX_BUILD_DIR variable to make it reflect the absolute folder structure/path on your own machine
+4. Edit the Makefile and update the WX_BUILD_DIR variable so it would contain the absolute path to the build-release-static folder on your own machine.
 
 5. run `make clean` before compiling/linking
 

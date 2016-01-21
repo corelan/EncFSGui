@@ -135,7 +135,7 @@ class DBEntry
 {
 public:
     // ctor
-    DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount);
+    DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount, bool preventautounmount);
 
     void setMountState(bool);
     bool getMountState();
@@ -143,10 +143,12 @@ public:
     bool getAutoMount();
     wxString getMountPath();
     wxString getVolName();
+    bool getPreventAutoUnmount();
 
 private:
     bool m_mountstate;
     bool m_automount;
+    bool m_preventautounmount;
     wxString m_volname;
     wxString m_enc_path;
     wxString m_mount_path;
@@ -154,12 +156,13 @@ private:
 
 
 // DBENtry constructor
-DBEntry::DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount)
+DBEntry::DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount, bool preventautounmount)
 {
     m_automount = automount;
     m_volname = volname;
     m_enc_path = enc_path;
     m_mount_path = mount_path;
+    m_preventautounmount = preventautounmount;
 }
 
 
@@ -488,17 +491,19 @@ void frmMain::PopulateVolumes()
         wxString mount_path;
         bool automount;
         bool alreadymounted;
+        bool preventautounmount;
         wxString volumename = v_AllVolumes.at(i);
         currentPath.Printf(wxT("/Volumes/%s"), volumename);
         pConfig->SetPath(currentPath);
         enc_path = pConfig->Read(wxT("enc_path"), "");
         mount_path = pConfig->Read(wxT("mount_path"), "");
         automount = pConfig->Read(wxT("automount"), 0l);
+        preventautounmount = pConfig->Read(wxT("preventautounmount"), 0l);
         alreadymounted = IsVolumeSystemMounted(mount_path, mount_output);
 
         if (not enc_path.IsEmpty() && not mount_path.IsEmpty())
         {
-            DBEntry* thisvolume = new DBEntry(volumename, enc_path, mount_path, automount);
+            DBEntry* thisvolume = new DBEntry(volumename, enc_path, mount_path, automount, preventautounmount);
             thisvolume->setMountState(alreadymounted);
             // add to map
             m_VolumeData[volumename] = thisvolume;       
@@ -551,7 +556,7 @@ void AutoUnmountVolumes()
     {
         wxString volumename = it->first;
         DBEntry * thisvol = it->second;
-        if (thisvol->getMountState())
+        if (thisvol->getMountState() && !thisvol->getPreventAutoUnmount())
         {
             unmountVolume(volumename);
         }
@@ -579,7 +584,7 @@ bool QuitApp(wxWindow * parent)
 
     if (autounmount)
     {
-        msg.Printf(wxT("\n*******************\nAll mounted volumes will be automatically unmounted.\nPlease close all open files first! \n******************* \n"));
+        msg.Printf(wxT("\n*******************\nAll mounted volumes will be automatically unmounted, except for the ones that were configured to never auto-unmount.\nPlease close all open files first! \n******************* \n"));
     }
     else
     {
@@ -1398,6 +1403,11 @@ void DBEntry::setMountState(bool newstate)
 bool DBEntry::getMountState()
 {
     return m_mountstate;
+}
+
+bool DBEntry::getPreventAutoUnmount()
+{
+    return m_preventautounmount;
 }
 
 wxString DBEntry::getEncPath()
