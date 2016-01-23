@@ -241,3 +241,19 @@ wxString getKeychainPassword(wxString & volumename)
     return output;
 }
 
+bool doesVolumeExist(wxString & volumename)
+{
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    pConfig->SetPath(wxT("/Volumes"));
+    wxString thisvolumename;
+    long dummy;
+    bool bCont = pConfig->GetFirstGroup(thisvolumename, dummy);
+    while ( bCont ) { 
+        if (thisvolumename == volumename)
+        {
+            return true;
+        }
+        bCont = pConfig->GetNextGroup(thisvolumename, dummy);
+    }
+    return false;
+}

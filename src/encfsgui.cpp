@@ -23,6 +23,11 @@
 
 #include "encfsgui.h"
 
+#define FUSE_USE_VERSION 26
+#include "fuse/fuse.h"
+#include "openssl.h"
+#include "encfs.h"
+
 
 // use bitmaps on windows, xpms on osx
 #ifdef __WINDOWS__
@@ -1175,6 +1180,8 @@ void frmMain::PopulateToolbar(wxToolBarBase* toolBar)
     toolBar->AddTool(ID_Toolbar_Existing, wxT("Open Existing"),
                      toolBarBitmaps[Tool_existingfolder], wxNullBitmap, wxITEM_NORMAL,
                      wxT("Open existing encfs folder"), wxT("Open existing encfs folder"));
+
+    toolBar->AddSeparator();
 
     toolBar->AddTool(ID_Toolbar_Browse, wxT("Browse"),
                      toolBarBitmaps[Tool_browsefolder], wxNullBitmap, wxITEM_NORMAL,

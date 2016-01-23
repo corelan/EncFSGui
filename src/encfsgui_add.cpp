@@ -18,6 +18,8 @@
 #include <wx/dir.h>
 #include <vector>
 #include "encfsgui.h"
+
+
 // ----------------------------------------------------------------------------
 // constants
 // ----------------------------------------------------------------------------
@@ -77,6 +79,7 @@ private:
     wxComboBox * m_combo_keyderivation;
     wxDECLARE_EVENT_TABLE();
     void SetEncfsOptionsState(bool);
+    bool createEncFSFolder();
 };
 
 // event table
@@ -165,7 +168,7 @@ void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
     if (SelectedProfile == ID_ENCFSPROFILE_BALANCED)
     {
         m_combo_cipher_algo->SetValue("AES");
-        m_combo_cipher_blocksize->SetValue("4096");
+        m_combo_cipher_blocksize->SetValue("2048");
         m_combo_cipher_keysize->SetValue("192");
         m_combo_filename_enc->SetValue("Stream");
         m_combo_keyderivation->SetValue("500");
@@ -191,9 +194,9 @@ void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
     else if (SelectedProfile == ID_ENCFSPROFILE_PERFORMANCE)
     {
         m_combo_cipher_algo->SetValue("AES");
-        m_combo_cipher_blocksize->SetValue("2048");
-        m_combo_cipher_keysize->SetValue("160");
-        m_combo_filename_enc->SetValue("Block");
+        m_combo_cipher_blocksize->SetValue("1024");
+        m_combo_cipher_keysize->SetValue("192");
+        m_combo_filename_enc->SetValue("Stream");
         m_combo_keyderivation->SetValue("500");
         m_chkbx_block_mac_headers->SetValue(false);
         m_chkbx_perfile_iv->SetValue(false);
@@ -256,10 +259,9 @@ void frmAddDialog::Create()
     // Cipher
     wxArrayString arrAlgos;
     arrAlgos.Add("AES");
-    arrAlgos.Add("Blowfish");
+    //arrAlgos.Add("Blowfish");
     wxArrayString arrKeySizes;
     arrKeySizes.Add("128");
-    arrKeySizes.Add("160");
     arrKeySizes.Add("192");
     arrKeySizes.Add("256");
     wxArrayString arrBlockSizes;
@@ -272,7 +274,7 @@ void frmAddDialog::Create()
     wxArrayString arrFilenameEnc;
     arrFilenameEnc.Add("Block");
     arrFilenameEnc.Add("Stream");
-    arrFilenameEnc.Add("None");
+    arrFilenameEnc.Add("Null");
     wxArrayString arrKeyDerivationDuration;
     arrKeyDerivationDuration.Add("500");
     arrKeyDerivationDuration.Add("1000");
@@ -404,11 +406,157 @@ void frmAddDialog::ChooseDestinationFolder(wxCommandEvent& WXUNUSED(event))
 }
 
 
+bool frmAddDialog::createEncFSFolder()
+{
+    bool createdok = false;
+    wxString encfsbin = getEncFSBinPath();
+    wxString cmd;
+    wxString args;
+    wxString enc_path = m_source_field->GetValue();
+    wxString pw = m_pass1->GetValue();
+    wxString mount_path = m_destination_field->GetValue();
+    wxString volumename = m_volumename_field->GetValue();
+
+    cmd.Printf(wxT("sh -c \"echo '%s' | %s -v -S '%s' '%s' --volname='%s'\""), pw, encfsbin, enc_path, mount_path, volumename);
+    pw = "";
+    return createdok;
+}
+
 
 void frmAddDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
 {
+    // check if all important fiels were populated
+    bool volname_ok = true;
+    wxString errormsg = ""; 
+    bool src_folder_ok = false;
+    bool dst_folder_ok = false;
+    bool pw_ok = false;
+    wxString newvolumename = m_volumename_field->GetValue();
 
+    // sanitize the name
+    newvolumename.Replace("/","");
+    newvolumename.Replace(" ","");
+    newvolumename.Replace("'","");
+    newvolumename.Replace('"',"");
+    m_volumename_field->SetValue(newvolumename);
 
+    //1. is volume name unique?
+    if (doesVolumeExist(newvolumename))
+    {
+        volname_ok = false;
+    }
+
+    if (newvolumename.IsEmpty())
+    {
+        volname_ok = false;
+    }
+
+    if (!volname_ok)
+    {
+        errormsg << "- Please specify a unique volume name\n";
+    }
+
+    //2. Does source folder exist
+    wxString srcfolder = m_source_field->GetValue();
+    if (!srcfolder.IsEmpty())
+    {
+        wxDir dir(srcfolder);
+        if (!dir.IsOpened())
+        {
+            errormsg << "- Please specify a valid encfs source folder location\n";
+            src_folder_ok = false;
+        }
+        else
+        {
+            src_folder_ok = true;
+        }
+    }
+
+    //3. Does destination folder exist, and is it empty ?
+    wxString dstfolder = m_destination_field->GetValue();
+    if (!dstfolder.IsEmpty())
+    {
+        wxDir * dir = new wxDir(dstfolder);
+        if (!dir->Exists(dstfolder))
+        {
+            errormsg << "- Please specify a valid/existing destination mount point location\n";
+            dst_folder_ok = false;
+        }
+        else
+        {
+            if (dir->HasFiles() && dir->HasSubDirs())
+            {
+                dst_folder_ok = false;
+                errormsg << "- Destination mount point is not empty\n";
+            }
+            else
+            {
+                dst_folder_ok = true;   
+            }
+            
+        }
+    }
+
+    //4. password ok ?
+    if (!m_pass1->IsEmpty())
+    {
+        if (m_pass1->GetValue() == m_pass2->GetValue())
+        {
+            pw_ok = true;
+        }
+        else
+        {
+            errormsg << "- Passwords do not match\n";
+        }
+    }
+    else
+    {
+        errormsg << "- Empty passwords are not allowed\n";
+        }
+
+    if (!volname_ok || !src_folder_ok || !dst_folder_ok || !pw_ok)
+    {
+        wxString title;
+        title.Printf(wxT("Errors found:"));
+        wxMessageDialog * dlg = new wxMessageDialog(this, errormsg, title, wxOK|wxCENTRE|wxICON_ERROR);
+        dlg->ShowModal();
+        dlg->Destroy();
+    }
+    else
+    {
+        // first, create the new volume
+        bool createdok = createEncFSFolder();
+        if (createdok)
+        {
+            // next, save new volume
+            wxString config_volname;
+            wxConfigBase *pConfig = wxConfigBase::Get();
+            config_volname.Printf(wxT("/Volumes/%s"), newvolumename);
+            pConfig->SetPath(config_volname);
+            pConfig->Write(wxT("enc_path"), srcfolder);
+            pConfig->Write(wxT("mount_path"), dstfolder);
+            pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
+            pConfig->Write(wxT("preventautounmount"), m_chkbx_prevent_autounmount->GetValue());
+            pConfig->Write(wxT("passwordsaved"), m_chkbx_save_password->GetValue());
+            // save password in KeyChain, if needed
+            if (m_chkbx_save_password->GetValue())
+            {
+                wxString cmd;
+                wxString pwaddoutput;
+                cmd.Printf(wxT("sh -c \"security add-generic-password -U -a 'EncFSGUI_%s' -s 'EncFSGUI_%s' -w '%s' login.keychain\""), newvolumename, newvolumename, m_pass1->GetValue());
+                pwaddoutput = StrRunCMDSync(cmd);
+            }   
+            Close(true);
+        }
+        else
+        {
+            wxString emsg;
+            emsg.Printf(wxT("Unable to create encfs folder"));
+            wxMessageDialog * dlg = new wxMessageDialog(this, emsg, emsg, wxOK|wxCENTRE|wxICON_ERROR);
+            dlg->ShowModal();
+            dlg->Destroy();
+        }
+    }
 }
 
 
@@ -516,20 +664,9 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     m_volumename_field->SetValue(newvolumename);
 
     //1. is volume name unique?
-    wxConfigBase *pConfig = wxConfigBase::Get();
-    std::vector<wxString> v_volnames;
-    pConfig->SetPath(wxT("/Volumes"));
-    wxString volumename;
-    wxString allNames;
-    long dummy;
-    bool bCont = pConfig->GetFirstGroup(volumename, dummy);
-    while ( bCont ) { 
-        v_volnames.push_back(volumename); 
-        if (volumename == newvolumename)
-        {
-            volname_ok = false;
-        }
-        bCont = pConfig->GetNextGroup(volumename, dummy);
+    if (doesVolumeExist(newvolumename))
+    {
+        volname_ok = false;
     }
 
     if (newvolumename.IsEmpty())
@@ -594,7 +731,7 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
             }
             else
             {
-                errormsg << "- Passwords are not the same\n";
+                errormsg << "- Passwords do not match\n";
             }
         }
         else
@@ -619,6 +756,7 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     {
         // save new volume
         wxString config_volname;
+        wxConfigBase *pConfig = wxConfigBase::Get();
         config_volname.Printf(wxT("/Volumes/%s"), newvolumename);
         pConfig->SetPath(config_volname);
         pConfig->Write(wxT("enc_path"), srcfolder);

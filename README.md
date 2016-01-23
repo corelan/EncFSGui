@@ -20,15 +20,17 @@ If you are looking for an EncFS Gui for Windows, check out the EncFSMP project o
 Also, this is my very first project in C++.  As I started learning C++ just a few weeks ago (self-study), I am fully aware that my C++ stinks. I am quite keen on learning & improving, and I am open for constructive advise and help.<br>
 
 With that said, all positive contributions are more than welcome. If you want to contribute, check out the development setup section first.<br>
-If you want to try the application, you'll need a number of dependencies installed on your OSX machine:
+
+For now, if you want to try the application, you'll need a number of dependencies installed on your OSX machine:
 - encfs
 - OSXFuse
+
+Note: The plan is to statically compile this application with the required dependencies (encfs,fuse, openssl), so you would not have to worry about installing dependencies yourself.
 
 
 ## Running EncFSGUi : Installing dependencies on OSX
 
 (this procedure should work on Yosemite and El Capitan, as those are the 2 versions that I am using myself) 
-
 
 
 1. Install the xcode development command line tools
@@ -92,11 +94,14 @@ If you want to try the application, you'll need a number of dependencies install
 
 
 
+
 ## Development setup
 
-1. Install the depencencies first (procedure listed above)
+### Install dependencies
 
-2. Clone the latest version of the wxWidgets repository from github:
+1. Install the depencencies from the procedure listed above first
+
+2. Clone the latest version of the wxWidgets repository from github to a folder on your local harddrive:
 
   ```
   git clone https://github.com/wxWidgets/wxWidgets.git wxWidgets-latest
@@ -117,13 +122,61 @@ If you want to try the application, you'll need a number of dependencies install
   cd demos;   make;cd ..
   ```
 
-4. Edit the Makefile and update the WX_BUILD_DIR variable so it would contain the absolute path to the build-release-static folder on your own machine.
+4. Install libraries to build encfs
 
-5. run `make clean` before compiling/linking
+  ```
+  brew install cmake
+  brew install openssl
+  brew install gettext
+  ```
 
-6. run `make` to compile and link
 
-7. If you plan on contributing, please create a new branch first.  Do NOT submit pull requests against the master branch.
+5. Clone the latest version of the encfs repository from github onto your harddrive (outside of the wxWidgets folder):
+  ```
+  git clone https://github.com/vgough/encfs.git
+  ```
+
+6. Build encfs
+
+  (From within the new encfs folder)
+  ```
+  mkdir build
+  cd build
+  cmake .. -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
+  make
+  ```
+  (Note: you may have to update the OPENSSL_INCLUDE_DIR and OPENSSL_ROOT_DIR directives, depending on where the files are on your system)
+
+  If you prefer to use this very latest version of encfs instead of the one created via brew, simply run after completing the steps above
+  ```
+  make install
+  ```
+
+
+7. Copy encfs' cpp and h files into the EncFSGUI project
+
+  Copy the 'encfs' folder from your local encfs clone into EncFSGUI/src folder (make sure to keep the encfs subfolder name)
+  Next, copy the config.h file from within the encfs 'build' folder into this newly created EncFSGUI/src/encfs subfolder
+  (This file will be created after running the cmake command in step 6 above)
+
+
+### Before compiling EncFSGUI
+
+4. Edit Makefile
+
+  - update the `WX_BUILD_DIR` variable so it would contain the absolute path to the build-release-static folder on your own machine.
+  - check the paths for `OSXFUSE_INCLUDE_DIR`, `OPENSSL_INCLUDE_DIR` and `OPENSSL_ROOT_DIR`, make sure they contain the correct absolute path on your machine
+
+### Compiling & linking EncFSGUI
+
+1. run `make clean` before compiling/linking
+
+2. run `make` to compile and link
+
+
+## Contribute
+
+If you plan on contributing, please create a new branch first.  Do NOT submit pull requests against the master branch.
 
 
 

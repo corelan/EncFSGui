@@ -28,6 +28,7 @@ wxString arrStrTowxStr(wxArrayString&);
 bool IsVolumeSystemMounted(wxString, wxArrayString);
 void BrowseFolder(wxString&);
 wxString getKeychainPassword(wxString&);
+bool doesVolumeExist(wxString&);
 
 //encfsgui_settings.cpp
 void openSettings(wxWindow *);
