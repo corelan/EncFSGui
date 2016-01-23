@@ -257,11 +257,14 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
 		pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
 		pConfig->Write(wxT("preventautounmount"), m_chkbx_prevent_autounmount->GetValue());
 		pConfig->Write(wxT("passwordsaved"), m_chkbx_save_password->GetValue());
-		// save password in KeyChain
-		wxString cmd;
-		wxString pwaddoutput;
-		cmd.Printf(wxT("sh -c \"security add-generic-password -U -a 'EncFSGUI_%s' -s 'EncFSGUI_%s' -w '%s' login.keychain\""), newvolumename, newvolumename, m_pass1->GetValue());
-		pwaddoutput = StrRunCMDSync(cmd);
+		// save password in KeyChain, if needed
+		if (m_chkbx_save_password->GetValue())
+		{
+			wxString cmd;
+			wxString pwaddoutput;
+			cmd.Printf(wxT("sh -c \"security add-generic-password -U -a 'EncFSGUI_%s' -s 'EncFSGUI_%s' -w '%s' login.keychain\""), newvolumename, newvolumename, m_pass1->GetValue());
+			pwaddoutput = StrRunCMDSync(cmd);			
+		}	
 		Close(true);
 	}
 
