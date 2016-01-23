@@ -26,9 +26,9 @@
 
 // use bitmaps on windows, xpms on osx
 #ifdef __WINDOWS__
-	#define USE_XPM_BITMAPS 0
+    #define USE_XPM_BITMAPS 0
 #else
-	#define USE_XPM_BITMAPS 1
+    #define USE_XPM_BITMAPS 1
 #endif
 
 // If this is 1, the sample will test an extra toolbar identical to the
@@ -79,9 +79,6 @@ enum Positions
     TOOLBAR_TOP
 };    
 
-//Toolbar stuff
-const int ID_TOOLBAR = 500;
-static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
 // globals to keep track of what we have selected in the ListCtrl
 // messy, but convenient
@@ -113,6 +110,7 @@ enum
     ID_Toolbar_Unmount,
     ID_Toolbar_Settings,
     ID_Toolbar_Quit,
+    ID_TOOLBAR,
     ID_List_Ctrl                   = 1000
 };
 
@@ -184,7 +182,12 @@ class mainListCtrl: public wxListCtrl
 {
 public:
     // ctor
-    mainListCtrl(wxWindow *parent, const wxWindowID id, const wxPoint& pos, const wxSize& size, long style, wxStatusBar * statusbar);
+    mainListCtrl(wxWindow *parent, 
+                 const wxWindowID id, 
+                 const wxPoint& pos, 
+                 const wxSize& size, 
+                 long style, 
+                 wxStatusBar * statusbar);
     // event handlers
     //void OnMouseEvent(wxMouseEvent& event);
     void OnItemSelected(wxListEvent& event);
@@ -202,7 +205,12 @@ private:
 
 
 // constructor
-mainListCtrl::mainListCtrl(wxWindow *parent, const wxWindowID id, const wxPoint& pos, const wxSize& size, long style, wxStatusBar * statusbar) : wxListCtrl(parent, id, pos, size, style)
+mainListCtrl::mainListCtrl(wxWindow *parent, 
+                           const wxWindowID id, 
+                           const wxPoint& pos, 
+                           const wxSize& size, 
+                           long style, 
+                           wxStatusBar * statusbar) : wxListCtrl(parent, id, pos, size, style)
 {
     m_statusBar = statusbar;   
 }
@@ -224,7 +232,10 @@ class frmMain : public wxFrame
 {
 public:
     // ctor(s)
-    frmMain(const wxString& title, const wxPoint& pos, const wxSize& size, long style);
+    frmMain(const wxString& title, 
+            const wxPoint& pos, 
+            const wxSize& size, 
+            long style);
 	// dtor
     virtual ~frmMain();
 
@@ -363,7 +374,10 @@ bool encFSGuiApp::OnInit()
 
     framestyle = wxDEFAULT_FRAME_STYLE ^ wxRESIZE_BORDER | wxFRAME_EX_METAL;
 
-    frmMain *frame = new frmMain("encFSGui", wxDefaultPosition, frmMainSize, framestyle );
+    frmMain *frame = new frmMain("encFSGui", 
+                                 wxDefaultPosition, 
+                                 frmMainSize, 
+                                 framestyle );
 
     frame->EnableCloseButton(false);
     // and show it (the frames, unlike simple controls, are not shown when
@@ -385,7 +399,10 @@ bool encFSGuiApp::OnInit()
 
 
 // frame constructor, overload built-in wxFrame
-frmMain::frmMain(const wxString& title, const wxPoint &pos, const wxSize &size, long style) : wxFrame(NULL, wxID_ANY, title, pos, size, style)
+frmMain::frmMain(const wxString& title, 
+                 const wxPoint &pos, 
+                 const wxSize &size, 
+                 long style) : wxFrame(NULL, wxID_ANY, title, pos, size, style)
 {
     
     wxStandardPathsBase& stdp = wxStandardPaths::Get();
@@ -437,7 +454,11 @@ frmMain::frmMain(const wxString& title, const wxPoint &pos, const wxSize &size, 
     m_panel = new wxPanel(this, wxID_ANY);
 
 #if USE_UNMANAGED_TOOLBAR
-    m_extraToolBar = new wxToolBar(m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_TEXT|wxTB_FLAT|wxTB_TOP);
+    m_extraToolBar = new wxToolBar(m_panel, 
+                                   wxID_ANY, 
+                                   wxDefaultPosition, 
+                                   wxDefaultSize, 
+                                   wxTB_TEXT|wxTB_FLAT|wxTB_TOP);
     PopulateToolbar(m_extraToolBar);
 #endif
 
@@ -456,7 +477,12 @@ frmMain::frmMain(const wxString& title, const wxPoint &pos, const wxSize &size, 
     // next, create the actual list control and populate it
     //long flags = wxLC_REPORT | wxLC_SINGLE_SEL | wxLC_ALIGN_LEFT | wxLC_SMALL_ICON | wxLC_HRULES;
     long flags = wxLC_REPORT | wxLC_SINGLE_SEL | wxLC_HRULES | wxLC_ALIGN_LEFT;
-    m_listCtrl = new mainListCtrl(m_panel, ID_List_Ctrl, wxDefaultPosition, wxDefaultSize, flags, m_statusBar );
+    m_listCtrl = new mainListCtrl(m_panel, 
+                                  ID_List_Ctrl, 
+                                  wxDefaultPosition, 
+                                  wxDefaultSize, 
+                                  flags, 
+                                  m_statusBar );
     
     RecreateList();
 
@@ -507,7 +533,12 @@ void frmMain::PopulateVolumes()
         pwsaved = pConfig->Read(wxT("passwordsaved"), 0l);
         if (not enc_path.IsEmpty() && not mount_path.IsEmpty())
         {
-            DBEntry* thisvolume = new DBEntry(volumename, enc_path, mount_path, automount, preventautounmount, pwsaved);
+            DBEntry* thisvolume = new DBEntry(volumename, 
+                                              enc_path, 
+                                              mount_path, 
+                                              automount, 
+                                              preventautounmount, 
+                                              pwsaved);
             thisvolume->setMountState(alreadymounted);
             // add to map
             m_VolumeData[volumename] = thisvolume;       
@@ -779,7 +810,10 @@ bool frmMain::unmountVolumeAsk(wxString& volumename)
     msg.Printf(wxT("Are you sure you want to unmount\n'%s' ?\n\nNote: make sure to close all open files\nbefore clicking 'Yes'."),mountvol);
     title.Printf(wxT("Unmount '%s' ?"), volumename);
 
-    wxMessageDialog * dlg = new wxMessageDialog(this, msg, title, wxYES_NO|wxCENTRE|wxNO_DEFAULT|wxICON_QUESTION);
+    wxMessageDialog * dlg = new wxMessageDialog(this, 
+                                                msg, 
+                                                title, 
+                                                wxYES_NO|wxCENTRE|wxNO_DEFAULT|wxICON_QUESTION);
     if (dlg->ShowModal() == wxID_YES)
     {
         unmountok = unmountVolume(volumename);
@@ -884,7 +918,10 @@ void frmMain::AutoMountVolumes()
                         wxString errortitle;
                         errormsg.Printf(wxT("Unable to mount volume '%s'\nEncfs folder: %s\nMount path: %s"), volumename, encvol, mountvol);
                         errortitle.Printf(wxT("Error found while mounting '%s'"), volumename);
-                        wxMessageDialog * dlg = new wxMessageDialog(this, errormsg, errortitle, wxOK|wxCENTRE|wxICON_ERROR);
+                        wxMessageDialog * dlg = new wxMessageDialog(this, 
+                                                                    errormsg, 
+                                                                    errortitle, 
+                                                                    wxOK|wxCENTRE|wxICON_ERROR);
                         dlg->ShowModal();
                         dlg->Destroy();
                         trymount = false;
@@ -995,7 +1032,12 @@ void frmMain::OnMount(wxCommandEvent& WXUNUSED(event))
 wxString frmMain::getPassWord(wxString& title, wxString& prompt)
 {
     wxString pw = "";
-    wxPasswordEntryDialog * dlg = new wxPasswordEntryDialog(this, prompt, title , wxEmptyString, wxTextEntryDialogStyle, wxDefaultPosition);
+    wxPasswordEntryDialog * dlg = new wxPasswordEntryDialog(this, 
+                                                            prompt, 
+                                                            title , 
+                                                            wxEmptyString, 
+                                                            wxTextEntryDialogStyle, 
+                                                            wxDefaultPosition);
     if (dlg->ShowModal() == wxID_OK)
     {
         pw = dlg->GetValue();
@@ -1090,6 +1132,7 @@ void frmMain::CreateToolbar()
 {
     // delete and recreate the toolbar
     wxToolBarBase *toolBar = GetToolBar();
+    static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
     long style = toolBar ? toolBar->GetWindowStyle() : TOOLBAR_STYLE;
     delete toolBar; // just in case
     SetToolBar(NULL);

@@ -1,8 +1,8 @@
 /*
-	encFSGui - source file contains
-	helper functions
+    encFSGui - source file contains
+    helper functions
 
-	written by Peter Van Eeckhoutte
+    written by Peter Van Eeckhoutte
 
 */
 
@@ -13,12 +13,12 @@
     #include <wx/wx.h>
 #endif
 
-#include <wx/filename.h>	// wxFileName
+#include <wx/filename.h>    // wxFileName
 #include <wx/fileconf.h>
 #include <wx/xml/xml.h>
 #include <wx/config.h>
 #include <wx/log.h>
-#include <wx/utils.h>		// wxExecute
+#include <wx/utils.h>       // wxExecute
 
 
 #include <fstream>
@@ -29,7 +29,7 @@
 
 void ShowMsg(wxString msg)
 {
-	wxLogMessage(msg);
+    wxLogMessage(msg);
 }
 
 
@@ -38,10 +38,10 @@ void ShowMsg(wxString msg)
 // and save to config
 wxString getEncFSBinPath()
 {
-	wxString defaultvalue;
-	wxString configvalue;
+    wxString defaultvalue;
+    wxString configvalue;
 
-	defaultvalue = "/usr/local/bin/encfs";
+    defaultvalue = "/usr/local/bin/encfs";
 
     wxConfigBase *pConfig = wxConfigBase::Get();
 
@@ -49,27 +49,27 @@ wxString getEncFSBinPath()
     // read path from config, or return default value in case config 
     // doesn't exist yet
     configvalue = pConfig->Read(wxT("encfsbinpath"), defaultvalue );
-	
-	if (configvalue.IsEmpty())
-	{
-		configvalue = defaultvalue;
-	}
     
+    if (configvalue.IsEmpty())
+    {
+        configvalue = defaultvalue;
+    }
+
     pConfig->Write(wxT("encfsbinpath"),configvalue);
 
-	return configvalue;
+    return configvalue;
 }
 
 wxString getMountBinPath()
 {
-	wxConfigBase *pConfig = wxConfigBase::Get();
+    wxConfigBase *pConfig = wxConfigBase::Get();
     pConfig->SetPath(wxT("/Config"));
     return pConfig->Read(wxT("mountbin_path"), "/sbin/mount");
 }
 
 wxString getUMountBinPath()
 {
-	wxConfigBase *pConfig = wxConfigBase::Get();
+    wxConfigBase *pConfig = wxConfigBase::Get();
     pConfig->SetPath(wxT("/Config"));
     return pConfig->Read(wxT("umountbin_path"), "/sbin/umount");
 }
@@ -78,24 +78,24 @@ wxString getUMountBinPath()
 // check if binary file exists
 bool isEncFSBinInstalled()
 {
-	wxString encfsbinpath = getEncFSBinPath();
-	if (not encfsbinpath.IsEmpty())
-	{
-		wxFileName encfsbinfile;
-		encfsbinfile = wxFileName::wxFileName(encfsbinpath);
-		if (encfsbinfile.FileExists())
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	else
-	{
-		return false;
-	}
+    wxString encfsbinpath = getEncFSBinPath();
+    if (not encfsbinpath.IsEmpty())
+    {
+        wxFileName encfsbinfile;
+        encfsbinfile = wxFileName::wxFileName(encfsbinpath);
+        if (encfsbinfile.FileExists())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
     return true;
 }
 
@@ -103,28 +103,28 @@ bool isEncFSBinInstalled()
 // convert output array into wxString
 wxString arrStrTowxStr(wxArrayString & input)
 {
-	wxString returnval;
-	returnval = "";
-	size_t count = input.GetCount();
-	if ( !count )
-	    return returnval;
+    wxString returnval;
+    returnval = "";
+    size_t count = input.GetCount();
+    if ( !count )
+        return returnval;
 
-	if (count == 1)
-	{
-		returnval = input[0];
-		return returnval;
-	} 
+    if (count == 1)
+    {
+        returnval = input[0];
+        return returnval;
+    } 
 
-	for ( size_t n = 0; n < count; n++ )
-	{
-	    returnval << input[n];
-	    if (n < count-1)
-	    {
-	    	returnval << "\n";
-	    }
-	}
+    for ( size_t n = 0; n < count; n++ )
+    {
+        returnval << input[n];
+        if (n < count-1)
+        {
+            returnval << "\n";
+        }
+    }
 
-	return returnval;
+    return returnval;
 
 }
 
@@ -133,63 +133,63 @@ wxString arrStrTowxStr(wxArrayString & input)
 wxString StrRunCMDSync(wxString cmd)
 {
     wxExecuteEnv env;
-	wxArrayString output, errors;
-	wxExecute(cmd, output, errors, 0, &env);
-	wxString returnvalue;
-	
-	// command line output may end up in errors
-	// depending on the exit code of the called app
-	// so this is not necessarily a problem
-	size_t count = output.GetCount();
-	if (count)
-	{
-		returnvalue = arrStrTowxStr(output);
-	
-	}
-	count = errors.GetCount();
-	if (count)
-	{	
-		if (!returnvalue.IsEmpty())
-		{
-			returnvalue << "\n";
-		}
-		returnvalue << arrStrTowxStr(errors);
-	}
+    wxArrayString output, errors;
+    wxExecute(cmd, output, errors, 0, &env);
+    wxString returnvalue;
+    
+    // command line output may end up in errors
+    // depending on the exit code of the called app
+    // so this is not necessarily a problem
+    size_t count = output.GetCount();
+    if (count)
+    {
+        returnvalue = arrStrTowxStr(output);
+    
+    }
+    count = errors.GetCount();
+    if (count)
+    {   
+        if (!returnvalue.IsEmpty())
+        {
+            returnvalue << "\n";
+        }
+        returnvalue << arrStrTowxStr(errors);
+    }
 
-	return returnvalue;
+    return returnvalue;
 }
 
 
 wxArrayString ArrRunCMDSync(wxString cmd)
 {
-	wxExecuteEnv env;
-	wxArrayString output, errors;
-	wxExecute(cmd, output, errors, 0, &env);
-	// command line output may end up in errors
-	// depending on the exit code of the called app
-	// so this is not necessarily a problem
-	size_t count = output.GetCount();
-	if (count)
-	{
-		return output;
-	}
-	return errors;
+    wxExecuteEnv env;
+    wxArrayString output, errors;
+    wxExecute(cmd, output, errors, 0, &env);
+    // command line output may end up in errors
+    // depending on the exit code of the called app
+    // so this is not necessarily a problem
+    size_t count = output.GetCount();
+    if (count)
+    {
+        return output;
+    }
+    return errors;
 }
 
 
 // Get EncFS Version by running encfs --version
 wxString getEncFSBinVersion()
 {
-	wxString version = "<unable to get version>";
+    wxString version = "<unable to get version>";
 
-	if (isEncFSBinInstalled())
-	{
-		wxString encfsbinpath = getEncFSBinPath();
-		wxString cmd = encfsbinpath + " --version";
-		version = StrRunCMDSync(cmd);
-	}
+    if (isEncFSBinInstalled())
+    {
+        wxString encfsbinpath = getEncFSBinPath();
+        wxString cmd = encfsbinpath + " --version";
+        version = StrRunCMDSync(cmd);
+    }
 
-	return version;
+    return version;
 }
 
 
@@ -197,27 +197,27 @@ wxString getEncFSBinVersion()
 // to determine if volume is mounted by encfs already
 bool IsVolumeSystemMounted(wxString volpath, wxArrayString mountinfo)
 {
-	bool matchfound = false;
-	size_t count = mountinfo.GetCount();
-	wxString encmarker = "encfs";
-	for ( size_t n = 0; n < count; n++ )
-	{
-		signed int checkval = -1;
-		wxString thisline;
-		thisline = mountinfo[n];
-		if (not thisline.IsEmpty())
-		{
-			signed int pos1;
-			signed int pos2;
-			pos1 = thisline.find(volpath);
-			pos2 = thisline.find(encmarker);
-			if ( (pos1 > checkval) && (pos2 > checkval) )
-			{
-				return true;
-			}
-		}
-	}
-	return matchfound;
+    bool matchfound = false;
+    size_t count = mountinfo.GetCount();
+    wxString encmarker = "encfs";
+    for ( size_t n = 0; n < count; n++ )
+    {
+        signed int checkval = -1;
+        wxString thisline;
+        thisline = mountinfo[n];
+        if (not thisline.IsEmpty())
+        {
+            signed int pos1;
+            signed int pos2;
+            pos1 = thisline.find(volpath);
+            pos2 = thisline.find(encmarker);
+            if ( (pos1 > checkval) && (pos2 > checkval) )
+            {
+                return true;
+            }
+        }
+    }
+    return matchfound;
 }
 
 
@@ -232,12 +232,12 @@ void BrowseFolder(wxString & mountpath)
 
 wxString getKeychainPassword(wxString & volumename)
 {
-	wxString cmd;
-	wxString fullname;
-	wxString output;
-	fullname.Printf(wxT("EncFSGUI_%s"), volumename);
-	cmd.Printf(wxT("sh -c 'security find-generic-password -a \"%s\" -s \"%s\" -w login.keychain'"), fullname, fullname);
-	output = StrRunCMDSync(cmd);
-	return output;
+    wxString cmd;
+    wxString fullname;
+    wxString output;
+    fullname.Printf(wxT("EncFSGUI_%s"), volumename);
+    cmd.Printf(wxT("sh -c 'security find-generic-password -a \"%s\" -s \"%s\" -w login.keychain'"), fullname, fullname);
+    output = StrRunCMDSync(cmd);
+    return output;
 }
 

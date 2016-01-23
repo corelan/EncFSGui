@@ -1,9 +1,9 @@
 /*
-	encFSGui - source file contains
-	code to handle opening existing encFS folders
-	or create new folders
+    encFSGui - source file contains
+    code to handle opening existing encFS folders
+    or create new folders
 
-	written by Peter Van Eeckhoutte
+    written by Peter Van Eeckhoutte
 
 */
 
@@ -24,9 +24,9 @@
 
 enum
 {
-	ID_BTN_CHOOSE_SOURCE,
-	ID_BTN_CHOOSE_DESTINATION,
-	ID_CHECK_AUTOMOUNT
+    ID_BTN_CHOOSE_SOURCE,
+    ID_BTN_CHOOSE_DESTINATION,
+    ID_CHECK_AUTOMOUNT
 };
 
 
@@ -39,13 +39,21 @@ enum
 class frmAddDialog : public wxDialog
 {
 public:
-	frmAddDialog(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, long style);
-	void Create();
+    frmAddDialog(wxWindow *parent, 
+                 const wxString& title, 
+                 const wxPoint& pos, 
+                 const wxSize& size, 
+                 long style);
+    void Create();
 
 };
 
 // constructor
-frmAddDialog::frmAddDialog(wxWindow *parent, const wxString& title, const wxPoint &pos, const wxSize &size, long style) :  wxDialog(parent, wxID_ANY, title, pos, size, style)
+frmAddDialog::frmAddDialog(wxWindow *parent, 
+                           const wxString& title, 
+                           const wxPoint &pos, 
+                           const wxSize &size, 
+                           long style) :  wxDialog(parent, wxID_ANY, title, pos, size, style)
 {
 
 }
@@ -66,21 +74,25 @@ void frmAddDialog::Create()
 class frmOpenDialog : public wxDialog
 {
 public:
-	frmOpenDialog(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, long style);
-	void Create();
-	void ChooseSourceFolder(wxCommandEvent &event);
-	void ChooseDestinationFolder(wxCommandEvent &event);
-	void SaveSettings(wxCommandEvent &event);
+    frmOpenDialog(wxWindow *parent, 
+                  const wxString& title, 
+                  const wxPoint& pos, 
+                  const wxSize& size, 
+                  long style);
+    void Create();
+    void ChooseSourceFolder(wxCommandEvent &event);
+    void ChooseDestinationFolder(wxCommandEvent &event);
+    void SaveSettings(wxCommandEvent &event);
 private:
-	wxTextCtrl * m_source_field;
-	wxTextCtrl * m_destination_field;
-	wxTextCtrl * m_volumename_field;
-	wxTextCtrl * m_pass1;
-	wxTextCtrl * m_pass2;
-	wxCheckBox * m_chkbx_automount;
-	wxCheckBox * m_chkbx_prevent_autounmount;
-	wxCheckBox * m_chkbx_save_password;
-	wxDECLARE_EVENT_TABLE();
+    wxTextCtrl * m_source_field;
+    wxTextCtrl * m_destination_field;
+    wxTextCtrl * m_volumename_field;
+    wxTextCtrl * m_pass1;
+    wxTextCtrl * m_pass2;
+    wxCheckBox * m_chkbx_automount;
+    wxCheckBox * m_chkbx_prevent_autounmount;
+    wxCheckBox * m_chkbx_save_password;
+    wxDECLARE_EVENT_TABLE();
 };
 
 
@@ -92,7 +104,11 @@ wxBEGIN_EVENT_TABLE(frmOpenDialog, wxDialog)
 wxEND_EVENT_TABLE()
 
 // constructor
-frmOpenDialog::frmOpenDialog(wxWindow *parent, const wxString& title, const wxPoint &pos, const wxSize &size, long style) :  wxDialog(parent, wxID_ANY, title, pos, size, style)
+frmOpenDialog::frmOpenDialog(wxWindow *parent, 
+                             const wxString& title, 
+                             const wxPoint &pos, 
+                             const wxSize &size, 
+                             long style) :  wxDialog(parent, wxID_ANY, title, pos, size, style)
 {
     
 }
@@ -101,53 +117,59 @@ frmOpenDialog::frmOpenDialog(wxWindow *parent, const wxString& title, const wxPo
 
 void frmOpenDialog::ChooseSourceFolder(wxCommandEvent& WXUNUSED(event))
 {
-	wxString currentdir;
-	currentdir = m_source_field->GetValue();
-	wxDirDialog openDirDialog(this, "Select existing encfs encrypted folder", currentdir, wxDD_DEFAULT_STYLE);
+    wxString currentdir;
+    currentdir = m_source_field->GetValue();
+    wxDirDialog openDirDialog(this, 
+                              "Select existing encfs encrypted folder", 
+                              currentdir, 
+                              wxDD_DEFAULT_STYLE);
     if (openDirDialog.ShowModal() == wxID_OK)
     {
-    	wxString fn = openDirDialog.GetPath();
-    	m_source_field->SetValue(fn);
+        wxString fn = openDirDialog.GetPath();
+        m_source_field->SetValue(fn);
     }
-    openDirDialog.Destroy();
+openDirDialog.Destroy();
 }
 
 void frmOpenDialog::ChooseDestinationFolder(wxCommandEvent& WXUNUSED(event))
 {
-	wxString currentdir;
-	currentdir = m_destination_field->GetValue();
-	if (currentdir.IsEmpty())
-	{
-		currentdir = "/Volumes";
-	}
-	wxDirDialog openDirDialog(this, "Select destination mount point folder", currentdir, wxDD_DEFAULT_STYLE);
+    wxString currentdir;
+    currentdir = m_destination_field->GetValue();
+    if (currentdir.IsEmpty())
+    {
+        currentdir = "/Volumes";
+    }
+    wxDirDialog openDirDialog(this, 
+                              "Select destination mount point folder", 
+                              currentdir, 
+                              wxDD_DEFAULT_STYLE);
     if (openDirDialog.ShowModal() == wxID_OK)
     {
-    	wxString fn = openDirDialog.GetPath();
-    	m_destination_field->SetValue(fn);
+       wxString fn = openDirDialog.GetPath();
+        m_destination_field->SetValue(fn);
     }
-    openDirDialog.Destroy();
+openDirDialog.Destroy();
 }
 
 void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
 {
-	// check if all important fiels were populated
-	bool volname_ok = true;
-	wxString errormsg = ""; 
-	bool src_folder_ok = false;
-	bool dst_folder_ok = false;
-	bool pw_ok = false;
-	wxString newvolumename = m_volumename_field->GetValue();
+    // check if all important fiels were populated
+    bool volname_ok = true;
+    wxString errormsg = ""; 
+    bool src_folder_ok = false;
+    bool dst_folder_ok = false;
+    bool pw_ok = false;
+    wxString newvolumename = m_volumename_field->GetValue();
 
-	// sanitize the name
-	newvolumename.Replace("/","");
-	newvolumename.Replace(" ","");
-	newvolumename.Replace("'","");
-	newvolumename.Replace('"',"");
-	m_volumename_field->SetValue(newvolumename);
+    // sanitize the name
+    newvolumename.Replace("/","");
+    newvolumename.Replace(" ","");
+    newvolumename.Replace("'","");
+    newvolumename.Replace('"',"");
+    m_volumename_field->SetValue(newvolumename);
 
-	//1. is volume name unique?
-	wxConfigBase *pConfig = wxConfigBase::Get();
+    //1. is volume name unique?
+wxConfigBase *pConfig = wxConfigBase::Get();
     std::vector<wxString> v_volnames;
     pConfig->SetPath(wxT("/Volumes"));
     wxString volumename;
@@ -158,195 +180,195 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
         v_volnames.push_back(volumename); 
         if (volumename == newvolumename)
         {
-        	volname_ok = false;
+            volname_ok = false;
         }
         bCont = pConfig->GetNextGroup(volumename, dummy);
     }
 
-	if (newvolumename.IsEmpty())
-	{
-		volname_ok = false;
-	}
+    if (newvolumename.IsEmpty())
+    {
+        volname_ok = false;
+    }
 
-	if (!volname_ok)
-	{
-		errormsg << "- Please specify a unique volume name\n";
-	}
+    if (!volname_ok)
+    {
+        errormsg << "- Please specify a unique volume name\n";
+    }
 
-	//2. Does source folder exist
-	wxString srcfolder = m_source_field->GetValue();
-	if (!srcfolder.IsEmpty())
-	{
-		wxDir dir(srcfolder);
-		if (!dir.IsOpened())
-		{
-			errormsg << "- Please specify a valid encfs source folder location\n";
-			src_folder_ok = false;
-		}
-		else
-		{
-			src_folder_ok = true;
-		}
-	}
+    //2. Does source folder exist
+    wxString srcfolder = m_source_field->GetValue();
+    if (!srcfolder.IsEmpty())
+    {
+        wxDir dir(srcfolder);
+        if (!dir.IsOpened())
+        {
+            errormsg << "- Please specify a valid encfs source folder location\n";
+            src_folder_ok = false;
+        }
+        else
+        {
+            src_folder_ok = true;
+        }
+    }
 
-	//3. Does destination folder exist, and is it empty ?
-	wxString dstfolder = m_destination_field->GetValue();
-	if (!dstfolder.IsEmpty())
-	{
-		wxDir * dir = new wxDir(dstfolder);
-		if (!dir->Exists(dstfolder))
-		{
-			errormsg << "- Please specify a valid/existing destination mount point location\n";
-			dst_folder_ok = false;
-		}
-		else
-		{
-			if (dir->HasFiles() && dir->HasSubDirs())
-			{
-				dst_folder_ok = false;
-				errormsg << "- Destination mount point is not empty\n";
-			}
-			else
-			{
-				dst_folder_ok = true;	
-			}
-			
-		}
-	}
+    //3. Does destination folder exist, and is it empty ?
+    wxString dstfolder = m_destination_field->GetValue();
+    if (!dstfolder.IsEmpty())
+    {
+        wxDir * dir = new wxDir(dstfolder);
+        if (!dir->Exists(dstfolder))
+        {
+            errormsg << "- Please specify a valid/existing destination mount point location\n";
+            dst_folder_ok = false;
+        }
+        else
+        {
+            if (dir->HasFiles() && dir->HasSubDirs())
+            {
+                dst_folder_ok = false;
+                errormsg << "- Destination mount point is not empty\n";
+            }
+            else
+            {
+                dst_folder_ok = true;   
+            }
+            
+        }
+    }
 
-	//4. save password ?
-	if (m_chkbx_save_password->GetValue())
-	{
-		if (!m_pass1->IsEmpty())
-		{
-			if (m_pass1->GetValue() == m_pass2->GetValue())
-			{
-				pw_ok = true;
-			}
-			else
-			{
-				errormsg << "- Passwords are not the same\n";
-			}
-		}
-		else
-		{
-			errormsg << "- Empty passwords are not allowed\n";
-		}
-	}
-	else
-	{
-		pw_ok = true;
-	}
+    //4. save password ?
+    if (m_chkbx_save_password->GetValue())
+    {
+        if (!m_pass1->IsEmpty())
+        {
+            if (m_pass1->GetValue() == m_pass2->GetValue())
+            {
+                pw_ok = true;
+            }
+            else
+            {
+                errormsg << "- Passwords are not the same\n";
+            }
+        }
+        else
+        {
+            errormsg << "- Empty passwords are not allowed\n";
+        }
+    }
+    else
+    {
+        pw_ok = true;
+    }
 
-	if (!volname_ok || !src_folder_ok || !dst_folder_ok || !pw_ok)
-	{
-		wxString title;
-		title.Printf(wxT("Errors found:"));
-		wxMessageDialog * dlg = new wxMessageDialog(this, errormsg, title, wxOK|wxCENTRE|wxICON_ERROR);
-		dlg->ShowModal();
-		dlg->Destroy();
-	}
-	else
-	{
-		// save new volume
-		wxString config_volname;
-		config_volname.Printf(wxT("/Volumes/%s"), newvolumename);
-		pConfig->SetPath(config_volname);
-		pConfig->Write(wxT("enc_path"), srcfolder);
-		pConfig->Write(wxT("mount_path"), dstfolder);
-		pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
-		pConfig->Write(wxT("preventautounmount"), m_chkbx_prevent_autounmount->GetValue());
-		pConfig->Write(wxT("passwordsaved"), m_chkbx_save_password->GetValue());
-		// save password in KeyChain, if needed
-		if (m_chkbx_save_password->GetValue())
-		{
-			wxString cmd;
-			wxString pwaddoutput;
-			cmd.Printf(wxT("sh -c \"security add-generic-password -U -a 'EncFSGUI_%s' -s 'EncFSGUI_%s' -w '%s' login.keychain\""), newvolumename, newvolumename, m_pass1->GetValue());
-			pwaddoutput = StrRunCMDSync(cmd);			
-		}	
-		Close(true);
-	}
+    if (!volname_ok || !src_folder_ok || !dst_folder_ok || !pw_ok)
+    {
+        wxString title;
+        title.Printf(wxT("Errors found:"));
+        wxMessageDialog * dlg = new wxMessageDialog(this, errormsg, title, wxOK|wxCENTRE|wxICON_ERROR);
+        dlg->ShowModal();
+        dlg->Destroy();
+    }
+    else
+    {
+        // save new volume
+        wxString config_volname;
+        config_volname.Printf(wxT("/Volumes/%s"), newvolumename);
+        pConfig->SetPath(config_volname);
+        pConfig->Write(wxT("enc_path"), srcfolder);
+        pConfig->Write(wxT("mount_path"), dstfolder);
+        pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
+        pConfig->Write(wxT("preventautounmount"), m_chkbx_prevent_autounmount->GetValue());
+        pConfig->Write(wxT("passwordsaved"), m_chkbx_save_password->GetValue());
+        // save password in KeyChain, if needed
+        if (m_chkbx_save_password->GetValue())
+        {
+            wxString cmd;
+            wxString pwaddoutput;
+            cmd.Printf(wxT("sh -c \"security add-generic-password -U -a 'EncFSGUI_%s' -s 'EncFSGUI_%s' -w '%s' login.keychain\""), newvolumename, newvolumename, m_pass1->GetValue());
+            pwaddoutput = StrRunCMDSync(cmd);
+        }   
+        Close(true);
+    }
 
 }
 
 // member functions
 void frmOpenDialog::Create()
 {
-	wxSizer * const sizerMaster = new wxBoxSizer(wxVERTICAL);
-	wxSizer * const sizerVolume = new wxStaticBoxSizer(wxVERTICAL, this, "Volume settings");
-	
-	// desired volume name
-	sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Set unique volume name:"));
-	m_volumename_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
-	sizerVolume->Add(m_volumename_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    wxSizer * const sizerMaster = new wxBoxSizer(wxVERTICAL);
+    wxSizer * const sizerVolume = new wxStaticBoxSizer(wxVERTICAL, this, "Volume settings");
+    
+    // desired volume name
+    sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Set unique volume name:"));
+    m_volumename_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
+    sizerVolume->Add(m_volumename_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
 
-	sizerVolume->AddSpacer(8);
+    sizerVolume->AddSpacer(8);
 
-	// encrypted folder
-	sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Encrypted encfs source folder:"));
-	m_source_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
-	sizerVolume->Add(m_source_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
-	sizerVolume->Add(new wxButton( this , ID_BTN_CHOOSE_SOURCE, wxT("Select encrypted folder")));
+    // encrypted folder
+    sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Encrypted encfs source folder:"));
+    m_source_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
+    sizerVolume->Add(m_source_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerVolume->Add(new wxButton( this , ID_BTN_CHOOSE_SOURCE, wxT("Select encrypted folder")));
 
-	sizerVolume->AddSpacer(8);
+    sizerVolume->AddSpacer(8);
 
-	// mount point
-	sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Destination (mount) folder:"));
-	m_destination_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
-	sizerVolume->Add(m_destination_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
-	sizerVolume->Add(new wxButton( this , ID_BTN_CHOOSE_DESTINATION, wxT("Select mount folder")));
+    // mount point
+    sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Destination (mount) folder:"));
+    m_destination_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
+    sizerVolume->Add(m_destination_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerVolume->Add(new wxButton( this , ID_BTN_CHOOSE_DESTINATION, wxT("Select mount folder")));
 
-	
+    
 
-	wxSizer * const sizerPassword = new wxStaticBoxSizer(wxVERTICAL, this, "Password options");
-	// save password ?
-	m_chkbx_save_password  = new wxCheckBox(this, wxID_ANY, "Save password in Keychain");
-	m_chkbx_save_password->SetValue(false);
+    wxSizer * const sizerPassword = new wxStaticBoxSizer(wxVERTICAL, this, "Password options");
+    // save password ?
+    m_chkbx_save_password  = new wxCheckBox(this, wxID_ANY, "Save password in Keychain");
+    m_chkbx_save_password->SetValue(false);
     sizerPassword->Add(m_chkbx_save_password);
 
 
     wxSizer * const sizerPW1 = new wxBoxSizer(wxHORIZONTAL);
     sizerPW1->Add(new wxStaticText(this, wxID_ANY, "Enter password:"));
-	m_pass1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-	sizerPW1->Add(m_pass1, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    m_pass1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    sizerPW1->Add(m_pass1, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
 
-	sizerPassword->Add(sizerPW1, wxSizerFlags(1).Expand().Border());
+    sizerPassword->Add(sizerPW1, wxSizerFlags(1).Expand().Border());
 
 
     wxSizer * const sizerPW2 = new wxBoxSizer(wxHORIZONTAL);
-	sizerPW2->Add(new wxStaticText(this, wxID_ANY, "Enter password again:"));
-	m_pass2 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-	sizerPW2->Add(m_pass2, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerPW2->Add(new wxStaticText(this, wxID_ANY, "Enter password again:"));
+    m_pass2 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    sizerPW2->Add(m_pass2, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
 
-	sizerPassword->Add(sizerPW2, wxSizerFlags(1).Expand().Border());
-	
+    sizerPassword->Add(sizerPW2, wxSizerFlags(1).Expand().Border());
+    
 
-	wxSizer * const sizerOptions = new wxStaticBoxSizer(wxVERTICAL, this, "Mount options");
+    wxSizer * const sizerOptions = new wxStaticBoxSizer(wxVERTICAL, this, "Mount options");
 
-	// auto mount ?
-	m_chkbx_automount  = new wxCheckBox(this, wxID_ANY, "Automatically mount this volume when application starts");
-	m_chkbx_automount->SetValue(false);
+    // auto mount ?
+    m_chkbx_automount  = new wxCheckBox(this, wxID_ANY, "Automatically mount this volume when application starts");
+    m_chkbx_automount->SetValue(false);
     sizerOptions->Add(m_chkbx_automount);
 
 
     // prevent auto unmount
-	m_chkbx_prevent_autounmount  = new wxCheckBox(this, wxID_ANY, "Prevent auto-unmounting this volume on application exit");
-	m_chkbx_prevent_autounmount->SetValue(false);
+    m_chkbx_prevent_autounmount  = new wxCheckBox(this, wxID_ANY, "Prevent auto-unmounting this volume on application exit");
+    m_chkbx_prevent_autounmount->SetValue(false);
     sizerOptions->Add(m_chkbx_prevent_autounmount);
 
 
-	// glue together
-	sizerMaster->Add(sizerVolume, wxSizerFlags(1).Expand().Border());
-	sizerMaster->Add(sizerPassword, wxSizerFlags(1).Expand().Border());
-	sizerMaster->Add(sizerOptions, wxSizerFlags(1).Expand().Border());
+    // glue together
+    sizerMaster->Add(sizerVolume, wxSizerFlags(1).Expand().Border());
+    sizerMaster->Add(sizerPassword, wxSizerFlags(1).Expand().Border());
+    sizerMaster->Add(sizerOptions, wxSizerFlags(1).Expand().Border());
 
-	// Add "Apply" and "Cancel"
+    // Add "Apply" and "Cancel"
     sizerMaster->Add(CreateStdDialogButtonSizer(wxAPPLY | wxCANCEL), wxSizerFlags().Right().Border());
 
-	CentreOnScreen();
+    CentreOnScreen();
 
-	SetSizer(sizerMaster);
+    SetSizer(sizerMaster);
 }
 
 
@@ -356,16 +378,20 @@ void frmOpenDialog::Create()
 
 void createNewEncFSFolder(wxWindow *parent)
 {
-	wxSize frmAddSize;
-	frmAddSize.Set(500,640);
-	long framestyle;
-	framestyle = wxDEFAULT_FRAME_STYLE | wxFRAME_EX_METAL;
+    wxSize frmAddSize;
+    frmAddSize.Set(500,640);
+    long framestyle;
+    framestyle = wxDEFAULT_FRAME_STYLE | wxFRAME_EX_METAL;
 
-	wxString strTitle;
-	strTitle.Printf( "Create a new EncFS folder");	
-	
-    frmOpenDialog* dlg = new frmOpenDialog(parent, strTitle, wxDefaultPosition, frmAddSize, framestyle);
- 	dlg->Create();
+    wxString strTitle;
+    strTitle.Printf( "Create a new EncFS folder");  
+    
+    frmOpenDialog* dlg = new frmOpenDialog(parent, 
+                                           strTitle, 
+                                           wxDefaultPosition, 
+                                           frmAddSize, 
+                                           framestyle);
+    dlg->Create();
     dlg->ShowModal();
 
 }
@@ -373,15 +399,19 @@ void createNewEncFSFolder(wxWindow *parent)
 
 void openExistingEncFSFolder(wxWindow *parent)
 {
-	wxSize frmOpenSize;
-	frmOpenSize.Set(500,540);
-	long framestyle;
-	framestyle = wxDEFAULT_FRAME_STYLE | wxFRAME_EX_METAL;
+    wxSize frmOpenSize;
+    frmOpenSize.Set(500,540);
+    long framestyle;
+    framestyle = wxDEFAULT_FRAME_STYLE | wxFRAME_EX_METAL;
 
-	wxString strTitle;
-	strTitle.Printf( "Open an existing EncFS folder");	
-	
-    frmOpenDialog* dlg = new frmOpenDialog(parent, strTitle, wxDefaultPosition, frmOpenSize, framestyle);
+    wxString strTitle;
+    strTitle.Printf( "Open an existing EncFS folder");  
+    
+    frmOpenDialog* dlg = new frmOpenDialog(parent, 
+                                           strTitle, 
+                                           wxDefaultPosition, 
+                                           frmOpenSize, 
+                                           framestyle);
     dlg->Create();
     dlg->ShowModal();
 }
