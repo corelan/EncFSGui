@@ -230,3 +230,14 @@ void BrowseFolder(wxString & mountpath)
     wxExecute(cmd, wxEXEC_ASYNC, NULL, &env);
 }
 
+wxString getKeychainPassword(wxString & volumename)
+{
+	wxString cmd;
+	wxString fullname;
+	wxString output;
+	fullname.Printf(wxT("EncFSGUI_%s"), volumename);
+	cmd.Printf(wxT("sh -c 'security find-generic-password -a \"%s\" -s \"%s\" -w login.keychain'"), fullname, fullname);
+	output = StrRunCMDSync(cmd);
+	return output;
+}
+

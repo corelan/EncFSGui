@@ -135,10 +135,11 @@ class DBEntry
 {
 public:
     // ctor
-    DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount, bool preventautounmount);
+    DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount, bool preventautounmount, bool pwsaved);
 
     void setMountState(bool);
     bool getMountState();
+    bool getPwSavedState();
     wxString getEncPath();
     bool getAutoMount();
     wxString getMountPath();
@@ -149,6 +150,7 @@ private:
     bool m_mountstate;
     bool m_automount;
     bool m_preventautounmount;
+    bool m_pwsaved;
     wxString m_volname;
     wxString m_enc_path;
     wxString m_mount_path;
@@ -156,13 +158,14 @@ private:
 
 
 // DBENtry constructor
-DBEntry::DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount, bool preventautounmount)
+DBEntry::DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount, bool preventautounmount, bool pwsaved)
 {
     m_automount = automount;
     m_volname = volname;
     m_enc_path = enc_path;
     m_mount_path = mount_path;
     m_preventautounmount = preventautounmount;
+    m_pwsaved = pwsaved;
 }
 
 
@@ -492,6 +495,7 @@ void frmMain::PopulateVolumes()
         bool automount;
         bool alreadymounted;
         bool preventautounmount;
+        bool pwsaved;
         wxString volumename = v_AllVolumes.at(i);
         currentPath.Printf(wxT("/Volumes/%s"), volumename);
         pConfig->SetPath(currentPath);
@@ -500,10 +504,10 @@ void frmMain::PopulateVolumes()
         automount = pConfig->Read(wxT("automount"), 0l);
         preventautounmount = pConfig->Read(wxT("preventautounmount"), 0l);
         alreadymounted = IsVolumeSystemMounted(mount_path, mount_output);
-
+        pwsaved = pConfig->Read(wxT("passwordsaved"), 0l);
         if (not enc_path.IsEmpty() && not mount_path.IsEmpty())
         {
-            DBEntry* thisvolume = new DBEntry(volumename, enc_path, mount_path, automount, preventautounmount);
+            DBEntry* thisvolume = new DBEntry(volumename, enc_path, mount_path, automount, preventautounmount, pwsaved);
             thisvolume->setMountState(alreadymounted);
             // add to map
             m_VolumeData[volumename] = thisvolume;       
@@ -722,7 +726,9 @@ int frmMain::mountFolder(wxString& volumename, wxString& pw)
     cmdoutput = StrRunCMDSync(cmd);
 
     // mount
-    cmd.Printf(wxT("sh -c \"echo %s | %s -v -S -o volname='%s' '%s' '%s'\""), pw, encfsbin, volumename, encvol, mountvol);
+    // TO DO : figure out a way to allow the use of single quotes in password (and other characters that would break the command below if not properly handled)
+    cmd.Printf(wxT("sh -c \"echo '%s' | %s -v -S -o volname='%s' '%s' '%s'\""), pw, encfsbin, volumename, encvol, mountvol);
+
     cmdoutput = StrRunCMDSync(cmd);
 
     // check if mount was successful
@@ -845,12 +851,24 @@ void frmMain::AutoMountVolumes()
             {
                 wxString msg;
                 msg.Printf(wxT("%sPlease enter password to auto-mount\n'%s'\nas\n'%s'"), extratxt, encvol, mountvol);
-                wxString pw = getPassWord(title, msg);
+                wxString pw;
+                if (thisvol->getPwSavedState())
+                {
+                    pw = getKeychainPassword(volumename);
+                }
+                else
+                {
+                    pw = getPassWord(title, msg);
+                }
+                 
+                
                 if (!pw.IsEmpty())
                 {
                      // try mount
                     int mountstatus = mountFolder(volumename, pw);
+                    // to do : instead of setting pw to a new value, clear out memory location directly 
                     pw = "GoodLuckWithThat";
+
                     if (mountstatus == ID_MNT_PWDFAIL)
                     {
                         extratxt.Printf(wxT("** You have entered an invalid password **\n\n"));
@@ -929,7 +947,16 @@ void frmMain::OnMount(wxCommandEvent& WXUNUSED(event))
     while (trymount)
     {
         msg.Printf(wxT("%sPlease enter password to mount\n'%s'\nas\n'%s'"), extratxt, encvol,mountvol);
-        wxString pw = getPassWord(title, msg);
+        wxString pw;
+        if (thisvol->getPwSavedState())
+        {
+            pw = getKeychainPassword(g_selectedVolume);
+        }
+        else
+        {
+            pw = getPassWord(title, msg);   
+        }
+
         if (!pw.IsEmpty())
         {
             // try mount
@@ -1384,6 +1411,11 @@ bool DBEntry::getMountState()
 bool DBEntry::getPreventAutoUnmount()
 {
     return m_preventautounmount;
+}
+
+bool DBEntry::getPwSavedState()
+{
+    return m_pwsaved;
 }
 
 wxString DBEntry::getEncPath()

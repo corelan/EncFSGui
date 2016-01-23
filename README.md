@@ -22,19 +22,24 @@ If you want to try the application, you'll need a number of dependencies install
 
 (this procedure should work on Yosemite and El Capitan, as those are the 2 versions that I am using myself) 
 
-1. Install XCode 7
-
-  (Look for it in the app store yo)
 
 
-2. Install command line tools
+1. Install the xcode development command line tools
+
+  Simply run 'gcc', OSX should ask you if you want to install the xcode command lines tools
+
+  ```
+  gcc
+  ```
+
+  If you already have XCode installed (which is not needed by itself to compile this app), you can also run:
 
   ```
   xcode-select --install
   ```
 
   Verify that the command line tools are installed correctly:<br>
-  `xcode-select -p` 	(should print out a path that ends with 'Developer')<br>
+  `xcode-select -p` 	(should print out a path that ends with 'Developer', but this will only work if you have xcode installed)<br>
   `gcc -version`		(should print out version information)<br>
 
 
@@ -42,6 +47,7 @@ If you want to try the application, you'll need a number of dependencies install
 
   ```
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  sudo chown -R $(whoami) /usr/local/lib
   brew doctor
   ```
 
@@ -63,6 +69,7 @@ If you want to try the application, you'll need a number of dependencies install
   sudo chown -R $USER:admin /usr/local/lib/pkgconfig
   brew link xz libtool boost rlog
   ```
+  (install xz libtool etc first if needed)
 
   Then check if everything is ok and finally install encfs
 
