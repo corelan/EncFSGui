@@ -5,7 +5,7 @@ Public repository for the encfsgui project, an OSX GUI wrapper around encfs
 ## Warning 
 This application is NOT ready for use yet. <br>
 It is still under heavy development and will be updated on a regular basis.<br>
-Proper announcements will be made when the app is ready for use. <br><br>
+Proper announcements will be made when the app is ready for use. <br>
 
 ## Donate
 
@@ -21,11 +21,10 @@ Also, this is my very first project in C++.  As I started learning C++ just a fe
 
 With that said, all positive contributions are more than welcome. If you want to contribute, check out the development setup section first.<br>
 
-For now, if you want to try the application, you'll need a number of dependencies installed on your OSX machine:
+Although the plan is to statically compile this application with the required dependencies (encfs, fuse, openssl), so you would not have to worry about installing dependencies yourself.<br>
+So, for now, if you want to try the application, you'll need a number of dependencies installed on your OSX machine:
 - encfs
 - OSXFuse
-
-Note: The plan is to statically compile this application with the required dependencies (encfs,fuse, openssl), so you would not have to worry about installing dependencies yourself.
 
 
 ## Running EncFSGUi : Installing dependencies on OSX

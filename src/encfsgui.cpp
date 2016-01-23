@@ -35,7 +35,6 @@
 
 
 
-
 // use bitmaps on windows, xpms on osx
 #ifdef __WINDOWS__
     #define USE_XPM_BITMAPS 0
