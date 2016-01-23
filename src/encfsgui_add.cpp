@@ -273,71 +273,80 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
 // member functions
 void frmOpenDialog::Create()
 {
-	wxSizer * const sizerTop = new wxBoxSizer(wxVERTICAL);
-	wxSizer * const sizerFolder = new wxStaticBoxSizer(wxVERTICAL, this, "Folder settings");
-
-
+	wxSizer * const sizerMaster = new wxBoxSizer(wxVERTICAL);
+	wxSizer * const sizerVolume = new wxStaticBoxSizer(wxVERTICAL, this, "Volume settings");
+	
 	// desired volume name
-	sizerFolder->Add(new wxStaticText(this, wxID_ANY, "&Set unique volume name:"));
+	sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Set unique volume name:"));
 	m_volumename_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
-	sizerFolder->Add(m_volumename_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 10).Expand());
+	sizerVolume->Add(m_volumename_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
 
-	sizerFolder->AddSpacer(8);
+	sizerVolume->AddSpacer(8);
 
 	// encrypted folder
-	sizerFolder->Add(new wxStaticText(this, wxID_ANY, "&Encrypted encfs source folder:"));
+	sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Encrypted encfs source folder:"));
 	m_source_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
-	sizerFolder->Add(m_source_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 10).Expand());
-	sizerFolder->Add(new wxButton( this , ID_BTN_CHOOSE_SOURCE, wxT("Select encrypted folder")));
+	sizerVolume->Add(m_source_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+	sizerVolume->Add(new wxButton( this , ID_BTN_CHOOSE_SOURCE, wxT("Select encrypted folder")));
 
-	sizerFolder->AddSpacer(8);
+	sizerVolume->AddSpacer(8);
 
 	// mount point
-	sizerFolder->Add(new wxStaticText(this, wxID_ANY, "&Destination (mount) folder:"));
+	sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Destination (mount) folder:"));
 	m_destination_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
-	sizerFolder->Add(m_destination_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 10).Expand());
-	sizerFolder->Add(new wxButton( this , ID_BTN_CHOOSE_DESTINATION, wxT("Select mount folder")));
+	sizerVolume->Add(m_destination_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+	sizerVolume->Add(new wxButton( this , ID_BTN_CHOOSE_DESTINATION, wxT("Select mount folder")));
 
-	sizerFolder->AddSpacer(15);
+	
 
+	wxSizer * const sizerPassword = new wxStaticBoxSizer(wxVERTICAL, this, "Password options");
 	// save password ?
-
 	m_chkbx_save_password  = new wxCheckBox(this, wxID_ANY, "Save password in Keychain");
 	m_chkbx_save_password->SetValue(false);
-    sizerFolder->Add(m_chkbx_save_password);
+    sizerPassword->Add(m_chkbx_save_password);
 
-    sizerFolder->Add(new wxStaticText(this, wxID_ANY, "Enter password:"));
+
+    wxSizer * const sizerPW1 = new wxBoxSizer(wxHORIZONTAL);
+    sizerPW1->Add(new wxStaticText(this, wxID_ANY, "Enter password:"));
 	m_pass1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-	sizerFolder->Add(m_pass1, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 10).Expand());
+	sizerPW1->Add(m_pass1, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
 
-	sizerFolder->Add(new wxStaticText(this, wxID_ANY, "Enter password again:"));
+	sizerPassword->Add(sizerPW1, wxSizerFlags(1).Expand().Border());
+
+
+    wxSizer * const sizerPW2 = new wxBoxSizer(wxHORIZONTAL);
+	sizerPW2->Add(new wxStaticText(this, wxID_ANY, "Enter password again:"));
 	m_pass2 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-	sizerFolder->Add(m_pass2, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 10).Expand());
+	sizerPW2->Add(m_pass2, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
 
+	sizerPassword->Add(sizerPW2, wxSizerFlags(1).Expand().Border());
+	
 
-	sizerFolder->AddSpacer(15);
+	wxSizer * const sizerOptions = new wxStaticBoxSizer(wxVERTICAL, this, "Mount options");
 
 	// auto mount ?
 	m_chkbx_automount  = new wxCheckBox(this, wxID_ANY, "Automatically mount this volume when application starts");
 	m_chkbx_automount->SetValue(false);
-    sizerFolder->Add(m_chkbx_automount);
+    sizerOptions->Add(m_chkbx_automount);
 
 
     // prevent auto unmount
 	m_chkbx_prevent_autounmount  = new wxCheckBox(this, wxID_ANY, "Prevent auto-unmounting this volume on application exit");
 	m_chkbx_prevent_autounmount->SetValue(false);
-    sizerFolder->Add(m_chkbx_prevent_autounmount);
+    sizerOptions->Add(m_chkbx_prevent_autounmount);
 
 
 	// glue together
-	sizerTop->Add(sizerFolder, wxSizerFlags(1).Expand().Border());
+	sizerMaster->Add(sizerVolume, wxSizerFlags(1).Expand().Border());
+	sizerMaster->Add(sizerPassword, wxSizerFlags(1).Expand().Border());
+	sizerMaster->Add(sizerOptions, wxSizerFlags(1).Expand().Border());
 
 	// Add "Apply" and "Cancel"
-    sizerTop->Add(CreateStdDialogButtonSizer(wxAPPLY | wxCANCEL), wxSizerFlags().Right().Border());
+    sizerMaster->Add(CreateStdDialogButtonSizer(wxAPPLY | wxCANCEL), wxSizerFlags().Right().Border());
 
 	CentreOnScreen();
 
-	SetSizer(sizerTop);
+	SetSizer(sizerMaster);
 }
 
 
