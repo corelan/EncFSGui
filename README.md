@@ -155,9 +155,9 @@ Note: The plan is to statically compile this application with the required depen
 
 7. Copy encfs' cpp and h files into the EncFSGUI project
 
-  Copy the 'encfs' folder from your local encfs clone into EncFSGUI/src folder (make sure to keep the encfs subfolder name)
-  Next, copy the config.h file from within the encfs 'build' folder into this newly created EncFSGUI/src/encfs subfolder
-  (This file will be created after running the cmake command in step 6 above)
+  Copy the 'encfs' folder from your local encfs clone into EncFSGUI/src folder (make sure to keep the encfs subfolder name)<br>
+  Next, copy the config.h file from within the encfs 'build' folder into this newly created EncFSGUI/src/encfs subfolder<br>
+  (This file will be created after running the cmake command in step 6 above)<br>
 
 
 ### Before compiling EncFSGUI
