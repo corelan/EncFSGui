@@ -17,6 +17,12 @@ If you want to try the application, you'll need a number of dependencies install
 - encfs
 - OSXFuse
 
+## Donate
+
+If you like this initiative and want to show your appreciation, please consider donating using [this link](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&bn=EncFSGUI&business=peter.ve@corelan.be&currency_code=EUR&item_name=Support%20EncFSGui%20Project)<br>
+
+(I could have decided to distribute this as a commercial source-closed project and sell it via the App Store... but I didn't, despite the fact that 'there is no free lunch')<br>
+
 
 ## Running EncFSGUi : Installing dependencies on OSX
 
