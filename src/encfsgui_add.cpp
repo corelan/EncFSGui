@@ -19,6 +19,7 @@
 #include <vector>
 #include "encfsgui.h"
 
+#include "encfs.h"
 
 // ----------------------------------------------------------------------------
 // constants

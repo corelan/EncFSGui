@@ -5,10 +5,11 @@ WX_BUILD_DIR=/Users/corelanc0d3r/wxWidgets/wxWidgets-latest/build-release-static
 OSXFUSE_INCLUDE_DIR=/usr/local/include/osxfuse
 OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
 OPENSSL_LIB_DIR=/usr/local/opt/openssl/lib
+ENCFS_INCLUDE_DIR=./encfs 
 
 COMPILER=g++
 LINKER=g++
-COMPFLAGS=`$(WX_BUILD_DIR)/wx-config --static=yes --cxxflags` -mmacosx-version-min=10.5 -D__WXOSX_COCOA__  -DWXUSINGDLL -Wall -Wundef -Wunused-parameter -Wno-ctor-dtor-privacy -Woverloaded-virtual -Wno-deprecated-declarations  -D_FILE_OFFSET_BITS=64 -I$(WX_BUILD_DIR)/lib/wx/include/osx_cocoa-unicode-3.1 -I../../../include -DWX_PRECOMP -g -O0 -fno-common -fvisibility=hidden -fvisibility-inlines-hidden -I./encfs -I$(OSXFUSE_INCLUDE_DIR) -I$(OPENSSL_INCLUDE_DIR) -I/usr/local/include
+COMPFLAGS=`$(WX_BUILD_DIR)/wx-config --static=yes --cxxflags` -mmacosx-version-min=10.5 -D__WXOSX_COCOA__  -DWXUSINGDLL -Wall -Wundef -Wunused-parameter -Wno-ctor-dtor-privacy -Woverloaded-virtual -Wno-deprecated-declarations  -D_FILE_OFFSET_BITS=64 -I$(WX_BUILD_DIR)/lib/wx/include/osx_cocoa-unicode-3.1 -I../../../include -DWX_PRECOMP -g -O0 -fno-common -fvisibility=hidden -fvisibility-inlines-hidden -I$(ENCFS_INCLUDE_DIR) -I$(OSXFUSE_INCLUDE_DIR) -I$(OPENSSL_INCLUDE_DIR) -I/usr/local/include
 LINKFLAGS=-mmacosx-version-min=10.5 `$(WX_BUILD_DIR)/wx-config --static=yes --libs` -L$(OPENSSL_LIB_DIR) 
 SOURCES=*.cpp
 OBJECTS=$(SOURCES:.cpp=.o)

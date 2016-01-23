@@ -152,11 +152,13 @@ So, for now, if you want to try the application, you'll need a number of depende
   ```
 
 
-7. Copy encfs' cpp and h files into the EncFSGUI project
+7. Copy encfs' cpp and h files into the EncFSGUI project folder
 
   Copy the 'encfs' folder from your local encfs clone into EncFSGUI/src folder (make sure to keep the encfs subfolder name)<br>
   Next, copy the config.h file from within the encfs 'build' folder into this newly created EncFSGUI/src/encfs subfolder<br>
   (This file will be created after running the cmake command in step 6 above)<br>
+
+  If you don't want to copy the encfs files over, you'll have to update the Makefile (see later) and update the `ENCFS_INCLUDE_DIR` value, making it point to the 'encfs' folder inside the encfs git clone.  Don't forget to copy config.h into that encfs folder of the git clone as well, and you should be all set.
 
 
 ### Before compiling EncFSGUI
