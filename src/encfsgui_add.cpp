@@ -306,19 +306,25 @@ void frmOpenDialog::Create()
     sizerVolume->AddSpacer(8);
 
     // encrypted folder
+
     sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Encrypted encfs source folder:"));
-    m_source_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
-    sizerVolume->Add(m_source_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
-    sizerVolume->Add(new wxButton( this , ID_BTN_CHOOSE_SOURCE, wxT("Select encrypted folder")));
+
+    wxSizer * const sizerSRC = new wxBoxSizer(wxHORIZONTAL);
+    m_source_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(370,22));
+    sizerSRC->Add(m_source_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerSRC->Add(new wxButton( this , ID_BTN_CHOOSE_SOURCE, wxT("Select")));
+    
+    sizerVolume->Add(sizerSRC,wxSizerFlags(1).Expand().Border());
 
     sizerVolume->AddSpacer(8);
 
     // mount point
     sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Destination (mount) folder:"));
-    m_destination_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
-    sizerVolume->Add(m_destination_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
-    sizerVolume->Add(new wxButton( this , ID_BTN_CHOOSE_DESTINATION, wxT("Select mount folder")));
-
+    wxSizer * const sizerDST = new wxBoxSizer(wxHORIZONTAL);
+    m_destination_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(370,22));
+    sizerDST->Add(m_destination_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerDST->Add(new wxButton( this , ID_BTN_CHOOSE_DESTINATION, wxT("Select")));
+    sizerVolume->Add(sizerDST,wxSizerFlags(1).Expand().Border());
     
 
     wxSizer * const sizerPassword = new wxStaticBoxSizer(wxVERTICAL, this, "Password options");
@@ -400,7 +406,7 @@ void createNewEncFSFolder(wxWindow *parent)
 void openExistingEncFSFolder(wxWindow *parent)
 {
     wxSize frmOpenSize;
-    frmOpenSize.Set(500,540);
+    frmOpenSize.Set(500,500);
     long framestyle;
     framestyle = wxDEFAULT_FRAME_STYLE | wxFRAME_EX_METAL;
 
