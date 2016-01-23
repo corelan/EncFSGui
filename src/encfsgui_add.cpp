@@ -26,7 +26,11 @@ enum
 {
     ID_BTN_CHOOSE_SOURCE,
     ID_BTN_CHOOSE_DESTINATION,
-    ID_CHECK_AUTOMOUNT
+    ID_RADIO_PROFILE,
+    ID_ENCFSPROFILE_BALANCED,
+    ID_ENCFSPROFILE_PERFORMANCE,
+    ID_ENCFSPROFILE_SECURE,
+    ID_ENCFSPROFILE_CUSTOM
 };
 
 
@@ -34,6 +38,9 @@ enum
 // Classes
 // ----------------------------------------------------------------------------
 
+//   ------------------------------------------
+// frmAddDialog - create a new encfs folder
+//   ------------------------------------------
 
 
 class frmAddDialog : public wxDialog
@@ -45,8 +52,41 @@ public:
                  const wxSize& size, 
                  long style);
     void Create();
-
+    void ChooseSourceFolder(wxCommandEvent &event);
+    void ChooseDestinationFolder(wxCommandEvent &event);
+    void SaveSettings(wxCommandEvent &event);
+    void SetEncFSProfileSelection(wxCommandEvent &event);
+    void ApplyEncFSProfileSelection(int);
+private:
+    wxTextCtrl * m_source_field;
+    wxTextCtrl * m_destination_field;
+    wxTextCtrl * m_volumename_field;
+    wxTextCtrl * m_pass1;
+    wxTextCtrl * m_pass2;
+    wxCheckBox * m_chkbx_automount;
+    wxCheckBox * m_chkbx_prevent_autounmount;
+    wxCheckBox * m_chkbx_save_password;
+    wxCheckBox * m_chkbx_perfile_iv;
+    wxCheckBox * m_chkbx_external_iv_chaining;
+    wxCheckBox * m_chkbx_filename_to_iv_header_chaining;
+    wxCheckBox * m_chkbx_block_mac_headers;
+    wxComboBox * m_combo_cipher_algo;
+    wxComboBox * m_combo_cipher_keysize;
+    wxComboBox * m_combo_cipher_blocksize;
+    wxComboBox * m_combo_filename_enc;
+    wxComboBox * m_combo_keyderivation;
+    wxDECLARE_EVENT_TABLE();
+    void SetEncfsOptionsState(bool);
 };
+
+// event table
+wxBEGIN_EVENT_TABLE(frmAddDialog, wxDialog)
+    EVT_BUTTON(ID_BTN_CHOOSE_SOURCE,  frmAddDialog::ChooseSourceFolder)
+    EVT_BUTTON(ID_BTN_CHOOSE_DESTINATION,  frmAddDialog::ChooseDestinationFolder)
+    EVT_BUTTON(wxID_APPLY, frmAddDialog::SaveSettings)
+    EVT_RADIOBOX(ID_RADIO_PROFILE, frmAddDialog::SetEncFSProfileSelection)
+wxEND_EVENT_TABLE()
+
 
 // constructor
 frmAddDialog::frmAddDialog(wxWindow *parent, 
@@ -58,16 +98,323 @@ frmAddDialog::frmAddDialog(wxWindow *parent,
 
 }
 
+// event functions
+void frmAddDialog::SetEncFSProfileSelection(wxCommandEvent& event)
+{
+    int selectedProfile = ID_ENCFSPROFILE_BALANCED;
+    wxString selectedOption;
+    selectedOption = event.GetString();
+
+    if (selectedOption == "Balanced")
+    {
+        selectedProfile = ID_ENCFSPROFILE_BALANCED;
+    }
+    else if (selectedOption == "Secure")
+    {
+        selectedProfile = ID_ENCFSPROFILE_SECURE;
+    }
+    else if (selectedOption == "Performance")
+    {
+        selectedProfile = ID_ENCFSPROFILE_PERFORMANCE;
+    }
+    else if (selectedOption == "Custom")
+    {
+        selectedProfile = ID_ENCFSPROFILE_CUSTOM;
+    }
+
+    ApplyEncFSProfileSelection(selectedProfile);
+}
+
 
 // member functions
 
-void frmAddDialog::Create()
+void frmAddDialog::SetEncfsOptionsState(bool enabledstate)
 {
+    if (!enabledstate)
+    {
+        m_combo_cipher_algo->Disable();
+        m_combo_cipher_keysize->Disable();
+        m_combo_cipher_blocksize->Disable();
+        m_combo_filename_enc->Disable();
+        m_combo_keyderivation->Disable();
+        m_chkbx_perfile_iv->Disable();
+        m_chkbx_block_mac_headers->Disable();
+        m_chkbx_external_iv_chaining->Disable();
+        m_chkbx_filename_to_iv_header_chaining->Disable();
+    }
+    else
+    {
+        m_combo_cipher_algo->Enable();
+        m_combo_cipher_keysize->Enable();
+        m_combo_cipher_blocksize->Enable();
+        m_combo_filename_enc->Enable();
+        m_combo_keyderivation->Enable();
+        m_chkbx_perfile_iv->Enable();
+        m_chkbx_block_mac_headers->Enable();
+        m_chkbx_external_iv_chaining->Enable();
+        m_chkbx_filename_to_iv_header_chaining->Enable();        
+    }
 
 }
 
 
-//
+// member functions
+
+void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
+{
+    if (SelectedProfile == ID_ENCFSPROFILE_BALANCED)
+    {
+        m_combo_cipher_algo->SetValue("AES");
+        m_combo_cipher_blocksize->SetValue("4096");
+        m_combo_cipher_keysize->SetValue("192");
+        m_combo_filename_enc->SetValue("Stream");
+        m_combo_keyderivation->SetValue("500");
+        m_chkbx_block_mac_headers->SetValue(false);
+        m_chkbx_perfile_iv->SetValue(true);
+        m_chkbx_external_iv_chaining->SetValue(false);
+        m_chkbx_filename_to_iv_header_chaining->SetValue(true);
+        SetEncfsOptionsState(false);
+    }
+    else if (SelectedProfile == ID_ENCFSPROFILE_SECURE)
+    {
+        m_combo_cipher_algo->SetValue("AES");
+        m_combo_cipher_blocksize->SetValue("4096");
+        m_combo_cipher_keysize->SetValue("256");
+        m_combo_filename_enc->SetValue("Block");
+        m_combo_keyderivation->SetValue("1000");
+        m_chkbx_block_mac_headers->SetValue(true);
+        m_chkbx_perfile_iv->SetValue(true);
+        m_chkbx_external_iv_chaining->SetValue(false);
+        m_chkbx_filename_to_iv_header_chaining->SetValue(true);
+        SetEncfsOptionsState(false);        
+    }
+    else if (SelectedProfile == ID_ENCFSPROFILE_PERFORMANCE)
+    {
+        m_combo_cipher_algo->SetValue("AES");
+        m_combo_cipher_blocksize->SetValue("2048");
+        m_combo_cipher_keysize->SetValue("160");
+        m_combo_filename_enc->SetValue("Block");
+        m_combo_keyderivation->SetValue("500");
+        m_chkbx_block_mac_headers->SetValue(false);
+        m_chkbx_perfile_iv->SetValue(false);
+        m_chkbx_external_iv_chaining->SetValue(false);
+        m_chkbx_filename_to_iv_header_chaining->SetValue(false);        
+        SetEncfsOptionsState(false);
+    }
+    else if (SelectedProfile == ID_ENCFSPROFILE_CUSTOM)
+    {
+        SetEncfsOptionsState(true);
+    }
+}
+
+
+void frmAddDialog::Create()
+{
+    wxSizer * const sizerMaster = new wxBoxSizer(wxVERTICAL);
+    wxSizer * const sizerVolume = new wxStaticBoxSizer(wxVERTICAL, this, "Volume settings");
+    
+    // desired volume name
+    sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Set unique volume name:"));
+    m_volumename_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
+    sizerVolume->Add(m_volumename_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+
+    // encrypted folder
+
+    sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Location of new empty encfs folder:"));
+
+    wxSizer * const sizerSRC = new wxBoxSizer(wxHORIZONTAL);
+    m_source_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(470,22));
+    sizerSRC->Add(m_source_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerSRC->Add(new wxButton( this , ID_BTN_CHOOSE_SOURCE, wxT("Select")));
+    sizerVolume->Add(sizerSRC,wxSizerFlags(1).Expand().Border());
+
+    // mount point
+    sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Destination (mount) folder:"));
+    wxSizer * const sizerDST = new wxBoxSizer(wxHORIZONTAL);
+    m_destination_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(470,22));
+    sizerDST->Add(m_destination_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerDST->Add(new wxButton( this , ID_BTN_CHOOSE_DESTINATION, wxT("Select")));
+    sizerVolume->Add(sizerDST,wxSizerFlags(1).Expand().Border());
+
+
+    // Security settings
+    wxArrayString arrProfilechoices;
+    arrProfilechoices.Add(wxT("Balanced"));
+    arrProfilechoices.Add(wxT("Performance"));
+    arrProfilechoices.Add(wxT("Secure"));
+    arrProfilechoices.Add(wxT("Custom"));
+
+    wxSizer * const sizerEncFS = new wxStaticBoxSizer(wxVERTICAL, this, "EncFS options");
+    // 4 profiles
+    // 1. Balanced    2. Performance    3. Security   4. Custom
+    wxRadioBox * encProfiles = new wxRadioBox(this, ID_RADIO_PROFILE, "EncFS profile", wxDefaultPosition, wxDefaultSize, arrProfilechoices, 0, wxRA_SPECIFY_COLS);
+    sizerEncFS->Add(encProfiles);
+    sizerEncFS->AddSpacer(10);
+
+    wxSizer * const sizerEncFS_row1 = new wxBoxSizer(wxHORIZONTAL);
+
+    // Cipher
+    wxArrayString arrAlgos;
+    arrAlgos.Add("AES");
+    arrAlgos.Add("Blowfish");
+    wxArrayString arrKeySizes;
+    arrKeySizes.Add("128");
+    arrKeySizes.Add("160");
+    arrKeySizes.Add("192");
+    arrKeySizes.Add("256");
+    wxArrayString arrBlockSizes;
+    for (int blocksize = 64; blocksize <= 4096; blocksize += 16)
+    {
+        wxString thissize;
+        thissize.Printf(wxT("%d"), blocksize);
+        arrBlockSizes.Add(thissize);
+    }
+    wxArrayString arrFilenameEnc;
+    arrFilenameEnc.Add("Block");
+    arrFilenameEnc.Add("Stream");
+    arrFilenameEnc.Add("None");
+    wxArrayString arrKeyDerivationDuration;
+    arrKeyDerivationDuration.Add("500");
+    arrKeyDerivationDuration.Add("1000");
+    arrKeyDerivationDuration.Add("2000");
+    arrKeyDerivationDuration.Add("3000");
+    arrKeyDerivationDuration.Add("4000");
+    arrKeyDerivationDuration.Add("5000");
+
+    // row 1 : cipher settings
+    sizerEncFS_row1->Add(new wxStaticText(this, wxID_ANY, "Cipher algorithm:"));
+    m_combo_cipher_algo = new wxComboBox(this, wxID_ANY, arrAlgos[0], wxDefaultPosition, wxDefaultSize, arrAlgos, wxCB_READONLY);
+    sizerEncFS_row1->Add(m_combo_cipher_algo,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerEncFS_row1->Add(new wxStaticText(this, wxID_ANY, "Keysize:"));
+    m_combo_cipher_keysize = new wxComboBox(this, wxID_ANY, arrKeySizes[0], wxDefaultPosition, wxDefaultSize, arrKeySizes, wxCB_READONLY);
+    sizerEncFS_row1->Add(m_combo_cipher_keysize,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerEncFS_row1->Add(new wxStaticText(this, wxID_ANY, "Blocksize"));
+    m_combo_cipher_blocksize = new wxComboBox(this, wxID_ANY, arrBlockSizes[0], wxDefaultPosition, wxDefaultSize, arrBlockSizes, wxCB_READONLY);
+    sizerEncFS_row1->Add(m_combo_cipher_blocksize,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerEncFS->Add(sizerEncFS_row1);
+
+    // row 2 : filename encoding & key derivation
+    wxSizer * const sizerEncFS_row2 = new wxBoxSizer(wxHORIZONTAL);
+    sizerEncFS_row2->Add(new wxStaticText(this, wxID_ANY, "Filename encoding:"));
+    m_combo_filename_enc = new wxComboBox(this, wxID_ANY, arrFilenameEnc[0], wxDefaultPosition, wxDefaultSize, arrFilenameEnc, wxCB_READONLY);
+    sizerEncFS_row2->Add(m_combo_filename_enc,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerEncFS_row2->Add(new wxStaticText(this, wxID_ANY, "PBKDF2 key derivation duration (ms):"));
+    m_combo_keyderivation = new wxComboBox(this, wxID_ANY, arrKeyDerivationDuration[0], wxDefaultPosition, wxDefaultSize, arrKeyDerivationDuration, wxCB_READONLY);
+    sizerEncFS_row2->Add(m_combo_keyderivation,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerEncFS->Add(sizerEncFS_row2);
+
+    // row 3 : HMAC & IV settings
+    wxSizer * const sizerEncFS_row3 = new wxBoxSizer(wxHORIZONTAL);
+    m_chkbx_block_mac_headers  = new wxCheckBox(this, wxID_ANY, "Per-block HMAC");
+    sizerEncFS_row3->Add(m_chkbx_block_mac_headers);
+    m_chkbx_perfile_iv = new wxCheckBox(this, wxID_ANY, "Per-file unique IV");
+    sizerEncFS_row3->Add(m_chkbx_perfile_iv);
+    m_chkbx_filename_to_iv_header_chaining = new wxCheckBox(this, wxID_ANY, "Chained IV");
+    sizerEncFS_row3->Add(m_chkbx_filename_to_iv_header_chaining);
+    m_chkbx_external_iv_chaining = new wxCheckBox(this, wxID_ANY, "External IV");
+    sizerEncFS_row3->Add(m_chkbx_external_iv_chaining);
+    sizerEncFS->Add(sizerEncFS_row3);
+    // row 4 : idle timings
+
+    
+    wxSizer * const sizerPassword = new wxStaticBoxSizer(wxVERTICAL, this, "Password options");
+
+    wxSizer * const sizerPW1 = new wxBoxSizer(wxHORIZONTAL);
+    sizerPW1->Add(new wxStaticText(this, wxID_ANY, "Enter password:"));
+    m_pass1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    sizerPW1->Add(m_pass1, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerPassword->Add(sizerPW1, wxSizerFlags(1).Expand().Border());
+
+    wxSizer * const sizerPW2 = new wxBoxSizer(wxHORIZONTAL);
+    sizerPW2->Add(new wxStaticText(this, wxID_ANY, "Enter password again:"));
+    m_pass2 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    sizerPW2->Add(m_pass2, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    sizerPassword->Add(sizerPW2, wxSizerFlags(1).Expand().Border());
+
+    // save password ?
+    m_chkbx_save_password  = new wxCheckBox(this, wxID_ANY, "Save password in Keychain");
+    m_chkbx_save_password->SetValue(false);
+    sizerPassword->Add(m_chkbx_save_password);
+
+    
+    wxSizer * const sizerOptions = new wxStaticBoxSizer(wxVERTICAL, this, "Mount options");
+    // auto mount ?
+    m_chkbx_automount  = new wxCheckBox(this, wxID_ANY, "Automatically mount this volume when application starts");
+    m_chkbx_automount->SetValue(false);
+    sizerOptions->Add(m_chkbx_automount);
+
+    // prevent auto unmount
+    m_chkbx_prevent_autounmount  = new wxCheckBox(this, wxID_ANY, "Prevent auto-unmounting this volume on application exit");
+    m_chkbx_prevent_autounmount->SetValue(false);
+    sizerOptions->Add(m_chkbx_prevent_autounmount);
+
+    // glue together
+    sizerMaster->Add(sizerVolume, wxSizerFlags(1).Expand().Border());
+    sizerMaster->Add(sizerEncFS, wxSizerFlags(1).Expand().Border());
+    sizerMaster->Add(sizerPassword, wxSizerFlags(1).Expand().Border());    
+    sizerMaster->Add(sizerOptions, wxSizerFlags(1).Expand().Border());
+
+    // Add "Apply" and "Cancel"
+    sizerMaster->Add(CreateStdDialogButtonSizer(wxAPPLY | wxCANCEL), wxSizerFlags().Right().Border());
+
+    CentreOnScreen();
+
+    SetSizer(sizerMaster);
+
+    // set encfs options based on profile selection
+    ApplyEncFSProfileSelection(ID_ENCFSPROFILE_BALANCED);
+
+}
+
+
+void frmAddDialog::ChooseSourceFolder(wxCommandEvent& WXUNUSED(event))
+{
+    wxString currentdir;
+    currentdir = m_source_field->GetValue();
+    wxDirDialog openDirDialog(this, 
+                              "Select desired location of new encfs encrypted folder", 
+                              currentdir, 
+                              wxDD_DEFAULT_STYLE);
+    if (openDirDialog.ShowModal() == wxID_OK)
+    {
+        wxString fn = openDirDialog.GetPath();
+        m_source_field->SetValue(fn);
+    }
+    openDirDialog.Destroy();
+}
+
+void frmAddDialog::ChooseDestinationFolder(wxCommandEvent& WXUNUSED(event))
+{
+    wxString currentdir;
+    currentdir = m_destination_field->GetValue();
+    if (currentdir.IsEmpty())
+    {
+        currentdir = "/Volumes";
+    }
+    wxDirDialog openDirDialog(this, 
+                              "Select destination mount point folder", 
+                              currentdir, 
+                              wxDD_DEFAULT_STYLE);
+    if (openDirDialog.ShowModal() == wxID_OK)
+    {
+       wxString fn = openDirDialog.GetPath();
+        m_destination_field->SetValue(fn);
+    }
+    openDirDialog.Destroy();
+}
+
+
+
+void frmAddDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
+{
+
+
+}
+
+
+
+//   ------------------------------------------
+// frmOpenDialog - add existing encfs folder
 //   ------------------------------------------
 
 
@@ -302,18 +649,15 @@ void frmOpenDialog::Create()
     sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Set unique volume name:"));
     m_volumename_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
     sizerVolume->Add(m_volumename_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
-
     sizerVolume->AddSpacer(8);
 
     // encrypted folder
-
     sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Encrypted encfs source folder:"));
 
     wxSizer * const sizerSRC = new wxBoxSizer(wxHORIZONTAL);
     m_source_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(370,22));
     sizerSRC->Add(m_source_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
     sizerSRC->Add(new wxButton( this , ID_BTN_CHOOSE_SOURCE, wxT("Select")));
-    
     sizerVolume->Add(sizerSRC,wxSizerFlags(1).Expand().Border());
 
     sizerVolume->AddSpacer(8);
@@ -326,43 +670,34 @@ void frmOpenDialog::Create()
     sizerDST->Add(new wxButton( this , ID_BTN_CHOOSE_DESTINATION, wxT("Select")));
     sizerVolume->Add(sizerDST,wxSizerFlags(1).Expand().Border());
     
-
     wxSizer * const sizerPassword = new wxStaticBoxSizer(wxVERTICAL, this, "Password options");
     // save password ?
     m_chkbx_save_password  = new wxCheckBox(this, wxID_ANY, "Save password in Keychain");
     m_chkbx_save_password->SetValue(false);
     sizerPassword->Add(m_chkbx_save_password);
 
-
     wxSizer * const sizerPW1 = new wxBoxSizer(wxHORIZONTAL);
     sizerPW1->Add(new wxStaticText(this, wxID_ANY, "Enter password:"));
     m_pass1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     sizerPW1->Add(m_pass1, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
-
     sizerPassword->Add(sizerPW1, wxSizerFlags(1).Expand().Border());
-
 
     wxSizer * const sizerPW2 = new wxBoxSizer(wxHORIZONTAL);
     sizerPW2->Add(new wxStaticText(this, wxID_ANY, "Enter password again:"));
     m_pass2 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     sizerPW2->Add(m_pass2, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
-
     sizerPassword->Add(sizerPW2, wxSizerFlags(1).Expand().Border());
     
-
     wxSizer * const sizerOptions = new wxStaticBoxSizer(wxVERTICAL, this, "Mount options");
-
     // auto mount ?
     m_chkbx_automount  = new wxCheckBox(this, wxID_ANY, "Automatically mount this volume when application starts");
     m_chkbx_automount->SetValue(false);
     sizerOptions->Add(m_chkbx_automount);
 
-
     // prevent auto unmount
     m_chkbx_prevent_autounmount  = new wxCheckBox(this, wxID_ANY, "Prevent auto-unmounting this volume on application exit");
     m_chkbx_prevent_autounmount->SetValue(false);
     sizerOptions->Add(m_chkbx_prevent_autounmount);
-
 
     // glue together
     sizerMaster->Add(sizerVolume, wxSizerFlags(1).Expand().Border());
@@ -385,14 +720,14 @@ void frmOpenDialog::Create()
 void createNewEncFSFolder(wxWindow *parent)
 {
     wxSize frmAddSize;
-    frmAddSize.Set(500,640);
+    frmAddSize.Set(600,680);
     long framestyle;
     framestyle = wxDEFAULT_FRAME_STYLE | wxFRAME_EX_METAL;
 
     wxString strTitle;
     strTitle.Printf( "Create a new EncFS folder");  
     
-    frmOpenDialog* dlg = new frmOpenDialog(parent, 
+    frmAddDialog* dlg = new frmAddDialog(parent, 
                                            strTitle, 
                                            wxDefaultPosition, 
                                            frmAddSize, 
