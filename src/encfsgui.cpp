@@ -31,15 +31,6 @@
     #define USE_XPM_BITMAPS 1
 #endif
 
-// If this is 1, the sample will test an extra toolbar identical to the
-// main one, but not managed by the frame. This can test subtle differences
-// in the way toolbars are handled, especially on Mac where there is one
-// native, 'installed' toolbar.
-#define USE_UNMANAGED_TOOLBAR 0
-
-// Define this as 0 for the platforms not supporting controls in toolbars
-#define USE_CONTROLS_IN_TOOLBAR 1
-
 // keep config files local
 #define wxCONFIG_USE_LOCAL_FILE 1
 #define USE_LOCAL_FILE 1
@@ -295,12 +286,6 @@ private:
     // fill the control with items
     void FillListWithVolumes();
     
-
-
-#if USE_UNMANAGED_TOOLBAR
-    wxToolBar          *m_extraToolBar;
-#endif    
-
     // ListView stuff
     mainListCtrl *m_listCtrl;
 
@@ -453,23 +438,8 @@ frmMain::frmMain(const wxString& title,
     // panel to be used as a container for the Toolbar
     m_panel = new wxPanel(this, wxID_ANY);
 
-#if USE_UNMANAGED_TOOLBAR
-    m_extraToolBar = new wxToolBar(m_panel, 
-                                   wxID_ANY, 
-                                   wxDefaultPosition, 
-                                   wxDefaultSize, 
-                                   wxTB_TEXT|wxTB_FLAT|wxTB_TOP);
-    PopulateToolbar(m_extraToolBar);
-#endif
-
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
     m_panel->SetSizer(sizer);
-
-#if USE_UNMANAGED_TOOLBAR
-    if (m_extraToolBar)
-        sizer->Add(m_extraToolBar, 0, wxEXPAND, 0);
-#endif    
-
 
     // check if we need to mount volumes at startup
     AutoMountVolumes();
