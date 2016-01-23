@@ -128,7 +128,7 @@ void frmOpenDialog::ChooseSourceFolder(wxCommandEvent& WXUNUSED(event))
         wxString fn = openDirDialog.GetPath();
         m_source_field->SetValue(fn);
     }
-openDirDialog.Destroy();
+    openDirDialog.Destroy();
 }
 
 void frmOpenDialog::ChooseDestinationFolder(wxCommandEvent& WXUNUSED(event))
@@ -148,7 +148,7 @@ void frmOpenDialog::ChooseDestinationFolder(wxCommandEvent& WXUNUSED(event))
        wxString fn = openDirDialog.GetPath();
         m_destination_field->SetValue(fn);
     }
-openDirDialog.Destroy();
+    openDirDialog.Destroy();
 }
 
 void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
@@ -169,7 +169,7 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     m_volumename_field->SetValue(newvolumename);
 
     //1. is volume name unique?
-wxConfigBase *pConfig = wxConfigBase::Get();
+    wxConfigBase *pConfig = wxConfigBase::Get();
     std::vector<wxString> v_volnames;
     pConfig->SetPath(wxT("/Volumes"));
     wxString volumename;

@@ -124,7 +124,12 @@ class DBEntry
 {
 public:
     // ctor
-    DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount, bool preventautounmount, bool pwsaved);
+    DBEntry(wxString volname, 
+            wxString enc_path, 
+            wxString mount_path, 
+            bool automount, 
+            bool preventautounmount, 
+            bool pwsaved);
 
     void setMountState(bool);
     bool getMountState();
@@ -147,7 +152,12 @@ private:
 
 
 // DBENtry constructor
-DBEntry::DBEntry(wxString volname, wxString enc_path, wxString mount_path, bool automount, bool preventautounmount, bool pwsaved)
+DBEntry::DBEntry(wxString volname, 
+                 wxString enc_path, 
+                 wxString mount_path, 
+                 bool automount, 
+                 bool preventautounmount, 
+                 bool pwsaved)
 {
     m_automount = automount;
     m_volname = volname;
@@ -639,6 +649,7 @@ int frmMain::OnExit(wxCommandEvent& WXUNUSED(event))
 frmMain::~frmMain()
 {
     this->Destroy();
+    Close(true);
 }
 
 
