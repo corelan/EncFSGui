@@ -7,6 +7,13 @@ This application is NOT ready for use yet. <br>
 It is still under heavy development and will be updated on a regular basis.<br>
 Proper announcements will be made when the app is ready for use. <br><br>
 
+## Donate
+
+If you like this initiative and want to show your appreciation, please consider donating using [this link](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&bn=EncFSGUI&business=peter.ve@corelan.be&currency_code=EUR&item_name=Support%20EncFSGui%20Project)<br>
+
+(I could have decided to distribute this as a commercial closed-sourced project and sell it via the App Store... but I didn't, despite the fact that 'there is no free lunch')<br>
+
+
 ## Background
 This application is written in C++, and uses the wxWidgets Cross-Platform Library.  Although the source probably compiles fine under Linux/Unix and Windows, it was written for OSX and contains hardcoded strings & paths that will certainly prevent the app from working on Windows.  It might actually work on Linux (but I haven't tested it myself)<br>
 If you are looking for an EncFS Gui for Windows, check out the EncFSMP project on sourceforge.<br>
@@ -16,12 +23,6 @@ With that said, all positive contributions are more than welcome. If you want to
 If you want to try the application, you'll need a number of dependencies installed on your OSX machine:
 - encfs
 - OSXFuse
-
-## Donate
-
-If you like this initiative and want to show your appreciation, please consider donating using [this link](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&bn=EncFSGUI&business=peter.ve@corelan.be&currency_code=EUR&item_name=Support%20EncFSGui%20Project)<br>
-
-(I could have decided to distribute this as a commercial source-closed project and sell it via the App Store... but I didn't, despite the fact that 'there is no free lunch')<br>
 
 
 ## Running EncFSGUi : Installing dependencies on OSX
