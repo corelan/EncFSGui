@@ -152,11 +152,12 @@ If you plan on contributing, please create a new branch first.  Do NOT submit pu
     - [ ] Rename volume
     - [ ] Select a different mount point
     - [ ] Unsave password from Keychain (if saved)
-    - [ ] Change password (routine already exists)
+    - [ ] Save password to Keychain (if not saved already)
+    - [ ] Change password (routine already exists) (& update Keychain if needed)
   - [ ] Implement 'Start application at login'
   - [ ] Check how to launch as an icon and add as an option
     - [ ] Add context menu to icon, allow mount/unmount volumes
   - [ ] Implement overall error handling
   - [ ] Code cleanup & documentation
-  - [ ] Fix Command+C (Copy) to trigger 'Cancel' button in dialogs
+  - [ ] Prevent Command+C (Copy) to trigger 'Cancel' button in dialogs
   - [ ] Allow use of passwords that contain quotes (single and double)
