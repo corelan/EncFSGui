@@ -47,7 +47,7 @@ void BrowseFolder(wxString&);
 wxString getKeychainPassword(wxString&);
 bool doesVolumeExist(wxString&);
 wxArrayString getEncFSVolumeInfo(wxString&);
-std::map<wxString, wxString> getEncodingCapabilities(wxString&);
+std::map<wxString, wxString> getEncodingCapabilities();
 wxString getExpectScriptContents();
 wxString getChangePasswordScriptContents(wxString&);
 

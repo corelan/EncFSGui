@@ -19,6 +19,9 @@
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/utils.h>       // wxExecute
+#include <wx/stdpaths.h> 
+#include <wx/dir.h>
+#include <wx/tokenzr.h>
 #include <map>
 
 #include <fstream>
@@ -441,9 +444,209 @@ wxString getChangePasswordScriptContents(wxString & enc_path)
 }
 
 
-std::map<wxString, wxString> getEncodingCapabilities(wxString & encfsOutput)
+std::map<wxString, wxString> getEncodingCapabilities()
 {
     std::map<wxString, wxString> encodingcaps;
+
+    // first, check if we have discovered the capabilities already
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    pConfig->SetPath(wxT("/FilenameEncoding"));
+    wxString capname;
+    long dummy;
+    wxString capval;
+    bool bCont = pConfig->GetFirstEntry(capname, dummy);
+    while (bCont)
+    {
+        // read value for this capname
+        capval = pConfig->Read(capname, "");
+        if (!capname.IsEmpty() && !capval.IsEmpty())
+        {
+            encodingcaps[capname] = capval;
+        }
+        bCont = pConfig->GetNextEntry(capname, dummy);
+    }
+
+
+    if (encodingcaps.size() == 0)
+    {
+        // create 2 temporary dirs
+        wxStandardPathsBase& stdp = wxStandardPaths::Get();
+        wxString tmp_dir = stdp.GetTempDir();
+        wxString enc_dir = "tmp_encfsgui_crypt";
+        wxString plain_dir = "tmp_encfsgui_plain";
+        wxString encfsbin = getEncFSBinPath();
+        wxString msg="";
+        wxString cmd="";
+
+        bool createdok = false;
+
+        wxString enc_path;
+        wxString plain_path;
+        enc_path.Printf(wxT("%s/%s"), tmp_dir, enc_dir);
+        plain_path.Printf(wxT("%s/%s"), tmp_dir, plain_dir);
+
+        // remove existing dirs, if they exist
+        wxDir * dirEnc = new wxDir(enc_path);
+        wxDir * dirPlain = new wxDir(plain_path);
+
+        if (dirEnc->Exists(enc_path))
+        {
+            dirEnc->Remove(enc_path, wxPATH_RMDIR_RECURSIVE);
+        }
+        if (dirPlain->Exists(plain_path))
+        {
+            dirPlain->Remove(plain_path, wxPATH_RMDIR_RECURSIVE);
+        }
+
+        // create dirs
+        dirEnc->Make(enc_path);
+        dirPlain->Make(plain_path);
+
+        wxString scriptcontents = getExpectScriptContents();
+
+        // use valid, but non-important values
+        scriptcontents.Replace("$ENCFSBIN", encfsbin);
+        scriptcontents.Replace("$ENCPATH", enc_path);
+        scriptcontents.Replace("$MOUNTPATH", plain_path);
+        scriptcontents.Replace("$CIPHERALGO", "1");
+        scriptcontents.Replace("$CIPHERKEYSIZE", "128");
+        scriptcontents.Replace("$BLOCKSIZE", "1024");
+        scriptcontents.Replace("$ENCODINGALGO", "1");
+        scriptcontents.Replace("$IVCHAINING","");
+        scriptcontents.Replace("$PERFILEIV","");
+        scriptcontents.Replace("$FILETOIVHEADERCHAINING","");
+        scriptcontents.Replace("$BLOCKAUTHCODEHEADERS","");    
+
+        // run encfs, just to capture the output related with filename encoding mechanisms
+        // write script to disk
+        wxString pw = "DefaultPassword";
+        wxTempFile * tmpfile = new wxTempFile();
+        wxString scriptfile;
+        scriptfile.Printf(wxT("%screateencfs.exp"), tmp_dir );
+        tmpfile->Open(scriptfile);
+        if (tmpfile->IsOpened())
+        {
+            tmpfile->Write(scriptcontents);
+        }
+        tmpfile->Commit();
+
+        cmd.Printf(wxT("sh -c \"'expect' '%s' '%s'\""), scriptfile, pw);
+        // run command asynchronously
+        wxArrayString arroutput = ArrRunCMDASync(cmd);
+
+        // wait until .xml file was created
+        bool configfilefound = false;
+        int nrruns = 0;
+        while (!configfilefound)
+        {
+            wxString configfilepath;
+            configfilepath.Printf(wxT("%s/.encfs6.xml"), enc_path);
+            wxFileName configfile;
+            configfile = wxFileName::wxFileName(configfilepath);
+
+            if (configfile.FileExists())
+            {
+                configfilefound = true;
+                createdok = true;
+            }
+            else 
+            {
+                // file does not exist
+                if (nrruns > 20)
+                {
+                    configfilefound = true;
+                    createdok = false;
+                }            
+            }
+            wxSleep(1);
+            ++nrruns;
+        }
+
+        if (createdok)
+        {
+            // parse the output, look for information about available file encoding mechanisms
+            // and add them to map
+            bool startfound = false;
+            bool endfound = false;
+            wxArrayString rawCaps;
+            size_t count = arroutput.GetCount();
+            for ( size_t n = 0; n < count; n++ )
+            {
+                wxString thisline = arroutput[n];
+                if (!startfound)
+                {
+                    if (thisline.Find("The following filename encoding algorithms are available") > -1)
+                    {
+                        startfound = true;
+                    }
+                }
+                else
+                {
+                    if (thisline.Find(".") == -1)
+                    {
+                        endfound = true;
+                    }
+                    else
+                    {
+                        rawCaps.Add(thisline);
+                    }
+                }
+                if (startfound && endfound)
+                {
+                    break;
+                }
+            }
+
+            for (size_t n = 0; n < rawCaps.GetCount(); n++)
+            {
+                wxString rawline = rawCaps[n];
+                // Tokenize the string
+                wxStringTokenizer tokenizer(rawline, " ");
+                int tokenindex = 0;
+                wxString encodingnr="";
+                wxString encodingname="";
+                while ( tokenizer.HasMoreTokens() )
+                {
+                    wxString thistoken = tokenizer.GetNextToken();
+                    if (tokenindex == 0)
+                    {
+                        thistoken.Replace(".","");
+                        encodingnr = thistoken;
+                    }
+                    else if (tokenindex == 1)
+                    {
+                        encodingname = thistoken;
+                    }
+                    tokenindex++;
+                }
+                // save into map
+                if (!encodingnr.IsEmpty() && !encodingname.IsEmpty())
+                {
+                    encodingcaps[encodingname] = encodingnr;
+                }
+            }
+
+        }
+
+        // clean up again
+        if (dirEnc->Exists(enc_path))
+        {
+            dirEnc->Remove(enc_path, wxPATH_RMDIR_RECURSIVE);
+        }
+        if (dirPlain->Exists(plain_path))
+        {
+            dirPlain->Remove(plain_path, wxPATH_RMDIR_RECURSIVE);
+        }    
+    } 
+
+    // save/rewrite config
+    pConfig->SetPath(wxT("/FilenameEncoding"));
+    for (std::map<wxString, wxString>::iterator it= encodingcaps.begin(); it != encodingcaps.end(); it++)
+    {
+        wxString encodingname = it->first;
+        wxString encodingval = it->second;
+        pConfig->Write(encodingname, encodingval);
+    }
 
     return encodingcaps;
 }

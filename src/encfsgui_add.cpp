@@ -21,6 +21,7 @@
 #include <wx/time.h>
 #include <wx/stdpaths.h>
 #include <vector>
+#include <map>
 
 #include "encfsgui.h"
 
@@ -81,6 +82,7 @@ private:
     wxComboBox * m_combo_cipher_keysize;
     wxComboBox * m_combo_cipher_blocksize;
     wxComboBox * m_combo_filename_enc;
+    std::map<wxString, wxString> m_encodingcaps;
     //wxComboBox * m_combo_keyderivation;
     wxDECLARE_EVENT_TABLE();
     void SetEncfsOptionsState(bool);
@@ -103,7 +105,8 @@ frmAddDialog::frmAddDialog(wxWindow *parent,
                            const wxSize &size, 
                            long style) :  wxDialog(parent, wxID_ANY, title, pos, size, style)
 {
-
+    // get capabilities for this system
+    m_encodingcaps = getEncodingCapabilities();
 }
 
 // event functions
@@ -263,14 +266,6 @@ void frmAddDialog::Create()
 
     // Cipher
     wxArrayString arrAlgos;
-    /*
-    Cipher::AlgorithmList algorithms = Cipher::GetAlgorithmList();
-    Cipher::AlgorithmList::const_iterator it;
-    for(it = algorithms.begin(); it != algorithms.end(); ++it)
-    {
-        arrAlgos.Add(wxString(it->name.c_str()));
-    }
-    */
     arrAlgos.Add("AES");
     //arrAlgos.Add("Blowfish");  // forget it
     wxArrayString arrKeySizes;
@@ -285,10 +280,12 @@ void frmAddDialog::Create()
         arrBlockSizes.Add(thissize);
     }
     wxArrayString arrFilenameEnc;
-    arrFilenameEnc.Add("Block");
-    arrFilenameEnc.Add("Block32");
-    arrFilenameEnc.Add("Null");
-    arrFilenameEnc.Add("Stream");
+
+    for (std::map<wxString, wxString>::iterator it= m_encodingcaps.begin(); it != m_encodingcaps.end(); it++)
+    {
+        wxString encodingname = it->first;
+        arrFilenameEnc.Add(encodingname);
+    }
     wxArrayString arrKeyDerivationDuration;
     arrKeyDerivationDuration.Add("500");
     arrKeyDerivationDuration.Add("1000");
@@ -314,9 +311,6 @@ void frmAddDialog::Create()
     sizerEncFS_row2->Add(new wxStaticText(this, wxID_ANY, "Filename encoding:"));
     m_combo_filename_enc = new wxComboBox(this, wxID_ANY, arrFilenameEnc[0], wxDefaultPosition, wxDefaultSize, arrFilenameEnc, wxCB_READONLY);
     sizerEncFS_row2->Add(m_combo_filename_enc,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
-    //sizerEncFS_row2->Add(new wxStaticText(this, wxID_ANY, "PBKDF2 key derivation duration (ms):"));
-    //m_combo_keyderivation = new wxComboBox(this, wxID_ANY, arrKeyDerivationDuration[0], wxDefaultPosition, wxDefaultSize, arrKeyDerivationDuration, wxCB_READONLY);
-    //sizerEncFS_row2->Add(m_combo_keyderivation,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
     sizerEncFS->Add(sizerEncFS_row2);
 
     // row 3 : HMAC & IV settings
@@ -451,23 +445,7 @@ bool frmAddDialog::createEncFSFolder()
     }
 
     wxString selectedfilenameencoding = m_combo_filename_enc->GetValue();
-    if (selectedfilenameencoding == "Block")
-    {
-        filenameencodingchoice = "1";
-    }
-    else if (selectedfilenameencoding == "Block32")
-    {
-        filenameencodingchoice = "2";
-    }
-    else if (selectedfilenameencoding == "Null")
-    {
-        filenameencodingchoice = "3";
-    }
-    else if (selectedfilenameencoding == "Stream")
-    {
-        filenameencodingchoice = "4";
-    }
-
+    filenameencodingchoice = m_encodingcaps[selectedfilenameencoding];
     scriptcontents = getExpectScriptContents();
     // replace keywords with actual values
     scriptcontents.Replace("$ENCFSBIN", encfsbin);

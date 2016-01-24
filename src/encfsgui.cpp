@@ -253,6 +253,7 @@ public:
     void OnMount(wxCommandEvent& event);
     void OnUnMount(wxCommandEvent& event);
     void OnInfo(wxCommandEvent& event);
+    void OnRemoveFolder(wxCommandEvent& event);
 
     // generic routine
     bool unmountVolumeAsk(wxString& volumename);   // ask for confirmation
@@ -1054,6 +1055,38 @@ void frmMain::OnEditFolder(wxCommandEvent& WXUNUSED(event))
 
 }
 
+void frmMain::OnRemoveFolder(wxCommandEvent& WXUNUSED(event))
+{
+    wxString msg;
+    wxString title;
+    bool deleted = false;
+    title.Printf(wxT("Remove '%s' ?"), g_selectedVolume);
+    msg.Printf(wxT("Are you really sure you want to remove volume '%s' from this application?\n"), g_selectedVolume);
+    msg << "Notes:\n";
+    msg << "1. This action will NOT remove the actual folders and/or data.  It will only cause this application to forget about this volume.\n";
+    msg << "2. If you have removed a volume by mistake, you can simply add it back via 'Open existing encfs folder'.\n";
+    msg << "3. Removing a mounted volume will NOT unmount it.\n";
+    wxMessageDialog * dlg = new wxMessageDialog(this, 
+                                                msg, 
+                                                title, 
+                                                wxYES_NO|wxCENTRE|wxNO_DEFAULT|wxICON_QUESTION);
+    if (dlg->ShowModal() == wxID_YES)
+    {
+        // simply remove from config file by removing the config group
+        wxConfigBase *pConfig = wxConfigBase::Get();
+        wxString configgroup;
+        configgroup.Printf(wxT("/Volumes/%s"), g_selectedVolume);
+        pConfig->DeleteGroup(configgroup);
+        deleted = true;
+    }
+    dlg->Destroy();
+    if (deleted)
+    {
+        RefreshAll();
+    }
+}
+
+
 void frmMain::OnSettings(wxCommandEvent& WXUNUSED(event))
 {
     openSettings(this);
@@ -1096,6 +1129,10 @@ void frmMain::OnToolLeftClick(wxCommandEvent& event)
     else if (event.GetId() == ID_Toolbar_Info)
     {
         OnInfo(event);
+    }
+    else if (event.GetId() == ID_Toolbar_Remove)
+    {
+        OnRemoveFolder(event);
     }
 }
 
