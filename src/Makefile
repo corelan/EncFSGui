@@ -23,6 +23,12 @@ all:	$(SOURCES) $(EXECUTABLE)
 	cp $(EXECUTABLE).icns $(EXECUTABLE).app/Contents/Resources
 	cp $(EXECUTABLE) $(EXECUTABLE).app/Contents/MacOS
 	rm -rf *.o*
+	mv $(EXECUTABLE).app Build
+	@echo
+	@echo Creating dmg into Releases folder
+	mkdir -p ../release
+	hdiutil create -fs HFS+ -srcfolder ./Build -volname EncFSGUI EncFSGUI.dmg
+	mv EncFSGUI.dmg ../release 
 	@echo
 	@echo	----------------------------------------
 	@echo	 The EncFSGUI project has been compiled
@@ -52,5 +58,7 @@ clean:
 	rm -rf *.dSYM
 	rm -rf *.d
 	rm -rf .deps
-	rm encfsgui
+	rm -rf encfsgui
+	mkdir -p Build
+	rm -rf Build/*
 	@echo	Done eating.

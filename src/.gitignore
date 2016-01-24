@@ -30,4 +30,4 @@
 # other stuff to exclude
 .DS_Store
 encfsgui
-encfs/
+Build/
