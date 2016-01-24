@@ -51,6 +51,7 @@
     #include "bitmaps/browsefolder.xpm"
     #include "bitmaps/removefolder.xpm"
     #include "bitmaps/editfolder.xpm"
+    #include "bitmaps/folderinfo.xpm"
     #include "bitmaps/mountfolder.xpm"
     #include "bitmaps/unmountfolder.xpm"
     #include "bitmaps/settings.xpm"
@@ -97,6 +98,7 @@ enum
     ID_Toolbar_Browse,
     ID_Toolbar_Remove,
     ID_Toolbar_Edit,
+    ID_Toolbar_Info,
     ID_Toolbar_Mount,
     ID_Toolbar_Unmount,
     ID_Toolbar_Settings,
@@ -250,6 +252,7 @@ public:
     void OnSettings(wxCommandEvent& event);
     void OnMount(wxCommandEvent& event);
     void OnUnMount(wxCommandEvent& event);
+    void OnInfo(wxCommandEvent& event);
 
     // generic routine
     bool unmountVolumeAsk(wxString& volumename);   // ask for confirmation
@@ -948,6 +951,23 @@ void frmMain::OnUnMount(wxCommandEvent& WXUNUSED(event))
     }
 }
 
+void frmMain::OnInfo(wxCommandEvent& WXUNUSED(event))
+{
+    // get full encfpath for this volume
+    DBEntry * thisvol = m_VolumeData[g_selectedVolume];
+    wxString encvol = thisvol->getEncPath();
+    wxArrayString volinfo = getEncFSVolumeInfo(encvol);
+    wxString msg = arrStrTowxStr(volinfo);
+    wxString title;
+    title.Printf(wxT("EncFS information for '%s'"), g_selectedVolume);
+    wxString msgbody;
+    msgbody.Printf(wxT("Encrypted path: '%s'\n\n"), encvol);
+    msgbody << msg;
+    
+    wxMessageDialog * dlg = new wxMessageDialog(this, msgbody, title, wxOK|wxCENTRE|wxICON_INFORMATION);
+    dlg->ShowModal();
+    dlg->Destroy();
+}
 
 
 void frmMain::OnMount(wxCommandEvent& WXUNUSED(event))
@@ -1073,6 +1093,10 @@ void frmMain::OnToolLeftClick(wxCommandEvent& event)
     {
         OnUnMount(event);
     }
+    else if (event.GetId() == ID_Toolbar_Info)
+    {
+        OnInfo(event);
+    }
 }
 
 
@@ -1131,6 +1155,7 @@ void frmMain::PopulateToolbar(wxToolBarBase* toolBar)
         Tool_browsefolder,
         Tool_removefolder,
         Tool_editfolder,
+        Tool_folderinfo,
         Tool_mountfolder,
         Tool_unmountfolder,
         Tool_settings,
@@ -1154,6 +1179,7 @@ void frmMain::PopulateToolbar(wxToolBarBase* toolBar)
     INIT_TOOL_BMP(browsefolder);
     INIT_TOOL_BMP(removefolder);
     INIT_TOOL_BMP(editfolder);
+    INIT_TOOL_BMP(folderinfo);
     INIT_TOOL_BMP(mountfolder);
     INIT_TOOL_BMP(unmountfolder);
     INIT_TOOL_BMP(settings);
@@ -1185,6 +1211,11 @@ void frmMain::PopulateToolbar(wxToolBarBase* toolBar)
     toolBar->AddTool(ID_Toolbar_Remove, wxT("Remove"),
                      toolBarBitmaps[Tool_removefolder], wxNullBitmap, wxITEM_NORMAL,
                      wxT("Remove encfs folder"), wxT("Remove encfs folder from database"));
+
+    toolBar->AddTool(ID_Toolbar_Info, wxT("Info"),
+                     toolBarBitmaps[Tool_folderinfo], wxNullBitmap, wxITEM_NORMAL,
+                     wxT("Show info"), wxT("Show encfs related information about this folder"));
+
 
     toolBar->AddTool(ID_Toolbar_Edit, wxT("Edit"),
                      toolBarBitmaps[Tool_editfolder], wxNullBitmap, wxITEM_NORMAL,
@@ -1233,6 +1264,7 @@ void mainListCtrl::UpdateToolBarButtons()
     m_toolBar->EnableTool(ID_Toolbar_Browse, encfsbininstalled);
     m_toolBar->EnableTool(ID_Toolbar_Remove, encfsbininstalled);
     m_toolBar->EnableTool(ID_Toolbar_Edit, encfsbininstalled);
+    m_toolBar->EnableTool(ID_Toolbar_Info, encfsbininstalled);
     m_toolBar->EnableTool(ID_Toolbar_Mount, encfsbininstalled);
     m_toolBar->EnableTool(ID_Toolbar_Unmount, encfsbininstalled);
 
@@ -1243,6 +1275,7 @@ void mainListCtrl::UpdateToolBarButtons()
             m_toolBar->EnableTool(ID_Toolbar_Remove, true);
             m_toolBar->EnableTool(ID_Toolbar_Edit, true);
             m_toolBar->EnableTool(ID_Toolbar_Browse, true);
+            m_toolBar->EnableTool(ID_Toolbar_Info, true);
 
             // to do - add logic to check if selected volume is mounted
             DBEntry *thisvolume = m_VolumeData[g_selectedVolume];
@@ -1267,7 +1300,8 @@ void mainListCtrl::UpdateToolBarButtons()
             m_toolBar->EnableTool(ID_Toolbar_Edit, false);
             m_toolBar->EnableTool(ID_Toolbar_Browse, false);
             m_toolBar->EnableTool(ID_Toolbar_Mount, false);
-            m_toolBar->EnableTool(ID_Toolbar_Unmount, false);    
+            m_toolBar->EnableTool(ID_Toolbar_Unmount, false);
+            m_toolBar->EnableTool(ID_Toolbar_Info, false);    
         }    
     }
 

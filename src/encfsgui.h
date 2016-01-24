@@ -6,6 +6,7 @@
 #endif
 
 #include <wx/config.h>
+#include <map>
 
 /*
 #ifndef RLOG_COMPONENT
@@ -30,17 +31,25 @@ void openExistingEncFSFolder(wxWindow *);
 // encfsgui_helpers.cpp
 bool isEncFSBinInstalled();
 wxString getEncFSBinPath();
+wxString getEncFSCTLBinPath();
 wxString getMountBinPath();
 wxString getUMountBinPath();
 void ShowMsg(wxString);
 wxString getEncFSBinVersion();
-wxString StrRunCMDSync(wxString);
-wxArrayString ArrRunCMDSync(wxString);
+
+wxString StrRunCMDSync(wxString&);
+wxArrayString ArrRunCMDSync(wxString&);
+wxArrayString ArrRunCMDASync(wxString&);
 wxString arrStrTowxStr(wxArrayString&);
+
 bool IsVolumeSystemMounted(wxString, wxArrayString);
 void BrowseFolder(wxString&);
 wxString getKeychainPassword(wxString&);
 bool doesVolumeExist(wxString&);
+wxArrayString getEncFSVolumeInfo(wxString&);
+std::map<wxString, wxString> getEncodingCapabilities(wxString&);
+wxString getExpectScriptContents();
+wxString getChangePasswordScriptContents(wxString&);
 
 //encfsgui_settings.cpp
 void openSettings(wxWindow *);

@@ -91,8 +91,6 @@ If you want to try the application, you'll need a number of dependencies install
   ```
 
 
-
-
 ## Development setup
 
 ### Install dependencies
@@ -120,53 +118,13 @@ If you want to try the application, you'll need a number of dependencies install
   cd demos;   make;cd ..
   ```
 
-4. Install libraries to build encfs
-
-  ```
-  brew install cmake
-  brew install openssl
-  brew install gettext
-  ```
-
-
-5. Clone the latest version of the encfs repository from github onto your harddrive (outside of the wxWidgets folder):
-  ```
-  git clone https://github.com/vgough/encfs.git
-  ```
-
-6. Build encfs
-
-  (From within the new encfs folder)
-  ```
-  mkdir build
-  cd build
-  cmake .. -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
-  make
-  ```
-  (Note: you may have to update the OPENSSL_INCLUDE_DIR and OPENSSL_ROOT_DIR directives, depending on where the files are on your system)
-
-  If you prefer to use this very latest version of encfs instead of the one created via brew, simply run after completing the steps above
-  ```
-  make install
-  ```
-
-
-7. Copy encfs' cpp and h files into the EncFSGUI project folder
-
-  Copy the 'encfs' folder from your local encfs clone into EncFSGUI/src folder (make sure to keep the encfs subfolder name)<br>
-  Next, copy the config.h file from within the encfs 'build' folder into this newly created EncFSGUI/src/encfs subfolder<br>
-  (This file will be created after running the cmake command in step 6 above)<br>
-
-  If you don't want to copy the encfs files over, you'll have to update the Makefile (see later) and update the `ENCFS_INCLUDE_DIR` value, making it point to the 'encfs' folder inside the encfs git clone.  Don't forget to copy config.h into that encfs folder of the git clone as well, and you should be all set.
-
-
 
 ### Before compiling EncFSGUI
 
-4. Edit Makefile
+1. Edit Makefile
 
   - update the `WX_BUILD_DIR` variable so it would contain the absolute path to the build-release-static folder on your own machine.
-  - check the paths for `OSXFUSE_INCLUDE_DIR`, `OPENSSL_INCLUDE_DIR` and `OPENSSL_ROOT_DIR`, make sure they contain the correct absolute path on your machine
+
 
 ### Compiling & linking EncFSGUI
 

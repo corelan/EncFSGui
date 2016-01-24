@@ -16,6 +16,10 @@
 #include <wx/dirdlg.h>
 #include <wx/config.h>
 #include <wx/dir.h>
+#include <wx/ffile.h>
+#include <wx/file.h>
+#include <wx/time.h>
+#include <wx/stdpaths.h>
 #include <vector>
 
 #include "encfsgui.h"
@@ -70,14 +74,14 @@ private:
     wxCheckBox * m_chkbx_prevent_autounmount;
     wxCheckBox * m_chkbx_save_password;
     wxCheckBox * m_chkbx_perfile_iv;
-    wxCheckBox * m_chkbx_external_iv_chaining;
+    wxCheckBox * m_chkbx_iv_chaining;
     wxCheckBox * m_chkbx_filename_to_iv_header_chaining;
     wxCheckBox * m_chkbx_block_mac_headers;
     wxComboBox * m_combo_cipher_algo;
     wxComboBox * m_combo_cipher_keysize;
     wxComboBox * m_combo_cipher_blocksize;
     wxComboBox * m_combo_filename_enc;
-    wxComboBox * m_combo_keyderivation;
+    //wxComboBox * m_combo_keyderivation;
     wxDECLARE_EVENT_TABLE();
     void SetEncfsOptionsState(bool);
     bool createEncFSFolder();
@@ -140,10 +144,10 @@ void frmAddDialog::SetEncfsOptionsState(bool enabledstate)
         m_combo_cipher_keysize->Disable();
         m_combo_cipher_blocksize->Disable();
         m_combo_filename_enc->Disable();
-        m_combo_keyderivation->Disable();
+        //m_combo_keyderivation->Disable();
         m_chkbx_perfile_iv->Disable();
         m_chkbx_block_mac_headers->Disable();
-        m_chkbx_external_iv_chaining->Disable();
+        m_chkbx_iv_chaining->Disable();
         m_chkbx_filename_to_iv_header_chaining->Disable();
     }
     else
@@ -152,10 +156,10 @@ void frmAddDialog::SetEncfsOptionsState(bool enabledstate)
         m_combo_cipher_keysize->Enable();
         m_combo_cipher_blocksize->Enable();
         m_combo_filename_enc->Enable();
-        m_combo_keyderivation->Enable();
+        //m_combo_keyderivation->Enable();
         m_chkbx_perfile_iv->Enable();
         m_chkbx_block_mac_headers->Enable();
-        m_chkbx_external_iv_chaining->Enable();
+        m_chkbx_iv_chaining->Enable();
         m_chkbx_filename_to_iv_header_chaining->Enable();        
     }
 
@@ -172,11 +176,11 @@ void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
         m_combo_cipher_blocksize->SetValue("2048");
         m_combo_cipher_keysize->SetValue("192");
         m_combo_filename_enc->SetValue("Stream");
-        m_combo_keyderivation->SetValue("500");
+        //m_combo_keyderivation->SetValue("500");
         m_chkbx_block_mac_headers->SetValue(false);
         m_chkbx_perfile_iv->SetValue(true);
-        m_chkbx_external_iv_chaining->SetValue(false);
-        m_chkbx_filename_to_iv_header_chaining->SetValue(true);
+        m_chkbx_iv_chaining->SetValue(false);
+        m_chkbx_filename_to_iv_header_chaining->SetValue(false);
         SetEncfsOptionsState(false);
     }
     else if (SelectedProfile == ID_ENCFSPROFILE_SECURE)
@@ -185,10 +189,10 @@ void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
         m_combo_cipher_blocksize->SetValue("4096");
         m_combo_cipher_keysize->SetValue("256");
         m_combo_filename_enc->SetValue("Block");
-        m_combo_keyderivation->SetValue("1000");
+        //m_combo_keyderivation->SetValue("1000");
         m_chkbx_block_mac_headers->SetValue(true);
         m_chkbx_perfile_iv->SetValue(true);
-        m_chkbx_external_iv_chaining->SetValue(false);
+        m_chkbx_iv_chaining->SetValue(true);
         m_chkbx_filename_to_iv_header_chaining->SetValue(true);
         SetEncfsOptionsState(false);        
     }
@@ -198,10 +202,10 @@ void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
         m_combo_cipher_blocksize->SetValue("1024");
         m_combo_cipher_keysize->SetValue("192");
         m_combo_filename_enc->SetValue("Stream");
-        m_combo_keyderivation->SetValue("500");
+        //m_combo_keyderivation->SetValue("500");
         m_chkbx_block_mac_headers->SetValue(false);
         m_chkbx_perfile_iv->SetValue(false);
-        m_chkbx_external_iv_chaining->SetValue(false);
+        m_chkbx_iv_chaining->SetValue(false);
         m_chkbx_filename_to_iv_header_chaining->SetValue(false);        
         SetEncfsOptionsState(false);
     }
@@ -268,7 +272,7 @@ void frmAddDialog::Create()
     }
     */
     arrAlgos.Add("AES");
-    arrAlgos.Add("Blowfish");
+    //arrAlgos.Add("Blowfish");  // forget it
     wxArrayString arrKeySizes;
     arrKeySizes.Add("128");
     arrKeySizes.Add("192");
@@ -282,8 +286,9 @@ void frmAddDialog::Create()
     }
     wxArrayString arrFilenameEnc;
     arrFilenameEnc.Add("Block");
-    arrFilenameEnc.Add("Stream");
+    arrFilenameEnc.Add("Block32");
     arrFilenameEnc.Add("Null");
+    arrFilenameEnc.Add("Stream");
     wxArrayString arrKeyDerivationDuration;
     arrKeyDerivationDuration.Add("500");
     arrKeyDerivationDuration.Add("1000");
@@ -309,9 +314,9 @@ void frmAddDialog::Create()
     sizerEncFS_row2->Add(new wxStaticText(this, wxID_ANY, "Filename encoding:"));
     m_combo_filename_enc = new wxComboBox(this, wxID_ANY, arrFilenameEnc[0], wxDefaultPosition, wxDefaultSize, arrFilenameEnc, wxCB_READONLY);
     sizerEncFS_row2->Add(m_combo_filename_enc,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
-    sizerEncFS_row2->Add(new wxStaticText(this, wxID_ANY, "PBKDF2 key derivation duration (ms):"));
-    m_combo_keyderivation = new wxComboBox(this, wxID_ANY, arrKeyDerivationDuration[0], wxDefaultPosition, wxDefaultSize, arrKeyDerivationDuration, wxCB_READONLY);
-    sizerEncFS_row2->Add(m_combo_keyderivation,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
+    //sizerEncFS_row2->Add(new wxStaticText(this, wxID_ANY, "PBKDF2 key derivation duration (ms):"));
+    //m_combo_keyderivation = new wxComboBox(this, wxID_ANY, arrKeyDerivationDuration[0], wxDefaultPosition, wxDefaultSize, arrKeyDerivationDuration, wxCB_READONLY);
+    //sizerEncFS_row2->Add(m_combo_keyderivation,wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
     sizerEncFS->Add(sizerEncFS_row2);
 
     // row 3 : HMAC & IV settings
@@ -320,10 +325,10 @@ void frmAddDialog::Create()
     sizerEncFS_row3->Add(m_chkbx_block_mac_headers);
     m_chkbx_perfile_iv = new wxCheckBox(this, wxID_ANY, "Per-file unique IV");
     sizerEncFS_row3->Add(m_chkbx_perfile_iv);
-    m_chkbx_filename_to_iv_header_chaining = new wxCheckBox(this, wxID_ANY, "Chained IV");
+    m_chkbx_iv_chaining = new wxCheckBox(this, wxID_ANY, "Chained IV");
+    sizerEncFS_row3->Add(m_chkbx_iv_chaining);
+    m_chkbx_filename_to_iv_header_chaining = new wxCheckBox(this, wxID_ANY, "External IV");
     sizerEncFS_row3->Add(m_chkbx_filename_to_iv_header_chaining);
-    m_chkbx_external_iv_chaining = new wxCheckBox(this, wxID_ANY, "External IV");
-    sizerEncFS_row3->Add(m_chkbx_external_iv_chaining);
     sizerEncFS->Add(sizerEncFS_row3);
     // row 4 : idle timings
 
@@ -415,19 +420,141 @@ void frmAddDialog::ChooseDestinationFolder(wxCommandEvent& WXUNUSED(event))
 }
 
 
+
 bool frmAddDialog::createEncFSFolder()
 {
     bool createdok = false;
     wxString encfsbin = getEncFSBinPath();
     wxString cmd;
+    wxString scriptcontents;
+    wxString newline;
     wxString args;
     wxString enc_path = m_source_field->GetValue();
     wxString pw = m_pass1->GetValue();
     wxString mount_path = m_destination_field->GetValue();
     wxString volumename = m_volumename_field->GetValue();
+    wxStandardPathsBase& stdp = wxStandardPaths::Get();
+    wxString tmpdir = stdp.GetTempDir();
+    wxString scriptfile;
+    scriptfile.Printf(wxT("%screateencfs.exp"), tmpdir );
 
-    cmd.Printf(wxT("sh -c \"echo '%s' | %s -v -S '%s' '%s' --volname='%s'\""), pw, encfsbin, enc_path, mount_path, volumename);
+    wxString algochoice="1";
+    wxString filenameencodingchoice="1";
+    wxString selectedalgo = m_combo_cipher_algo->GetValue();
+    if ( selectedalgo == "AES")
+    {
+        algochoice = "1";
+    }
+    else if (selectedalgo == "Blowfish")
+    {
+        algochoice = "2";
+    }
+
+    wxString selectedfilenameencoding = m_combo_filename_enc->GetValue();
+    if (selectedfilenameencoding == "Block")
+    {
+        filenameencodingchoice = "1";
+    }
+    else if (selectedfilenameencoding == "Block32")
+    {
+        filenameencodingchoice = "2";
+    }
+    else if (selectedfilenameencoding == "Null")
+    {
+        filenameencodingchoice = "3";
+    }
+    else if (selectedfilenameencoding == "Stream")
+    {
+        filenameencodingchoice = "4";
+    }
+
+    scriptcontents = getExpectScriptContents();
+    // replace keywords with actual values
+    scriptcontents.Replace("$ENCFSBIN", encfsbin);
+    scriptcontents.Replace("$ENCPATH", enc_path);
+    scriptcontents.Replace("$MOUNTPATH", mount_path);
+    scriptcontents.Replace("$CIPHERALGO", algochoice);
+    scriptcontents.Replace("$CIPHERKEYSIZE", m_combo_cipher_keysize->GetValue());
+    scriptcontents.Replace("$BLOCKSIZE", m_combo_cipher_blocksize->GetValue());
+    scriptcontents.Replace("$ENCODINGALGO", filenameencodingchoice);
+
+
+    if (m_chkbx_iv_chaining->GetValue())
+    {
+        scriptcontents.Replace("$IVCHAINING","");
+    }
+    else
+    {  
+        scriptcontents.Replace("$IVCHAINING","n");
+    }
+
+    if (m_chkbx_perfile_iv->GetValue())
+    {
+        scriptcontents.Replace("$PERFILEIV","");
+    }
+    else
+    {
+        scriptcontents.Replace("$PERFILEIV","n");
+    }
+
+    if (m_chkbx_filename_to_iv_header_chaining->GetValue())
+    {
+        scriptcontents.Replace("$FILETOIVHEADERCHAINING","y");
+    }
+    else
+    {
+        scriptcontents.Replace("$FILETOIVHEADERCHAINING","");   // n is default here
+    }
+    
+    if (m_chkbx_block_mac_headers->GetValue())
+    {
+        scriptcontents.Replace("$BLOCKAUTHCODEHEADERS","y");
+    }
+    else
+    {
+        scriptcontents.Replace("$BLOCKAUTHCODEHEADERS",""); // n is default here
+    }
+
+    // write script to disk
+    wxTempFile * tmpfile = new wxTempFile();
+    tmpfile->Open(scriptfile);
+    if (tmpfile->IsOpened())
+    {
+        tmpfile->Write(scriptcontents);
+    }
+    tmpfile->Commit();
+
+    cmd.Printf(wxT("sh -c \"'expect' '%s' '%s'\""), scriptfile, pw);
+    // run command asynchronously
+    wxArrayString arroutput = ArrRunCMDASync(cmd);
     pw = "";
+    // wait for max 20 seconds, or until config file exists
+    bool configfilefound = false;
+    int nrruns = 0;
+    while (!configfilefound)
+    {
+        wxString configfilepath;
+        configfilepath.Printf(wxT("%s/.encfs6.xml"), enc_path);
+        wxFileName configfile;
+        configfile = wxFileName::wxFileName(configfilepath);
+
+        if (configfile.FileExists())
+        {
+            configfilefound = true;
+            createdok = true;
+        }
+        else 
+        {
+            // file does not exist
+            if (nrruns > 20)
+            {
+                configfilefound = true;
+                createdok = false;
+            }            
+        }
+        wxSleep(1);
+        ++nrruns;
+    }
     return createdok;
 }
 
@@ -469,15 +596,24 @@ void frmAddDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     wxString srcfolder = m_source_field->GetValue();
     if (!srcfolder.IsEmpty())
     {
-        wxDir dir(srcfolder);
-        if (!dir.IsOpened())
+        wxDir * dir = new wxDir(srcfolder);
+        if (!dir->IsOpened())
         {
             errormsg << "- Please specify a valid encfs source folder location\n";
             src_folder_ok = false;
         }
         else
         {
-            src_folder_ok = true;
+            // the new encrypted folder location must be empty
+            if (dir->HasFiles() && dir->HasSubDirs())
+            {
+                src_folder_ok = false;
+                errormsg << "- New encrypted folder is not empty\n";
+            }
+            else
+            {
+                src_folder_ok = true;   
+            }
         }
     }
 
@@ -533,7 +669,14 @@ void frmAddDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     }
     else
     {
-        // first, create the new volume
+        // change ownership on folders
+        wxString changeowner;
+        wxString outp;
+        changeowner.Printf(wxT("chmod 700 '%s'"), srcfolder);
+        outp = StrRunCMDSync(changeowner);
+        changeowner.Printf(wxT("chmod 700 '%s'"), dstfolder);
+        outp = StrRunCMDSync(changeowner);
+        // create the new volume
         bool createdok = createEncFSFolder();
         if (createdok)
         {

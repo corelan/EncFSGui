@@ -19,7 +19,7 @@
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/utils.h>       // wxExecute
-
+#include <map>
 
 #include <fstream>
 
@@ -58,6 +58,14 @@ wxString getEncFSBinPath()
     pConfig->Write(wxT("encfsbinpath"),configvalue);
 
     return configvalue;
+}
+
+wxString getEncFSCTLBinPath()
+{
+    wxString returnval;
+    returnval = getEncFSBinPath();
+    returnval << "ctl";
+    return returnval;
 }
 
 wxString getMountBinPath()
@@ -130,12 +138,12 @@ wxString arrStrTowxStr(wxArrayString & input)
 
 
 // run a command (sync) and return output
-wxString StrRunCMDSync(wxString cmd)
+wxString StrRunCMDSync(wxString & cmd)
 {
     wxExecuteEnv env;
     wxArrayString output, errors;
     wxExecute(cmd, output, errors, 0, &env);
-    wxString returnvalue;
+    wxString returnvalue = "";
     
     // command line output may end up in errors
     // depending on the exit code of the called app
@@ -159,8 +167,16 @@ wxString StrRunCMDSync(wxString cmd)
     return returnvalue;
 }
 
+wxArrayString ArrRunCMDASync(wxString & cmd)
+{
+    wxExecuteEnv env;
+    wxArrayString output;
+    wxExecute(cmd, output, wxEXEC_ASYNC, &env);
+    return output;
+}
 
-wxArrayString ArrRunCMDSync(wxString cmd)
+
+wxArrayString ArrRunCMDSync(wxString & cmd)
 {
     wxExecuteEnv env;
     wxArrayString output, errors;
@@ -257,3 +273,178 @@ bool doesVolumeExist(wxString & volumename)
     }
     return false;
 }
+
+wxArrayString getEncFSVolumeInfo(wxString& encfs_volume)
+{
+    wxString cmd;
+    wxString encfsctlbin = getEncFSCTLBinPath();
+    wxArrayString cmdoutput;
+
+    cmd.Printf(wxT("sh -c \"'%s' '%s'\""), encfsctlbin, encfs_volume);
+    cmdoutput = ArrRunCMDSync(cmd);
+    return cmdoutput;
+}
+
+wxString getExpectScriptContents()
+{
+    wxString newline;
+    wxString scriptcontents;
+
+    // header
+    newline.Printf(wxT("#!/usr/bin/env expect\n"));
+    scriptcontents << newline;
+
+    newline.Printf(wxT("set passwd [lindex $argv 0]\n"));
+    scriptcontents << newline;
+
+    newline.Printf(wxT("set timeout 10\n"));
+    scriptcontents << newline;
+
+    // launch encfs
+    newline.Printf(wxT("spawn \"$ENCFSBIN\" -v \"$ENCPATH\" \"$MOUNTPATH\"\n"));
+    scriptcontents << newline;
+
+    // activate expert mode
+    newline.Printf(wxT("expect \"Please choose from one of the following options:\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("expect \"?>\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"x\\n\"\n"));
+    scriptcontents << newline;
+
+    // set cipher algorithm
+    newline.Printf(wxT("expect \"Enter the number corresponding to your choice: \"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"$CIPHERALGO\\n\"\n"));
+    scriptcontents << newline;
+
+    // select cipher keysize
+    newline.Printf(wxT("expect \"Selected key size:\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"$CIPHERKEYSIZE\\n\"\n"));
+    scriptcontents << newline;
+
+    // select filesystem block size
+    newline.Printf(wxT("expect \"filesystem block size:\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"$BLOCKSIZE\\n\"\n"));
+    scriptcontents << newline;
+
+    // select encoding algo
+    newline.Printf(wxT("expect \"Enter the number corresponding to your choice: \"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"$ENCODINGALGO\\n\"\n"));
+    scriptcontents << newline;
+
+    // filename IV chaining
+    newline.Printf(wxT("expect \"Enable filename initialization vector chaining?\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"$IVCHAINING\\n\"\n"));
+    scriptcontents << newline;
+
+    // per filename IV
+    newline.Printf(wxT("expect \"Enable per-file initialization vectors?\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"$PERFILEIV\\n\"\n"));
+    scriptcontents << newline;
+
+    // file to IV header chaining can only be used when both previous options are enabled
+    // which means it might slide to the next option right away
+    newline.Printf(wxT("expect {\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("\t\"Enable filename to IV header chaining?\" {\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("\t\tsend \"$FILETOIVHEADERCHAINING\\n\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("\t\texpect \"Enable block authentication code headers\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("\t\tsend \"$BLOCKAUTHCODEHEADERS\\n\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("\t\t}\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("\t\"Enable block authentication code headers\" {\n"));  //space matters
+    scriptcontents << newline;
+    newline.Printf(wxT("\t\tsend \"$BLOCKAUTHCODEHEADERS\\n\"\n"));
+    scriptcontents << newline;   
+    newline.Printf(wxT("\t\t}\n"));
+    scriptcontents << newline;   
+    newline.Printf(wxT("\t}\n"));
+    scriptcontents << newline;    
+
+    // add random bytes to each block header
+    newline.Printf(wxT("expect \"Select a number of bytes, from 0 (no random bytes) to 8: \"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"0\\n\"\n"));
+    scriptcontents << newline;
+
+    // file-hole pass-through
+    newline.Printf(wxT("expect \"Enable file-hole pass-through?\"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"\\n\"\n"));
+    scriptcontents << newline;        
+
+    // password
+    newline.Printf(wxT("expect \"New Encfs Password: \"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"$passwd\\n\"\n"));
+    scriptcontents << newline;    
+
+    newline.Printf(wxT("expect \"Verify Encfs Password: \"\n"));
+    scriptcontents << newline;
+    newline.Printf(wxT("send \"$passwd\\n\"\n"));
+    scriptcontents << newline;    
+
+    newline.Printf(wxT("puts \"\\nDone.\\n\"\n"));
+    scriptcontents << newline;
+
+    newline.Printf(wxT("expect \"\\n\"\n"));
+    scriptcontents << newline;    
+    
+    newline.Printf(wxT("sleep 2\n"));
+    scriptcontents << newline;
+
+    return scriptcontents;
+}
+
+wxString getChangePasswordScriptContents(wxString & enc_path)
+{
+    wxString scriptcontents;
+    wxString newline;
+    wxString encfsctlbin = getEncFSCTLBinPath();
+
+    newline.Printf(wxT("#!/usr/bin/env expect\n"));
+    scriptcontents << newline;
+
+    newline.Printf(wxT("set oldpw [lindex $argv 0]\n"));
+    scriptcontents << newline;
+
+    newline.Printf(wxT("set newpw [lindex $argv 1]\n"));
+    scriptcontents << newline;
+
+    newline.Printf(wxT("spawn '%s' autopasswd '%s'\n"), encfsctlbin, enc_path);
+    scriptcontents << newline;
+
+    newline.Printf(wxT("expect \"Enter current Encfs password\"\n"));
+    scriptcontents << newline;
+    
+    newline.Printf(wxT("send \"$oldpw\r\"\n"));
+    scriptcontents << newline;
+
+    newline.Printf(wxT("expect \"Enter new Encfs password\"\n"));
+    scriptcontents << newline;
+    
+    newline.Printf(wxT("send \"$newpw\r\"\n"));
+    scriptcontents << newline;
+
+    return scriptcontents;
+
+}
+
+
+std::map<wxString, wxString> getEncodingCapabilities(wxString & encfsOutput)
+{
+    std::map<wxString, wxString> encodingcaps;
+
+    return encodingcaps;
+}
+
