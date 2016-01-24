@@ -7,11 +7,12 @@ OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
 OPENSSL_LIB_DIR=/usr/local/opt/openssl/lib
 ENCFS_INCLUDE_DIR=./encfs
 
-COMPILER=c++
-LINKER=c++
+COMPILER=g++
+LINKER=g++
+MIN_MACOSX_VERSION=-mmacosx-version-min=10.5
 #STDFLAGS=-stdlib=libc++ -std=c++11
-COMPFLAGS=`$(WX_BUILD_DIR)/wx-config --static=yes --cxxflags` -DFUSE_USE_VERSION=26 -mmacosx-version-min=10.7 -D__WXOSX_COCOA__  -DWXUSINGDLL -Wall -Wundef -Wunused-parameter -Wno-ctor-dtor-privacy -Woverloaded-virtual -Wno-deprecated-declarations  -D_FILE_OFFSET_BITS=64 -I$(WX_BUILD_DIR)/lib/wx/include/osx_cocoa-unicode-3.1 -I../../../include -DWX_PRECOMP -g -O0 -fno-common -fvisibility=hidden -fvisibility-inlines-hidden -I$(ENCFS_INCLUDE_DIR) -I$(OSXFUSE_INCLUDE_DIR) -I$(OPENSSL_INCLUDE_DIR) -I/usr/local/include
-LINKFLAGS=-mmacosx-version-min=10.7 `$(WX_BUILD_DIR)/wx-config --static=yes --libs` -L$(OPENSSL_LIB_DIR)
+COMPFLAGS=`$(WX_BUILD_DIR)/wx-config --static=yes --cxxflags` -DFUSE_USE_VERSION=26 $(MIN_MACOSX_VERSION) -D__WXOSX_COCOA__  -DWXUSINGDLL -Wall -Wundef -Wunused-parameter -Wno-ctor-dtor-privacy -Woverloaded-virtual -Wno-deprecated-declarations  -D_FILE_OFFSET_BITS=64 -I$(WX_BUILD_DIR)/lib/wx/include/osx_cocoa-unicode-3.1 -I../../../include -DWX_PRECOMP -g -O0 -fno-common -fvisibility=hidden -fvisibility-inlines-hidden -I$(ENCFS_INCLUDE_DIR) -I$(OSXFUSE_INCLUDE_DIR) -I$(OPENSSL_INCLUDE_DIR) -I/usr/local/include
+LINKFLAGS=$(MIN_MACOSX_VERSION) `$(WX_BUILD_DIR)/wx-config --static=yes --libs` -L$(OPENSSL_LIB_DIR)
 SOURCES=*.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=encfsgui
@@ -28,6 +29,7 @@ all:	$(SOURCES) $(EXECUTABLE)
 	/bin/echo "APPL????" >$(EXECUTABLE).app/Contents/PkgInfo
 	cp $(EXECUTABLE).icns $(EXECUTABLE).app/Contents/Resources
 	cp $(EXECUTABLE) $(EXECUTABLE).app/Contents/MacOS
+	rm -rf *.o*
 	@echo
 	@echo	----------------------------------------
 	@echo	 The EncFSGUI project has been compiled
@@ -40,7 +42,6 @@ $(EXECUTABLE): $(OBJECTS)
 	@echo	[+] Step 2: Linking file to executable
 	@echo	--------------------------------------
 	$(LINKER) $(LINKFLAGS) $(OBJECTS) -o $@ 
-	rm -rf *.o*
 	SetFile -t APPL encfsgui
 	@echo	    Step 2 Done
 

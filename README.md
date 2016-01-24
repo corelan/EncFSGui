@@ -21,8 +21,7 @@ Also, this is my very first project in C++.  As I started learning C++ just a fe
 
 With that said, all positive contributions are more than welcome. If you want to contribute, check out the development setup section first.<br>
 
-Although the plan is to statically compile this application with the required dependencies (encfs, fuse, openssl), so you would not have to worry about installing dependencies yourself.<br>
-So, for now, if you want to try the application, you'll need a number of dependencies installed on your OSX machine:
+If you want to try the application, you'll need a number of dependencies installed on your OSX machine:
 - encfs
 - OSXFuse
 
