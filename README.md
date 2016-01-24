@@ -34,7 +34,7 @@ If you want to try the application, you'll need a number of dependencies install
 - OSXFuse
 
 
-## Running EncFSGUi : Installing dependencies on OSX
+## Running EncFSGUI: Installing dependencies on OSX
 
 (this procedure should work on Yosemite and El Capitan, as those are the 2 versions that I am using myself) 
 
