@@ -159,6 +159,11 @@ If you plan on contributing, please create a new branch first.  Do NOT submit pu
     - [ ] Add context menu to icon, allow mount/unmount volumes
   - [ ] Implement overall error handling
   - [ ] Code cleanup & documentation
+    - [ ] Create proper destructors where needed
+    - [ ] Add proper documentation for functions & classes
+    - [ ] Review variable names
+    - [ ] Adopt a better coding style
+    - [ ] Learn how to write proper C++
   - [ ] Prevent Command+C (Copy) to trigger 'Cancel' button in dialogs
   - [ ] Allow use of passwords that contain quotes (single and double)
   - [ ] Move installation instructions to wiki
