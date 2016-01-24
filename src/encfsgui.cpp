@@ -258,7 +258,7 @@ public:
     int mountFolder(wxString& volumename, wxString& pw);
 
     // override default OnExit handler (so we can run code when user clicks close button on frame)
-    virtual int OnExit(wxCommandEvent& event) wxOVERRIDE;
+    virtual int OnExit(wxCommandEvent& event);
 
     // handle clicks on toolbar
     void OnToolLeftClick(wxCommandEvent& event);

@@ -17,7 +17,9 @@
 #include <wx/config.h>
 #include <wx/dir.h>
 #include <vector>
+
 #include "encfsgui.h"
+
 
 // ----------------------------------------------------------------------------
 // constants
@@ -257,8 +259,16 @@ void frmAddDialog::Create()
 
     // Cipher
     wxArrayString arrAlgos;
+    /*
+    Cipher::AlgorithmList algorithms = Cipher::GetAlgorithmList();
+    Cipher::AlgorithmList::const_iterator it;
+    for(it = algorithms.begin(); it != algorithms.end(); ++it)
+    {
+        arrAlgos.Add(wxString(it->name.c_str()));
+    }
+    */
     arrAlgos.Add("AES");
-    //arrAlgos.Add("Blowfish");
+    arrAlgos.Add("Blowfish");
     wxArrayString arrKeySizes;
     arrKeySizes.Add("128");
     arrKeySizes.Add("192");

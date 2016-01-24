@@ -161,6 +161,7 @@ So, for now, if you want to try the application, you'll need a number of depende
   If you don't want to copy the encfs files over, you'll have to update the Makefile (see later) and update the `ENCFS_INCLUDE_DIR` value, making it point to the 'encfs' folder inside the encfs git clone.  Don't forget to copy config.h into that encfs folder of the git clone as well, and you should be all set.
 
 
+
 ### Before compiling EncFSGUI
 
 4. Edit Makefile

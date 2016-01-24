@@ -6,6 +6,8 @@
 #endif
 
 #include <wx/config.h>
+
+/*
 #ifndef RLOG_COMPONENT
 //#  warning RLOG_COMPONENT not defined - setting to UNKNOWN
 #define RLOG_COMPONENT "[unknown]"
@@ -15,7 +17,7 @@
 #include "fuse/fuse.h"
 #include "openssl.h"
 #include "encfs.h"
-
+*/
 
 // ----------------------------------------------------------------------------
 // function declarations
