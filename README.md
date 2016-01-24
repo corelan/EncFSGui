@@ -146,4 +146,13 @@ If you want to try the application, you'll need a number of dependencies install
 If you plan on contributing, please create a new branch first.  Do NOT submit pull requests against the master branch.
 
 
+## TO DO
 
+  - [ ] Add code to edit a (non-mounted) volume
+    - [ ] Rename volume
+    - [ ] Select a different mount point
+    - [ ] Unsave password from Keychain (if saved)
+    - [ ] Change password (routine already exists)
+  - [ ] Implement 'Start application at login'
+  - [ ] Check how to launch as an icon and add as an option
+    - [ ] Add context menu to icon, allow mount/unmount volumes
