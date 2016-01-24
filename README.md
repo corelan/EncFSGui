@@ -161,3 +161,6 @@ If you plan on contributing, please create a new branch first.  Do NOT submit pu
   - [ ] Code cleanup & documentation
   - [ ] Prevent Command+C (Copy) to trigger 'Cancel' button in dialogs
   - [ ] Allow use of passwords that contain quotes (single and double)
+  - [ ] Move installation instructions to wiki
+  - [ ] Add pictures
+  - [ ] Add license information everywhere, as needed
