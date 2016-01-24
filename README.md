@@ -3,9 +3,9 @@
 Public repository for the encfsgui project, an OSX GUI wrapper around encfs
 
 ## Warning 
-This application is NOT ready for use yet. <br>
+This application is still missing some features, but it should be quite usable already.<br>
 It is still under heavy development and will be updated on a regular basis.<br>
-Proper announcements will be made when the app is ready for use. <br>
+Proper announcements will be made when the app is ready for use.<br>
 
 If you feel brave enough, feel free to grab a compiled version of the app from here: https://github.com/corelan/EncFSGui/raw/master/release/EncFSGUI.dmg<br>
 Note: To run the app, check the "Installing dependencies on OSX" section below<br>
@@ -156,3 +156,5 @@ If you plan on contributing, please create a new branch first.  Do NOT submit pu
   - [ ] Implement 'Start application at login'
   - [ ] Check how to launch as an icon and add as an option
     - [ ] Add context menu to icon, allow mount/unmount volumes
+  - [ ] Implement overall error handling
+  - [ ] Code cleanup & documentation
