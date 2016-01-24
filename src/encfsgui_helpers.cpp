@@ -228,8 +228,8 @@ bool IsVolumeSystemMounted(wxString volpath, wxArrayString mountinfo)
         {
             signed int pos1;
             signed int pos2;
-            pos1 = thisline.find(volpath);
-            pos2 = thisline.find(encmarker);
+            pos1 = thisline.Find(volpath);
+            pos2 = thisline.Find(encmarker);
             if ( (pos1 > checkval) && (pos2 > checkval) )
             {
                 return true;
