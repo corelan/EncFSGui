@@ -164,3 +164,6 @@ If you plan on contributing, please create a new branch first.  Do NOT submit pu
   - [ ] Move installation instructions to wiki
   - [ ] Add pictures
   - [ ] Add license information everywhere, as needed
+  - [ ] Updates
+    - [ ] Code to check for updates
+    - [ ] Option to "auto check for updates"
