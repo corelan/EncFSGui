@@ -1,26 +1,26 @@
 # EncFSGui
 
-Public repository for the encfsgui project, an OSX GUI wrapper around encfs
+Public repository for the EncFSGui project, an OSX GUI wrapper around encfs
 
 ## Warning 
 This application is still missing some features, but it should be quite usable already.<br>
 It is still under heavy development and will be updated on a regular basis.<br>
 Proper announcements will be made when the app is ready for use.<br>
 
-If you feel brave enough, feel free to grab a compiled version of the app from here: https://github.com/corelan/EncFSGui/raw/master/release/EncFSGUI.dmg<br>
+If you feel brave enough, feel free to grab a compiled version of the app from here: https://github.com/corelan/EncFSGui/raw/master/release/EncFSGui.dmg<br>
 Note: To run the app, check the "Installing dependencies on OSX" section below<br>
 
 
 ## Donate
-If you like this initiative and want to show your appreciation, please consider donating using [this link](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&bn=EncFSGUI&business=peter.ve@corelan.be&currency_code=EUR&item_name=Support%20EncFSGui%20Project)<br>
+If you like this initiative and want to show your appreciation, please consider donating using [this link](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&bn=EncFSGui&business=peter.ve@corelan.be&currency_code=EUR&item_name=Support%20EncFSGui%20Project)<br>
 
 (I could have decided to distribute this as a commercial closed-sourced project and sell it via the App Store... but I didn't, despite the fact that 'there is no free lunch')<br>
 
 
 ## Background
-EncFSGUI is a wrapper around encfs, encfsctl and mount, and relies on OSXFuse to provide a filesystem.<br>
+EncFSGui is a wrapper around encfs, encfsctl and mount, and relies on OSXFuse to provide a filesystem.<br>
 In other words, it relies entirely on those utilities, the ability to interact with those tools and to capture the output from those tools.<br>
-As a result, the EncFSGUI source code is pretty easy to understand, as it does not contain any crypto or other black magic to do its job.<br>
+As a result, the EncFSGui source code is pretty easy to understand, as it does not contain any crypto or other black magic to do its job.<br>
 The downside is that it is a wrapper and may break if tools start behaving in a different way.<br>
 
 This application is written in C++, and uses the wxWidgets Cross-Platform Library.  Although the source probably compiles fine under Linux/Unix and Windows, it was written for OSX and contains hardcoded strings & paths that will certainly prevent the app from working on Windows.  It might actually work on Linux (but I haven't tested it myself)<br>
@@ -34,7 +34,7 @@ If you want to try the application, you'll need a number of dependencies install
 - OSXFuse
 
 
-## Running EncFSGUI: Installing dependencies on OSX
+## Running EncFSGui: Installing dependencies on OSX
 
 (this procedure should work on Yosemite and El Capitan, as those are the 2 versions that I am using myself) 
 
@@ -127,14 +127,14 @@ If you want to try the application, you'll need a number of dependencies install
   ```
 
 
-### Before compiling EncFSGUI
+### Before compiling EncFSGui
 
 1. Edit Makefile
 
   - update the `WX_BUILD_DIR` variable so it would contain the absolute path to the build-release-static folder on your own machine.
 
 
-### Compiling & linking EncFSGUI
+### Compiling & linking EncFSGui
 
 1. run `make clean` before compiling/linking
 

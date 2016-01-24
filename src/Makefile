@@ -27,8 +27,9 @@ all:	$(SOURCES) $(EXECUTABLE)
 	@echo
 	@echo Creating dmg into Releases folder
 	mkdir -p ../release
-	hdiutil create -fs HFS+ -srcfolder ./Build -volname EncFSGUI EncFSGUI.dmg
-	mv EncFSGUI.dmg ../release 
+	rm -rf ../release/*
+	hdiutil create -fs HFS+ -srcfolder ./Build -volname EncFSGui EncFSGui.dmg
+	mv EncFSGui.dmg ../release 
 	@echo
 	@echo	----------------------------------------
 	@echo	 The EncFSGUI project has been compiled
