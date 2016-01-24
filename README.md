@@ -7,6 +7,9 @@ This application is NOT ready for use yet. <br>
 It is still under heavy development and will be updated on a regular basis.<br>
 Proper announcements will be made when the app is ready for use. <br>
 
+If you feel brave enough, feel free to grab a compiled version of the app from here: https://github.com/corelan/EncFSGui/raw/master/release/EncFSGUI.dmg<br>
+Note: To run the app, check the "Installing dependencies on OSX" section below<br>
+
 
 ## Donate
 If you like this initiative and want to show your appreciation, please consider donating using [this link](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&bn=EncFSGUI&business=peter.ve@corelan.be&currency_code=EUR&item_name=Support%20EncFSGui%20Project)<br>
