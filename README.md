@@ -7,14 +7,19 @@ This application is NOT ready for use yet. <br>
 It is still under heavy development and will be updated on a regular basis.<br>
 Proper announcements will be made when the app is ready for use. <br>
 
-## Donate
 
+## Donate
 If you like this initiative and want to show your appreciation, please consider donating using [this link](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&bn=EncFSGUI&business=peter.ve@corelan.be&currency_code=EUR&item_name=Support%20EncFSGui%20Project)<br>
 
 (I could have decided to distribute this as a commercial closed-sourced project and sell it via the App Store... but I didn't, despite the fact that 'there is no free lunch')<br>
 
 
 ## Background
+EncFSGUI is a wrapper around encfs, encfsctl and mount, and relies on OSXFuse to provide a filesystem.<br>
+In other words, it relies entirely on those utilities, the ability to interact with those tools and to capture the output from those tools.<br>
+As a result, the EncFSGUI source code is pretty easy to understand, as it does not contain any crypto or other black magic to do its job.<br>
+The downside is that it is a wrapper and may break if tools start behaving in a different way.<br>
+
 This application is written in C++, and uses the wxWidgets Cross-Platform Library.  Although the source probably compiles fine under Linux/Unix and Windows, it was written for OSX and contains hardcoded strings & paths that will certainly prevent the app from working on Windows.  It might actually work on Linux (but I haven't tested it myself)<br>
 If you are looking for an EncFS Gui for Windows, check out the EncFSMP project on sourceforge.<br>
 Also, this is my very first project in C++.  As I started learning C++ just a few weeks ago (self-study), I am fully aware that my C++ stinks. I am quite keen on learning & improving, and I am open for constructive advise and help.<br>
