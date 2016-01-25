@@ -1,3 +1,11 @@
+/*
+    encFSGui - encfsgui.h
+    source file contains function declarations
+
+    written by Peter Van Eeckhoutte
+
+*/
+
 #pragma once
 // For compilers that support precompilation, includes "wx/wx.h".
 #include <wx/wxprec.h>
@@ -27,6 +35,9 @@
 // encfsgui_add.cpp
 void createNewEncFSFolder(wxWindow *);
 void openExistingEncFSFolder(wxWindow *);
+
+// encfsgui_edit.cpp
+void editExistingEncFSFolder(wxWindow *, wxString&, bool);
 
 // encfsgui_helpers.cpp
 bool isEncFSBinInstalled();

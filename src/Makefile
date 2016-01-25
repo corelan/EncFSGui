@@ -62,4 +62,7 @@ clean:
 	rm -rf encfsgui
 	mkdir -p Build
 	rm -rf Build/*
+	@echo
 	@echo	Done eating.
+	@echo	Run 'make' to compile the sources and create the application binary.
+	@echo

@@ -1,6 +1,6 @@
 /*
-    encFSGui - source file contains
-    code to change settings
+    encFSGui - encfsgui_settings.cpp
+    source file contains code to change app settings
 
     written by Peter Van Eeckhoutte
 

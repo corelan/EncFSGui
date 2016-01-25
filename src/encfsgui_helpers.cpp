@@ -1,6 +1,6 @@
 /*
-    encFSGui - source file contains
-    helper functions
+    encFSGui - encfsgui_helpers.cpp
+    source file contains helper functions
 
     written by Peter Van Eeckhoutte
 

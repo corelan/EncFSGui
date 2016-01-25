@@ -1,7 +1,7 @@
 /*
-    encFSGui - source file contains
-    code to handle opening existing encFS folders
-    or create new folders
+    encFSGui - encfsgui_add.cpp
+    This file contains code to create new encfs folders
+    or to add existing encfs to the app
 
     written by Peter Van Eeckhoutte
 

@@ -1,5 +1,6 @@
 /*
-	encFSGui - main source
+	encFSGui - encfsgui.cpp
+    main source
 
 	written by Peter Van Eeckhoutte
 
@@ -832,7 +833,7 @@ int frmMain::mountSelectedFolder(wxString& pw)
         SetToolBarButtonState(ID_Toolbar_Mount, false);
         SetToolBarButtonState(ID_Toolbar_Unmount, true);
         SetToolBarButtonState(ID_Toolbar_Browse, true);
-        SetToolBarButtonState(ID_Toolbar_Edit, false);
+        SetToolBarButtonState(ID_Toolbar_Edit, true);   // limited edits allowed
     }
     else
     {
@@ -948,7 +949,7 @@ void frmMain::OnUnMount(wxCommandEvent& WXUNUSED(event))
         SetToolBarButtonState(ID_Toolbar_Mount, false);
         SetToolBarButtonState(ID_Toolbar_Unmount, true);
         SetToolBarButtonState(ID_Toolbar_Browse, true);
-        SetToolBarButtonState(ID_Toolbar_Edit, false);
+        SetToolBarButtonState(ID_Toolbar_Edit, true); // limited edits allowed
     }
 }
 
@@ -1052,7 +1053,10 @@ wxString frmMain::getPassWord(wxString& title, wxString& prompt)
 
 void frmMain::OnEditFolder(wxCommandEvent& WXUNUSED(event))
 {
-
+    DBEntry * thisvol = m_VolumeData[g_selectedVolume];
+    bool ismounted = thisvol->getMountState();
+    editExistingEncFSFolder(this, g_selectedVolume, ismounted);
+    RefreshAll();
 }
 
 void frmMain::OnRemoveFolder(wxCommandEvent& WXUNUSED(event))
@@ -1108,6 +1112,13 @@ void frmMain::OnToolLeftClick(wxCommandEvent& event)
     else if (event.GetId() == ID_Toolbar_Settings)
     {
         openSettings(this);
+        RefreshAll();
+    }
+    else if (event.GetId() == ID_Toolbar_Edit)
+    {
+        DBEntry * thisvol = m_VolumeData[g_selectedVolume];
+        bool ismounted = thisvol->getMountState();
+        editExistingEncFSFolder(this, g_selectedVolume, ismounted);
         RefreshAll();
     }
     else if (event.GetId() == ID_Toolbar_Quit)
@@ -1321,7 +1332,7 @@ void mainListCtrl::UpdateToolBarButtons()
                 m_toolBar->EnableTool(ID_Toolbar_Mount, false);
                 m_toolBar->EnableTool(ID_Toolbar_Unmount, true);
                 m_toolBar->EnableTool(ID_Toolbar_Browse, true);   
-                m_toolBar->EnableTool(ID_Toolbar_Edit, false);   
+                m_toolBar->EnableTool(ID_Toolbar_Edit, true);   
             }
             else
             {
