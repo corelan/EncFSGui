@@ -16,17 +16,46 @@
 #include <wx/config.h>
 #include <map>
 
-/*
-#ifndef RLOG_COMPONENT
-//#  warning RLOG_COMPONENT not defined - setting to UNKNOWN
-#define RLOG_COMPONENT "[unknown]"
-#endif // RLOG_COMPONENT not defined
-#define FUSE_USE_VERSION 26
 
-#include "fuse/fuse.h"
-#include "openssl.h"
-#include "encfs.h"
-*/
+
+
+// ----------------------------------------------------------------------------
+// Classes
+// ----------------------------------------------------------------------------
+
+// DBEntry - Class for volume entry from DB
+
+class DBEntry
+{
+public:
+    // ctor
+    DBEntry(wxString volname, 
+            wxString enc_path, 
+            wxString mount_path, 
+            bool automount, 
+            bool preventautounmount, 
+            bool pwsaved);
+
+    void setMountState(bool);
+    bool getMountState();
+    bool getPwSavedState();
+    wxString getEncPath();
+    bool getAutoMount();
+    wxString getMountPath();
+    wxString getVolName();
+    bool getPreventAutoUnmount();
+
+private:
+    bool m_mountstate;
+    bool m_automount;
+    bool m_preventautounmount;
+    bool m_pwsaved;
+    wxString m_volname;
+    wxString m_enc_path;
+    wxString m_mount_path;
+};
+
+
 
 // ----------------------------------------------------------------------------
 // function declarations
@@ -37,7 +66,7 @@ void createNewEncFSFolder(wxWindow *);
 void openExistingEncFSFolder(wxWindow *);
 
 // encfsgui_edit.cpp
-void editExistingEncFSFolder(wxWindow *, wxString&, bool);
+void editExistingEncFSFolder(wxWindow *, wxString&, std::map<wxString, DBEntry*>);
 
 // encfsgui_helpers.cpp
 bool isEncFSBinInstalled();
@@ -47,6 +76,7 @@ wxString getMountBinPath();
 wxString getUMountBinPath();
 void ShowMsg(wxString);
 wxString getEncFSBinVersion();
+void renameVolume(wxString&, wxString&);
 
 wxString StrRunCMDSync(wxString&);
 wxArrayString ArrRunCMDSync(wxString&);

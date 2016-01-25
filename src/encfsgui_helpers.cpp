@@ -647,7 +647,35 @@ std::map<wxString, wxString> getEncodingCapabilities()
         wxString encodingval = it->second;
         pConfig->Write(encodingname, encodingval);
     }
-
+    pConfig->Flush();
     return encodingcaps;
+}
+
+
+void renameVolume(wxString& oldname, wxString& newname)
+{
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    wxString currentvol;
+    wxString newvol;
+    currentvol.Printf(wxT("/Volumes/%s"), oldname);
+    newvol.Printf(wxT("/Volumes/%s"), newname);
+    pConfig->SetPath(currentvol);
+    // get current values
+    wxString enc_path = pConfig->Read(wxT("enc_path"), "");
+    wxString mount_path = pConfig->Read(wxT("mount_path"), "");
+    bool automount = pConfig->ReadBool(wxT("automount"), 0l);
+    bool preventautounmount = pConfig->ReadBool(wxT("preventautounmount"), 0l);
+    bool passwordsaved = pConfig->ReadBool(wxT("passwordsaved"), 0l);
+    // delete old group
+    pConfig->DeleteGroup(currentvol);
+    // create a new one
+    pConfig->SetPath(newvol);
+    pConfig->Write("enc_path", enc_path);
+    pConfig->Write("mount_path", mount_path);
+    pConfig->Write("automount", automount);
+    pConfig->Write("preventautounmount", preventautounmount);
+    pConfig->Write("passwordsaved", passwordsaved);
+    
+    pConfig->Flush();
 }
 

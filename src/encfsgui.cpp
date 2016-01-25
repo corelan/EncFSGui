@@ -110,58 +110,6 @@ enum
 };
 
 
-// ----------------------------------------------------------------------------
-// Classes
-// ----------------------------------------------------------------------------
-
-// DBEntry - Class for volume entry from DB
-
-class DBEntry
-{
-public:
-    // ctor
-    DBEntry(wxString volname, 
-            wxString enc_path, 
-            wxString mount_path, 
-            bool automount, 
-            bool preventautounmount, 
-            bool pwsaved);
-
-    void setMountState(bool);
-    bool getMountState();
-    bool getPwSavedState();
-    wxString getEncPath();
-    bool getAutoMount();
-    wxString getMountPath();
-    wxString getVolName();
-    bool getPreventAutoUnmount();
-
-private:
-    bool m_mountstate;
-    bool m_automount;
-    bool m_preventautounmount;
-    bool m_pwsaved;
-    wxString m_volname;
-    wxString m_enc_path;
-    wxString m_mount_path;
-};
-
-
-// DBENtry constructor
-DBEntry::DBEntry(wxString volname, 
-                 wxString enc_path, 
-                 wxString mount_path, 
-                 bool automount, 
-                 bool preventautounmount, 
-                 bool pwsaved)
-{
-    m_automount = automount;
-    m_volname = volname;
-    m_enc_path = enc_path;
-    m_mount_path = mount_path;
-    m_preventautounmount = preventautounmount;
-    m_pwsaved = pwsaved;
-}
 
 
 // -----------------------------------------------
@@ -859,8 +807,9 @@ void frmMain::AutoMountVolumes()
         if ((not thisvol->getMountState()) && (thisvol->getAutoMount()) )
         {
             bool trymount = true;
+            int nrtries = 0;
             wxString extratxt = "";
-            while (trymount)
+            while (trymount && nrtries < 5)
             {
                 wxString msg;
                 msg.Printf(wxT("%sPlease enter password to auto-mount\n'%s'\nas\n'%s'"), extratxt, encvol, mountvol);
@@ -911,7 +860,7 @@ void frmMain::AutoMountVolumes()
                     // bail out
                     trymount = false;
                 }
-                
+                nrtries++;
             }            
         }
     }
@@ -977,7 +926,8 @@ void frmMain::OnMount(wxCommandEvent& WXUNUSED(event))
     mountvol = thisvol->getMountPath();
     encvol = thisvol->getEncPath();
     bool trymount = true;
-    while (trymount)
+    int nrtries = 0;
+    while (trymount && nrtries < 5)
     {
         msg.Printf(wxT("%sPlease enter password to mount\n'%s'\nas\n'%s'"), extratxt, encvol,mountvol);
         wxString pw;
@@ -1021,6 +971,7 @@ void frmMain::OnMount(wxCommandEvent& WXUNUSED(event))
             // bail out
             trymount = false;
         }
+        nrtries++;
     }
 }
 
@@ -1046,9 +997,7 @@ wxString frmMain::getPassWord(wxString& title, wxString& prompt)
 
 void frmMain::OnEditFolder(wxCommandEvent& WXUNUSED(event))
 {
-    DBEntry * thisvol = m_VolumeData[g_selectedVolume];
-    bool ismounted = thisvol->getMountState();
-    editExistingEncFSFolder(this, g_selectedVolume, ismounted);
+    editExistingEncFSFolder(this, g_selectedVolume, m_VolumeData);
     RefreshAll();
 }
 
@@ -1109,9 +1058,7 @@ void frmMain::OnToolLeftClick(wxCommandEvent& event)
     }
     else if (event.GetId() == ID_Toolbar_Edit)
     {
-        DBEntry * thisvol = m_VolumeData[g_selectedVolume];
-        bool ismounted = thisvol->getMountState();
-        editExistingEncFSFolder(this, g_selectedVolume, ismounted);
+        editExistingEncFSFolder(this, g_selectedVolume, m_VolumeData);
         RefreshAll();
     }
     else if (event.GetId() == ID_Toolbar_Quit)
@@ -1492,6 +1439,22 @@ void frmMain::RefreshAll()
 // CDBEntry member functions
 // ----------------------------------------------------------------------------
 
+// DBENtry constructor
+DBEntry::DBEntry(wxString volname, 
+                 wxString enc_path, 
+                 wxString mount_path, 
+                 bool automount, 
+                 bool preventautounmount, 
+                 bool pwsaved)
+{
+    m_automount = automount;
+    m_volname = volname;
+    m_enc_path = enc_path;
+    m_mount_path = mount_path;
+    m_preventautounmount = preventautounmount;
+    m_pwsaved = pwsaved;
+}
+
 
 void DBEntry::setMountState(bool newstate)
 {
@@ -1606,10 +1569,6 @@ void mainListCtrl::OnItemActivated(wxListEvent& WXUNUSED(event))
             // open
             wxString mountpath = thisvol->getMountPath();
             BrowseFolder(mountpath);
-        }
-        else
-        {
-            // edit
         }
     }
 }

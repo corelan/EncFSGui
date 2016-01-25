@@ -50,6 +50,7 @@ $(EXECUTABLE): $(OBJECTS)
 	@echo	[+] Step 1: Compiling source
 	@echo	----------------------------
 	$(COMPILER) $(COMPFLAGS) -c $(SOURCES)
+	rm -f *from*
 	@echo	    Step 1 Done
 	
 clean:

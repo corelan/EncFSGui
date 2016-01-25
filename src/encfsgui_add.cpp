@@ -286,13 +286,6 @@ void frmAddDialog::Create()
         wxString encodingname = it->first;
         arrFilenameEnc.Add(encodingname);
     }
-    wxArrayString arrKeyDerivationDuration;
-    arrKeyDerivationDuration.Add("500");
-    arrKeyDerivationDuration.Add("1000");
-    arrKeyDerivationDuration.Add("2000");
-    arrKeyDerivationDuration.Add("3000");
-    arrKeyDerivationDuration.Add("4000");
-    arrKeyDerivationDuration.Add("5000");
 
     // row 1 : cipher settings
     sizerEncFS_row1->Add(new wxStaticText(this, wxID_ANY, "Cipher algorithm:"));
@@ -668,6 +661,7 @@ void frmAddDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
             pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
             pConfig->Write(wxT("preventautounmount"), m_chkbx_prevent_autounmount->GetValue());
             pConfig->Write(wxT("passwordsaved"), m_chkbx_save_password->GetValue());
+            pConfig->Flush();
             // save password in KeyChain, if needed
             if (m_chkbx_save_password->GetValue())
             {
@@ -894,6 +888,7 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
         pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
         pConfig->Write(wxT("preventautounmount"), m_chkbx_prevent_autounmount->GetValue());
         pConfig->Write(wxT("passwordsaved"), m_chkbx_save_password->GetValue());
+        pConfig->Flush();
         // save password in KeyChain, if needed
         if (m_chkbx_save_password->GetValue())
         {

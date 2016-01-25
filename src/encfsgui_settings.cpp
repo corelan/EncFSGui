@@ -176,7 +176,7 @@ void frmSettingsDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     pConfig->Write(wxT("umountbinpath"), m_umountbin_field->GetValue());
     pConfig->Write(wxT("startatlogin"), m_chkbx_startatlogin->GetValue());
     pConfig->Write(wxT("autounmount"), m_chkbx_unmount_on_quit->GetValue());
-
+    pConfig->Flush();
     Close(true);
 }
 
