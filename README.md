@@ -17,14 +17,23 @@ If you like this initiative and want to show your appreciation, please consider 
 (I could have decided to distribute this as a commercial closed-sourced project and sell it via the App Store... but I didn't, despite the fact that 'there is no free lunch')<br>
 
 
-## Background
+## What is EncFSGui ?
+EncFSGui is a small tool that allows you to manage the encfs folders on your system, and to mount/dismount folders when needed. It fully compatible with recent encfs versions.<br>
+You can use EncFSGui to mount encfs folders created by BoxCryptor Classic or other similar tools that rely on encfs too.<br> 
+EncFSGui was written for OSX, but it might run on Linux as well.<br>
+If you are looking for an EncFS tool for Windows, check out the EncFSMP project on sourceforge.<br>
+I am fully aware that EncFSMP runs on OSX too, but unfortunately the performance of the embedded file system engine was not so good on OSX.<br>
+
+
+## How does it work ?
 EncFSGui is a wrapper around encfs, encfsctl and mount, and relies on OSXFuse to provide a filesystem.<br>
 In other words, it relies entirely on those utilities, the ability to interact with those tools and to capture the output from those tools.<br>
 As a result, the EncFSGui source code is pretty easy to understand, as it does not contain any crypto or other black magic to do its job.<br>
 The downside is that it is a wrapper and may break if tools start behaving in a different way.<br>
 
-This application is written in C++, and uses the wxWidgets Cross-Platform Library.  Although the source probably compiles fine under Linux/Unix and Windows, it was written for OSX and contains hardcoded strings & paths that will certainly prevent the app from working on Windows.  It might actually work on Linux (but I haven't tested it myself)<br>
-If you are looking for an EncFS Gui for Windows, check out the EncFSMP project on sourceforge.<br>
+## Background
+This application is written in C++, and uses the wxWidgets Cross-Platform Library.<br>  
+Although the source probably compiles fine under Linux/Unix and Windows, it was written for OSX and contains hardcoded strings & paths that will certainly prevent the app from working on Windows.  It might actually work on Linux (but I haven't tested it myself)<br>
 Also, this is my very first project in C++.  As I started learning C++ just a few weeks ago (self-study), I am fully aware that my C++ stinks. I am quite keen on learning & improving, and I am open for constructive advise and help.<br>
 
 With that said, all positive contributions are more than welcome. If you want to contribute, check out the development setup section first.<br>
@@ -143,7 +152,8 @@ If you want to try the application, you'll need a number of dependencies install
 
 ## Contribute
 
-If you plan on contributing, please create a new branch first.  Do NOT submit pull requests against the master branch.
+If you would like to contribute, please create a new branch first.  Do NOT submit pull requests against the master branch.<br>
+All initiatives to improve the code / app are more than welcome.  Alternatively, please check the TO DO list below.
 
 
 ## TO DO
@@ -155,6 +165,7 @@ If you plan on contributing, please create a new branch first.  Do NOT submit pu
     - [ ] Save password to Keychain (if not saved already)
     - [ ] Change password (routine already exists) (& update Keychain if needed)
   - [ ] Implement 'Start application at login'
+  - [ ] Allow use of master password
   - [ ] Check how to launch as an icon and add as an option
     - [ ] Add context menu to icon, allow mount/unmount volumes
   - [ ] Implement overall error handling
@@ -172,3 +183,4 @@ If you plan on contributing, please create a new branch first.  Do NOT submit pu
   - [ ] Updates
     - [ ] Code to check for updates
     - [ ] Option to "auto check for updates"
+  - [ ] Check if it would be possible to statically compile the app with encfs, osxfuse and openssl
