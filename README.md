@@ -19,9 +19,9 @@ If you like this initiative and want to show your appreciation, please consider 
 
 
 ## What is EncFSGui ?
-EncFSGui is a small tool that allows you to manage the encfs folders on your system, and to mount/dismount folders when needed. It fully compatible with recent encfs versions.<br>
+EncFSGui is a small tool that allows you to manage the encfs folders on your system, and to mount/dismount folders when needed. It is fully compatible with recent encfs versions.<br>
 You can use EncFSGui to mount encfs folders created by BoxCryptor Classic or other similar tools that rely on encfs too.<br> 
-EncFSGui was written for OSX, but it might run on Linux as well.<br>
+EncFSGui was written for OSX, but it might compile/run on Linux as well (some changes may be needed though).<br>
 If you are looking for an EncFS tool for Windows, check out the EncFSMP project on sourceforge.<br>
 I am fully aware that EncFSMP runs on OSX too, but unfortunately the performance of the embedded file system engine was not so good on OSX.<br>
 
