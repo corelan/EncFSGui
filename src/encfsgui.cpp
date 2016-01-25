@@ -1,8 +1,8 @@
 /*
-	encFSGui - encfsgui.cpp
+    encFSGui - encfsgui.cpp
     main source
 
-	written by Peter Van Eeckhoutte
+    written by Peter Van Eeckhoutte
 
 */
 
@@ -25,13 +25,6 @@
 #include "encfsgui.h"
 
 
-// use bitmaps on windows, xpms on osx
-#ifdef __WINDOWS__
-    #define USE_XPM_BITMAPS 0
-#else
-    #define USE_XPM_BITMAPS 1
-#endif
-
 // keep config files local
 #define wxCONFIG_USE_LOCAL_FILE 1
 #define USE_LOCAL_FILE 1
@@ -46,20 +39,20 @@
     #include "encfsgui.xpm" 
 #endif
 
-#if USE_XPM_BITMAPS
-    #include "bitmaps/createfolder.xpm"
-    #include "bitmaps/existingfolder.xpm"
-    #include "bitmaps/browsefolder.xpm"
-    #include "bitmaps/removefolder.xpm"
-    #include "bitmaps/editfolder.xpm"
-    #include "bitmaps/folderinfo.xpm"
-    #include "bitmaps/mountfolder.xpm"
-    #include "bitmaps/unmountfolder.xpm"
-    #include "bitmaps/settings.xpm"
-    #include "bitmaps/quit.xpm"
-    #include "bitmaps/ico_ok.xpm"
-    #include "bitmaps/ico_notok.xpm"
-#endif // USE_XPM_BITMAPS
+
+#include "bitmaps/createfolder.xpm"
+#include "bitmaps/existingfolder.xpm"
+#include "bitmaps/browsefolder.xpm"
+#include "bitmaps/removefolder.xpm"
+#include "bitmaps/editfolder.xpm"
+#include "bitmaps/folderinfo.xpm"
+#include "bitmaps/mountfolder.xpm"
+#include "bitmaps/unmountfolder.xpm"
+#include "bitmaps/settings.xpm"
+#include "bitmaps/quit.xpm"
+#include "bitmaps/ico_ok.xpm"
+#include "bitmaps/ico_notok.xpm"
+
 
 
 // ----------------------------------------------------------------------------
@@ -1214,13 +1207,7 @@ void frmMain::PopulateToolbar(wxToolBarBase* toolBar)
 
     wxBitmap toolBarBitmaps[Tool_Max];
 
-#if USE_XPM_BITMAPS
-    #define INIT_TOOL_BMP(bmp) \
-        toolBarBitmaps[Tool_##bmp] = wxBitmap(bmp)
-#else // !USE_XPM_BITMAPS
-    #define INIT_TOOL_BMP(bmp) \
-        toolBarBitmaps[Tool_##bmp] = wxBITMAP(bmp)
-#endif // USE_XPM_BITMAPS/!USE_XPM_BITMAPS
+    #define INIT_TOOL_BMP(bmp) toolBarBitmaps[Tool_##bmp] = wxBitmap(bmp)
 
     INIT_TOOL_BMP(createfolder);
     INIT_TOOL_BMP(existingfolder);
