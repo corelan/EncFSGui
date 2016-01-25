@@ -158,11 +158,11 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
 
 ## TO DO
 
-  - [ ] Add code to edit a (non-mounted) volume
-    - [ ] Rename volume
-    - [ ] Select a different mount point
-    - [ ] Unsave password from Keychain (if saved)
-    - [ ] Save password to Keychain (if not saved already)
+  - [X] Add code to edit a (non-mounted) volume
+    - [X] Rename volume
+    - [X] Select a different mount point
+    - [X] Unsave password from Keychain (if saved)
+    - [X] Save password to Keychain (if not saved already)
     - [ ] Change password (routine already exists) (& update Keychain if needed)
   - [ ] Implement 'Start application at login'
   - [ ] Allow use of master password
