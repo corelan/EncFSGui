@@ -14,6 +14,10 @@
 
 #include <wx/filename.h>
 #include <wx/config.h>
+#include <wx/dir.h>
+#include <wx/file.h>
+#include <wx/filefn.h> // wxRemoveFile
+#include <wx/stdpaths.h>
 
 #include "encfsgui.h"
 
@@ -169,6 +173,7 @@ void frmSettingsDialog::SelectUMountBinPath(wxCommandEvent& WXUNUSED(event))
 
 void frmSettingsDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
 {
+
     wxConfigBase *pConfig = wxConfigBase::Get();
     pConfig->SetPath(wxT("/Config"));
     pConfig->Write(wxT("encfsbinpath"), m_encfsbin_field->GetValue());
@@ -177,6 +182,61 @@ void frmSettingsDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     pConfig->Write(wxT("startatlogin"), m_chkbx_startatlogin->GetValue());
     pConfig->Write(wxT("autounmount"), m_chkbx_unmount_on_quit->GetValue());
     pConfig->Flush();
+
+    // set app to run at login if needed
+    bool autolaunch = m_chkbx_startatlogin->GetValue();
+    // destination for file: ~/Library/LaunchAgents
+    wxStandardPathsBase& stdp = wxStandardPaths::Get();
+    wxString tdir = stdp.GetUserConfigDir();
+    tdir.Replace("Preferences","LaunchAgents");
+    wxString launchfile;
+    launchfile.Printf(wxT("%s/org.corelan.encfsgui.LaunchAtLogin.plist"), tdir);
+
+    if (autolaunch)
+    {
+        wxString launchscript = getLaunchAgentContents();
+        // check if we are inside /Applications first
+        //   /Applications/EncFSGui.app/
+        wxString appfolder = "/Applications/EncFSGui.app";
+        wxDir * dir = new wxDir(appfolder);
+
+        if (!dir->Exists(appfolder))
+        {
+            wxString title = "Oops";
+            wxString errormsg = "It looks like you have not placed EncFSGui.app\n into /Applications yet. Try again later";
+            wxMessageDialog * dlg = new wxMessageDialog(this, errormsg, title, wxOK|wxCENTRE|wxICON_ERROR);
+            dlg->ShowModal();
+            dlg->Destroy();
+            pConfig->Write(wxT("startatlogin"), false);
+            pConfig->Flush();
+        }
+        else
+        {
+            wxFile * pFile = new wxFile(launchfile, wxFile::write);
+            if (pFile->Access(launchfile, wxFile::write))
+            {
+                pFile->Write(launchscript);
+                pFile->Close();
+            }
+            else
+            {
+                wxString title = "Oops";
+                wxString errormsg;
+                errormsg.Printf(wxT("Unable to create LaunchAgent '%s'"), launchfile);
+                wxMessageDialog * dlg = new wxMessageDialog(this, errormsg, title, wxOK|wxCENTRE|wxICON_ERROR);
+                dlg->ShowModal();
+                dlg->Destroy();
+                pConfig->Write(wxT("startatlogin"), false);
+                pConfig->Flush();
+            }
+        }
+    }
+    else
+    {
+        // try removing the LaunchAgants file, if it exists
+        wxRemoveFile(launchfile);
+    }
+
     Close(true);
 }
 

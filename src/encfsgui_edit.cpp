@@ -262,6 +262,13 @@ void frmEditDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     }
     wxString newvolname = m_volumename_field->GetValue();
 
+    //sanitize the volume name
+    newvolname.Replace("/","");
+    newvolname.Replace(" ","");
+    newvolname.Replace("'","");
+    newvolname.Replace('"',"");
+    m_volumename_field->SetValue(newvolname);
+
     if (!(m_volumename == newvolname))
     {
         // check if the new name is still unique

@@ -91,6 +91,7 @@ wxArrayString getEncFSVolumeInfo(wxString&);
 std::map<wxString, wxString> getEncodingCapabilities();
 wxString getExpectScriptContents();
 wxString getChangePasswordScriptContents(wxString&);
+wxString getLaunchAgentContents();
 
 //encfsgui_settings.cpp
 void openSettings(wxWindow *);

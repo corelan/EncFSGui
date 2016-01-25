@@ -9,21 +9,22 @@ LINKFLAGS=$(MIN_MACOSX_VERSION) `$(WX_BUILD_DIR)/wx-config --static=yes --libs`
 SOURCES=*.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=encfsgui
+APPNAME=EncFSGui
 
 all:	$(SOURCES) $(EXECUTABLE)
-	@echo	[+] Step 3: Creating app bundle
-	@echo	-------------------------------
-	rm -rf $(EXECUTABLE).app
+	@echo	[+] Step 3: Creating app bundle $(APPNAME).app
+	@echo	----------------------------------------------
+	rm -rf *.app
 	SetFile -t APPL $(EXECUTABLE)
-	mkdir -p $(EXECUTABLE).app/Contents
-	mkdir -p $(EXECUTABLE).app/Contents/MacOS
-	mkdir -p $(EXECUTABLE).app/Contents/Resources
-	cp Info.plist.in $(EXECUTABLE).app/Contents/Info.plist
-	/bin/echo "APPL????" >$(EXECUTABLE).app/Contents/PkgInfo
-	cp $(EXECUTABLE).icns $(EXECUTABLE).app/Contents/Resources
-	cp $(EXECUTABLE) $(EXECUTABLE).app/Contents/MacOS
+	mkdir -p $(APPNAME).app/Contents
+	mkdir -p $(APPNAME).app/Contents/MacOS
+	mkdir -p $(APPNAME).app/Contents/Resources
+	cp Info.plist.in $(APPNAME).app/Contents/Info.plist
+	/bin/echo "APPL????" >$(APPNAME).app/Contents/PkgInfo
+	cp $(EXECUTABLE).icns $(APPNAME).app/Contents/Resources
+	cp $(EXECUTABLE) $(APPNAME).app/Contents/MacOS
 	rm -rf *.o*
-	mv $(EXECUTABLE).app Build
+	mv $(APPNAME).app Build/$(APPNAME).app
 	@echo
 	@echo Creating dmg into Releases folder
 	mkdir -p ../release
@@ -55,14 +56,16 @@ $(EXECUTABLE): $(OBJECTS)
 	
 clean:
 	@echo	[+] Eating leftovers
-	rm -rf ./encfs*.o*
 	rm -rf *.o*
 	rm -rf *.dSYM
 	rm -rf *.d
 	rm -rf .deps
 	rm -rf encfsgui
+	rm -rf *.app
 	mkdir -p Build
 	rm -rf Build/*
+	mkdir -p ../release
+	rm -rf ../release/*
 	@echo
 	@echo	Done eating.
 	@echo	Run 'make' to compile the sources and create the application binary.

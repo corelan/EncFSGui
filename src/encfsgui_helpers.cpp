@@ -440,7 +440,31 @@ wxString getChangePasswordScriptContents(wxString & enc_path)
     scriptcontents << newline;
 
     return scriptcontents;
+}
 
+
+wxString getLaunchAgentContents()
+{
+    const wxString scriptcontents =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
+        "<plist version=\"1.0\">\n"
+        "<dict>\n"
+        "    <key>Label</key>\n"
+        "    <string>org.corelan.encfsgui.LaunchAtLogin</string>\n"
+        "    <key>ProgramArguments</key>\n"
+        "    <array>\n"
+        "        <string>/Applications/EncFSGui.app/Contents/MacOS/encfsgui</string>\n"
+        "    </array>\n"
+        "    <key>ProcessType</key>\n"
+        "    <string>Interactive</string>\n"
+        "    <key>RunAtLoad</key>\n"
+        "    <true/>\n"
+        "    <key>KeepAlive</key>\n"
+        "    <false/>\n"
+        "</dict>\n"
+        "</plist>\n";
+    return scriptcontents;
 }
 
 

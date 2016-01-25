@@ -315,7 +315,7 @@ bool encFSGuiApp::OnInit()
 
     framestyle = wxDEFAULT_FRAME_STYLE ^ wxRESIZE_BORDER | wxFRAME_EX_METAL;
 
-    frmMain *frame = new frmMain("encFSGui", 
+    frmMain *frame = new frmMain("::[ EncFSGui ]::", 
                                  wxDefaultPosition, 
                                  frmMainSize, 
                                  framestyle );

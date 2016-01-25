@@ -3,9 +3,9 @@
 Public repository for the EncFSGui project, an OSX GUI wrapper around encfs
 
 ## Warning 
-This application is still missing some features, but it should be quite usable already.<br>
-It is still under heavy development and will be updated on a regular basis.<br>
-Proper announcements will be made when the app is ready for use.<br>
+This application is still missing some (minor) features, but it should now be ready for use.<br>
+It is still under active development and will be updated on a regular basis.<br>
+
 
 If you feel brave enough, feel free to grab a compiled version of the app from here: https://github.com/corelan/EncFSGui/raw/master/release/EncFSGui.dmg<br>
 Note: To run the app, check the "Installing dependencies on OSX" section below<br>
