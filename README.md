@@ -163,8 +163,8 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
     - [X] Select a different mount point
     - [X] Unsave password from Keychain (if saved)
     - [X] Save password to Keychain (if not saved already)
-    - [ ] Change password (routine already exists) (& update Keychain if needed)
-  - [ ] Implement 'Start application at login'
+    - [ ] Change password of encfs volume (routine already exists) (& update Keychain if needed)
+  - [X] Implement 'Start application at login'
   - [ ] Allow use of master password
   - [ ] Check how to launch as an icon and add as an option
     - [ ] Add context menu to icon, allow mount/unmount volumes
