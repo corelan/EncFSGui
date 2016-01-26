@@ -96,9 +96,12 @@ enum
     ID_Toolbar_Settings,
     ID_Toolbar_Quit,
     ID_TOOLBAR,
+    // taskbar icon
     ID_Taskbar_Exit,
     ID_Taskbar_Show,
     ID_Taskbar_Hide,
+    ID_Taskbar_Settings,
+    // list control
     ID_List_Ctrl                   = 1000
 };
 
@@ -155,6 +158,7 @@ wxBEGIN_EVENT_TABLE(TaskBarIcon, wxTaskBarIcon)
     EVT_MENU(ID_Taskbar_Exit, TaskBarIcon::OnMenuExit)
     EVT_MENU(ID_Taskbar_Show, TaskBarIcon::OnMenuShow)
     EVT_MENU(ID_Taskbar_Hide, TaskBarIcon::OnMenuHide)
+    EVT_MENU(ID_Taskbar_Settings, TaskBarIcon::OnMenuSettings)
     EVT_TASKBAR_LEFT_DCLICK  (TaskBarIcon::OnLeftButtonDClick)
 wxEND_EVENT_TABLE()
 
@@ -186,10 +190,11 @@ bool encFSGuiApp::OnInit()
     wxConfigBase::Set(pConfig);
    
     // create the main application window
-	wxSize frmMainSize;
-	frmMainSize.Set(880,340);
-	long framestyle;
-	//framestyle = wxDEFAULT_FRAME_STYLE ^ wxRESIZE_BORDER | wxFRAME_EX_METAL | wxICONIZE | wxMINIMIZE; 
+    wxSize frmMainSize;
+    frmMainSize.Set(880,340);
+    long framestyle;
+
+    //framestyle = wxDEFAULT_FRAME_STYLE ^ wxRESIZE_BORDER | wxFRAME_EX_METAL | wxICONIZE | wxMINIMIZE; 
 
     framestyle = wxDEFAULT_FRAME_STYLE ^ wxRESIZE_BORDER | wxFRAME_EX_METAL;
 
@@ -201,8 +206,6 @@ bool encFSGuiApp::OnInit()
     g_frmMain = frame;
 
     frame->EnableCloseButton(false);
-    // and show it (the frames, unlike simple controls, are not shown when
-    // created initially)
 
     pConfig->SetPath(wxT("/Config"));
     bool startasicon = pConfig->Read(wxT("startasicon"), 0l);
@@ -213,7 +216,7 @@ bool encFSGuiApp::OnInit()
     }
     else
     {
-        frame->Show(true);
+        frame->Show();
     }
 
     wxInitAllImageHandlers();
@@ -239,6 +242,8 @@ wxMenu *TaskBarIcon::CreatePopupMenu()
     wxMenu *menu = new wxMenu;
     menu->Append(ID_Taskbar_Show, wxT("&Show EncFSGui"));
     menu->Append(ID_Taskbar_Hide, wxT("&Hide EncFSGui"));
+    menu->AppendSeparator();
+    menu->Append(ID_Taskbar_Settings, wxT("S&ettings"));
     /* OSX has built-in quit menu for the dock menu, but not for the status item */
 #ifdef __WXOSX__ 
     if ( OSXIsStatusItem() )
@@ -260,7 +265,7 @@ void TaskBarIcon::OnMenuExit(wxCommandEvent& event)
 
 void TaskBarIcon::OnMenuShow(wxCommandEvent& WXUNUSED(event))
 {
-    g_frmMain->Show(true);
+    g_frmMain->Show();
 }
 
 void TaskBarIcon::OnMenuHide(wxCommandEvent& WXUNUSED(event))
@@ -270,7 +275,13 @@ void TaskBarIcon::OnMenuHide(wxCommandEvent& WXUNUSED(event))
 
 void TaskBarIcon::OnLeftButtonDClick(wxTaskBarIconEvent&)
 {
-    g_frmMain->Show(true);
+    g_frmMain->Show();
+}
+
+void TaskBarIcon::OnMenuSettings(wxCommandEvent& event)
+{
+    g_frmMain->Show();
+    g_frmMain->OnSettings(event);
 }
 
 

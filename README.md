@@ -167,7 +167,7 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
     - [ ] Change password of encfs volume (routine already exists) (& update Keychain if needed)
   - [X] Implement 'Start application at login'
   - [ ] Allow use of master password
-  - [ ] Check how to launch as an icon and add as an option
+  - [X] Check how to launch as an icon and add as an option
     - [ ] Add context menu to icon, allow mount/unmount volumes
   - [ ] Implement overall error handling
   - [ ] Code cleanup & documentation

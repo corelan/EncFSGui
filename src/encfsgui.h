@@ -43,6 +43,7 @@ public:
     void OnMenuExit(wxCommandEvent& event);
     void OnMenuShow(wxCommandEvent& event);
     void OnMenuHide(wxCommandEvent& event);
+    void OnMenuSettings(wxCommandEvent& event);
     virtual wxMenu *CreatePopupMenu() wxOVERRIDE;
     wxDECLARE_EVENT_TABLE();
 };
