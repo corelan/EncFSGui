@@ -209,7 +209,7 @@ bool encFSGuiApp::OnInit()
 
     if (startasicon)
     {
-        frame->Show(false);
+        frame->Hide();
     }
     else
     {
@@ -265,7 +265,7 @@ void TaskBarIcon::OnMenuShow(wxCommandEvent& WXUNUSED(event))
 
 void TaskBarIcon::OnMenuHide(wxCommandEvent& WXUNUSED(event))
 {
-    g_frmMain->Show(false);
+    g_frmMain->Hide();
 }
 
 void TaskBarIcon::OnLeftButtonDClick(wxTaskBarIconEvent&)
