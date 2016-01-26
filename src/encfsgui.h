@@ -36,7 +36,9 @@
 class TaskBarIcon : public wxTaskBarIcon
 {
 public:
+    //ctor
     TaskBarIcon(wxTaskBarIconType iconType);
+
     void OnLeftButtonDClick(wxTaskBarIconEvent&);
     void OnMenuExit(wxCommandEvent& event);
     void OnMenuShow(wxCommandEvent& event);
