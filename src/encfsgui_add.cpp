@@ -457,7 +457,8 @@ bool frmAddDialog::createEncFSFolder()
         scriptcontents.Replace("$BLOCKAUTHCODEHEADERS",""); // n is default here
     }
 
-    scriptcontents.Replace("sleep x","sleep 2");
+    //scriptcontents.Replace("sleep x","sleep 2");
+    scriptcontents.Replace("sleep x","expect eof");
 
     // write script to disk
     wxTempFile * tmpfile = new wxTempFile();
@@ -468,7 +469,8 @@ bool frmAddDialog::createEncFSFolder()
     }
     tmpfile->Commit();
 
-    cmd.Printf(wxT("sh -c \"'expect' '%s' '%s'\""), scriptfile, pw);
+    //cmd.Printf(wxT("sh -c \"'expect' '%s' '%s'\""), scriptfile, pw);
+    cmd.Printf(wxT("expect '%s' '%s'"), scriptfile, pw);
     // run command asynchronously
     wxArrayString arroutput = ArrRunCMDASync(cmd);
     pw = "";

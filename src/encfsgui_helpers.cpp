@@ -41,26 +41,9 @@ void ShowMsg(wxString msg)
 // and save to config
 wxString getEncFSBinPath()
 {
-    wxString defaultvalue;
-    wxString configvalue;
-
-    defaultvalue = "/usr/local/bin/encfs";
-
     wxConfigBase *pConfig = wxConfigBase::Get();
-
     pConfig->SetPath(wxT("/Config"));
-    // read path from config, or return default value in case config 
-    // doesn't exist yet
-    configvalue = pConfig->Read(wxT("encfsbinpath"), defaultvalue );
-    
-    if (configvalue.IsEmpty())
-    {
-        configvalue = defaultvalue;
-    }
-
-    pConfig->Write(wxT("encfsbinpath"),configvalue);
-
-    return configvalue;
+    return pConfig->Read(wxT("mountbin_path"), "/usr/local/bin/encfs");
 }
 
 wxString getEncFSCTLBinPath()
