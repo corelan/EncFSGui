@@ -313,7 +313,7 @@ wxString getKeychainPassword(wxString&);
 bool doesVolumeExist(wxString&);
 wxArrayString getEncFSVolumeInfo(wxString&);
 std::map<wxString, wxString> getEncodingCapabilities();
-wxString getExpectScriptContents();
+wxString getExpectScriptContents(bool);
 wxString getChangePasswordScriptContents(wxString&);
 wxString getLaunchAgentContents();
 

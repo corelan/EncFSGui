@@ -426,7 +426,7 @@ bool frmAddDialog::createEncFSFolder()
 
     wxString selectedfilenameencoding = m_combo_filename_enc->GetValue();
     filenameencodingchoice = m_encodingcaps[selectedfilenameencoding];
-    scriptcontents = getExpectScriptContents();
+    scriptcontents = getExpectScriptContents(false);
     // replace keywords with actual values
     scriptcontents.Replace("$ENCFSBIN", encfsbin);
     scriptcontents.Replace("$ENCPATH", enc_path);

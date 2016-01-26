@@ -271,7 +271,7 @@ wxArrayString getEncFSVolumeInfo(wxString& encfs_volume)
     return cmdoutput;
 }
 
-wxString getExpectScriptContents()
+wxString getExpectScriptContents(bool insertbreak)
 {
     wxString newline;
     wxString scriptcontents;
@@ -321,6 +321,12 @@ wxString getExpectScriptContents()
     scriptcontents << newline;
     newline.Printf(wxT("send \"$ENCODINGALGO\\n\"\n"));
     scriptcontents << newline;
+
+    if (insertbreak)
+    {
+        newline.Printf(wxT("break\n"));
+        scriptcontents << newline;        
+    }
 
     // filename IV chaining
     newline.Printf(wxT("expect \"Enable filename initialization vector chaining?\"\n"));
@@ -509,7 +515,8 @@ std::map<wxString, wxString> getEncodingCapabilities()
         dirEnc->Make(enc_path);
         dirPlain->Make(plain_path);
 
-        wxString scriptcontents = getExpectScriptContents();
+        // true means insert 'break' after listing the filename encoding options
+        wxString scriptcontents = getExpectScriptContents(true); 
 
         // use valid, but non-important values
         scriptcontents.Replace("$ENCFSBIN", encfsbin);
@@ -538,37 +545,10 @@ std::map<wxString, wxString> getEncodingCapabilities()
         }
         tmpfile->Commit();
 
-        cmd.Printf(wxT("'expect' '%s' '%s'"), scriptfile, pw);
-        // run command asynchronously
-        wxArrayString arroutput = ArrRunCMDASync(cmd);
-
-        // wait until .xml file was created
-        bool configfilefound = false;
-        int nrruns = 0;
-        while (!configfilefound)
-        {
-            wxString configfilepath;
-            configfilepath.Printf(wxT("%s/.encfs6.xml"), enc_path);
-            wxFileName configfile;
-            configfile = wxFileName::wxFileName(configfilepath);
-
-            if (configfile.FileExists())
-            {
-                configfilefound = true;
-                createdok = true;
-            }
-            else 
-            {
-                // file does not exist
-                if (nrruns > 20)
-                {
-                    configfilefound = true;
-                    createdok = false;
-                }            
-            }
-            wxSleep(1);
-            ++nrruns;
-        }
+        cmd.Printf(wxT("expect '%s' '%s'"), scriptfile, pw);
+        // run command synchronously this time, it shouldn't take long :)
+        wxArrayString arroutput = ArrRunCMDSync(cmd);
+        createdok = true;
 
         if (createdok)
         {
