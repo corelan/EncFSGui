@@ -149,8 +149,16 @@ void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
         m_combo_cipher_algo->SetValue("AES");
         m_combo_cipher_blocksize->SetValue("2048");
         m_combo_cipher_keysize->SetValue("192");
-        m_combo_filename_enc->SetValue("Stream");
-        //m_combo_keyderivation->SetValue("500");
+        m_combo_filename_enc->SetValue("Null");
+        if (m_encodingcaps.count("Stream") > 0)
+        {
+            m_combo_filename_enc->SetValue("Stream");
+        }
+        else if (m_encodingcaps.count("Block") > 0)
+        {
+            m_combo_filename_enc->SetValue("Block");
+        }
+        
         m_chkbx_block_mac_headers->SetValue(false);
         m_chkbx_perfile_iv->SetValue(true);
         m_chkbx_iv_chaining->SetValue(false);
@@ -162,8 +170,16 @@ void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
         m_combo_cipher_algo->SetValue("AES");
         m_combo_cipher_blocksize->SetValue("4096");
         m_combo_cipher_keysize->SetValue("256");
-        m_combo_filename_enc->SetValue("Block");
-        //m_combo_keyderivation->SetValue("1000");
+        m_combo_filename_enc->SetValue("Null");
+        // block preferred, as length of filename == multiple of cipher block size
+        if (m_encodingcaps.count("Block") > 0)
+        {
+            m_combo_filename_enc->SetValue("Block");
+        }
+        else if (m_encodingcaps.count("Stream") > 0)
+        {
+            m_combo_filename_enc->SetValue("Stream");
+        }
         m_chkbx_block_mac_headers->SetValue(true);
         m_chkbx_perfile_iv->SetValue(true);
         m_chkbx_iv_chaining->SetValue(true);
@@ -175,7 +191,7 @@ void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
         m_combo_cipher_algo->SetValue("AES");
         m_combo_cipher_blocksize->SetValue("1024");
         m_combo_cipher_keysize->SetValue("192");
-        m_combo_filename_enc->SetValue("Stream");
+        m_combo_filename_enc->SetValue("Null");
         //m_combo_keyderivation->SetValue("500");
         m_chkbx_block_mac_headers->SetValue(false);
         m_chkbx_perfile_iv->SetValue(false);

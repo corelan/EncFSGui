@@ -523,7 +523,7 @@ std::map<wxString, wxString> getEncodingCapabilities()
         scriptcontents.Replace("$PERFILEIV","");
         scriptcontents.Replace("$FILETOIVHEADERCHAINING","");
         scriptcontents.Replace("$BLOCKAUTHCODEHEADERS","");
-        scriptcontents.Replace("sleep x","sleep 1");    
+        scriptcontents.Replace("sleep x","expect eof");    
 
         // run encfs, just to capture the output related with filename encoding mechanisms
         // write script to disk
@@ -538,7 +538,7 @@ std::map<wxString, wxString> getEncodingCapabilities()
         }
         tmpfile->Commit();
 
-        cmd.Printf(wxT("sh -c \"'expect' '%s' '%s'\""), scriptfile, pw);
+        cmd.Printf(wxT("'expect' '%s' '%s'"), scriptfile, pw);
         // run command asynchronously
         wxArrayString arroutput = ArrRunCMDASync(cmd);
 
