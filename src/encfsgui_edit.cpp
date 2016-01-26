@@ -37,44 +37,6 @@ enum
 };
 
 
-// ----------------------------------------------------------------------------
-// Classes
-// ----------------------------------------------------------------------------
-
-//   ------------------------------------------
-// frmEditDialog - edit an encfs folder
-//   ------------------------------------------
-
-
-class frmEditDialog : public wxDialog
-{
-public:
-    frmEditDialog(wxWindow *parent, 
-                 const wxString& title, 
-                 const wxPoint& pos, 
-                 const wxSize& size, 
-                 long style,
-                 wxString selectedvolume,
-                 std::map<wxString, DBEntry*> volumedata);
-    void Create();
-    void ChooseDestinationFolder(wxCommandEvent &event);
-    void SaveSettings(wxCommandEvent &event);
-    void ChangePWFieldState(wxCommandEvent &event);
-private:
-    wxString m_volumename;
-    wxTextCtrl * m_destination_field;
-    wxTextCtrl * m_volumename_field;
-    wxTextCtrl * m_pass1;
-    wxTextCtrl * m_pass2;
-    wxCheckBox * m_chkbx_automount;
-    wxCheckBox * m_chkbx_prevent_autounmount;
-    wxCheckBox * m_chkbx_save_password;
-    wxButton * m_selectdst_button;
-    std::map<wxString, DBEntry*> m_editVolumeData;
-    bool m_mounted;
-    bool m_pwsaved;
-    wxDECLARE_EVENT_TABLE();
-};
 
 // event table
 wxBEGIN_EVENT_TABLE(frmEditDialog, wxDialog)

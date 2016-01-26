@@ -1,6 +1,7 @@
 /*
     encFSGui - encfsgui.h
-    source file contains function declarations
+    this file contains 
+    class & helper function declarations
 
     written by Peter Van Eeckhoutte
 
@@ -170,6 +171,114 @@ private:
     // any class wishing to process wxWidgets events must use this macro
     wxDECLARE_EVENT_TABLE();
 };
+
+
+
+// frmAddDialog - create a new encfs folder
+
+
+class frmAddDialog : public wxDialog
+{
+public:
+    frmAddDialog(wxWindow *parent, 
+                 const wxString& title, 
+                 const wxPoint& pos, 
+                 const wxSize& size, 
+                 long style);
+    void Create();
+    void ChooseSourceFolder(wxCommandEvent &event);
+    void ChooseDestinationFolder(wxCommandEvent &event);
+    void SaveSettings(wxCommandEvent &event);
+    void SetEncFSProfileSelection(wxCommandEvent &event);
+    void ApplyEncFSProfileSelection(int);
+private:
+    wxTextCtrl * m_source_field;
+    wxTextCtrl * m_destination_field;
+    wxTextCtrl * m_volumename_field;
+    wxTextCtrl * m_pass1;
+    wxTextCtrl * m_pass2;
+    wxCheckBox * m_chkbx_automount;
+    wxCheckBox * m_chkbx_prevent_autounmount;
+    wxCheckBox * m_chkbx_save_password;
+    wxCheckBox * m_chkbx_perfile_iv;
+    wxCheckBox * m_chkbx_iv_chaining;
+    wxCheckBox * m_chkbx_filename_to_iv_header_chaining;
+    wxCheckBox * m_chkbx_block_mac_headers;
+    wxComboBox * m_combo_cipher_algo;
+    wxComboBox * m_combo_cipher_keysize;
+    wxComboBox * m_combo_cipher_blocksize;
+    wxComboBox * m_combo_filename_enc;
+    std::map<wxString, wxString> m_encodingcaps;
+    //wxComboBox * m_combo_keyderivation;
+    wxDECLARE_EVENT_TABLE();
+    void SetEncfsOptionsState(bool);
+    bool createEncFSFolder();
+};
+
+
+
+// frmOpenDialog - add existing encfs folder
+
+
+class frmOpenDialog : public wxDialog
+{
+public:
+    frmOpenDialog(wxWindow *parent, 
+                  const wxString& title, 
+                  const wxPoint& pos, 
+                  const wxSize& size, 
+                  long style);
+    void Create();
+    void ChooseSourceFolder(wxCommandEvent &event);
+    void ChooseDestinationFolder(wxCommandEvent &event);
+    void SaveSettings(wxCommandEvent &event);
+private:
+    wxTextCtrl * m_source_field;
+    wxTextCtrl * m_destination_field;
+    wxTextCtrl * m_volumename_field;
+    wxTextCtrl * m_pass1;
+    wxTextCtrl * m_pass2;
+    wxCheckBox * m_chkbx_automount;
+    wxCheckBox * m_chkbx_prevent_autounmount;
+    wxCheckBox * m_chkbx_save_password;
+    wxDECLARE_EVENT_TABLE();
+};
+
+
+
+// frmEditDialog - edit an encfs folder
+
+
+class frmEditDialog : public wxDialog
+{
+public:
+    frmEditDialog(wxWindow *parent, 
+                 const wxString& title, 
+                 const wxPoint& pos, 
+                 const wxSize& size, 
+                 long style,
+                 wxString selectedvolume,
+                 std::map<wxString, DBEntry*> volumedata);
+    void Create();
+    void ChooseDestinationFolder(wxCommandEvent &event);
+    void SaveSettings(wxCommandEvent &event);
+    void ChangePWFieldState(wxCommandEvent &event);
+private:
+    wxString m_volumename;
+    wxTextCtrl * m_destination_field;
+    wxTextCtrl * m_volumename_field;
+    wxTextCtrl * m_pass1;
+    wxTextCtrl * m_pass2;
+    wxCheckBox * m_chkbx_automount;
+    wxCheckBox * m_chkbx_prevent_autounmount;
+    wxCheckBox * m_chkbx_save_password;
+    wxButton * m_selectdst_button;
+    std::map<wxString, DBEntry*> m_editVolumeData;
+    bool m_mounted;
+    bool m_pwsaved;
+    wxDECLARE_EVENT_TABLE();
+};
+
 
 
 // ----------------------------------------------------------------------------

@@ -42,54 +42,11 @@ enum
 };
 
 
+
 // ----------------------------------------------------------------------------
-// Classes
+// event table frmAddDialog
 // ----------------------------------------------------------------------------
 
-//   ------------------------------------------
-// frmAddDialog - create a new encfs folder
-//   ------------------------------------------
-
-
-class frmAddDialog : public wxDialog
-{
-public:
-    frmAddDialog(wxWindow *parent, 
-                 const wxString& title, 
-                 const wxPoint& pos, 
-                 const wxSize& size, 
-                 long style);
-    void Create();
-    void ChooseSourceFolder(wxCommandEvent &event);
-    void ChooseDestinationFolder(wxCommandEvent &event);
-    void SaveSettings(wxCommandEvent &event);
-    void SetEncFSProfileSelection(wxCommandEvent &event);
-    void ApplyEncFSProfileSelection(int);
-private:
-    wxTextCtrl * m_source_field;
-    wxTextCtrl * m_destination_field;
-    wxTextCtrl * m_volumename_field;
-    wxTextCtrl * m_pass1;
-    wxTextCtrl * m_pass2;
-    wxCheckBox * m_chkbx_automount;
-    wxCheckBox * m_chkbx_prevent_autounmount;
-    wxCheckBox * m_chkbx_save_password;
-    wxCheckBox * m_chkbx_perfile_iv;
-    wxCheckBox * m_chkbx_iv_chaining;
-    wxCheckBox * m_chkbx_filename_to_iv_header_chaining;
-    wxCheckBox * m_chkbx_block_mac_headers;
-    wxComboBox * m_combo_cipher_algo;
-    wxComboBox * m_combo_cipher_keysize;
-    wxComboBox * m_combo_cipher_blocksize;
-    wxComboBox * m_combo_filename_enc;
-    std::map<wxString, wxString> m_encodingcaps;
-    //wxComboBox * m_combo_keyderivation;
-    wxDECLARE_EVENT_TABLE();
-    void SetEncfsOptionsState(bool);
-    bool createEncFSFolder();
-};
-
-// event table
 wxBEGIN_EVENT_TABLE(frmAddDialog, wxDialog)
     EVT_BUTTON(ID_BTN_CHOOSE_SOURCE,  frmAddDialog::ChooseSourceFolder)
     EVT_BUTTON(ID_BTN_CHOOSE_DESTINATION,  frmAddDialog::ChooseDestinationFolder)
@@ -97,6 +54,21 @@ wxBEGIN_EVENT_TABLE(frmAddDialog, wxDialog)
     EVT_RADIOBOX(ID_RADIO_PROFILE, frmAddDialog::SetEncFSProfileSelection)
 wxEND_EVENT_TABLE()
 
+// ----------------------------------------------------------------------------
+// event table frmOpenDialog
+// ----------------------------------------------------------------------------
+
+wxBEGIN_EVENT_TABLE(frmOpenDialog, wxDialog)
+    EVT_BUTTON(ID_BTN_CHOOSE_SOURCE,  frmOpenDialog::ChooseSourceFolder)
+    EVT_BUTTON(ID_BTN_CHOOSE_DESTINATION,  frmOpenDialog::ChooseDestinationFolder)
+    EVT_BUTTON(wxID_APPLY, frmOpenDialog::SaveSettings)
+wxEND_EVENT_TABLE()
+
+
+
+// ----------------------------------------------------------------------------
+// frmAddDialog
+// ----------------------------------------------------------------------------
 
 // constructor
 frmAddDialog::frmAddDialog(wxWindow *parent, 
@@ -169,7 +141,6 @@ void frmAddDialog::SetEncfsOptionsState(bool enabledstate)
 }
 
 
-// member functions
 
 void frmAddDialog::ApplyEncFSProfileSelection(int SelectedProfile)
 {
@@ -685,42 +656,11 @@ void frmAddDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
 
 
 
-//   ------------------------------------------
-// frmOpenDialog - add existing encfs folder
-//   ------------------------------------------
 
 
-class frmOpenDialog : public wxDialog
-{
-public:
-    frmOpenDialog(wxWindow *parent, 
-                  const wxString& title, 
-                  const wxPoint& pos, 
-                  const wxSize& size, 
-                  long style);
-    void Create();
-    void ChooseSourceFolder(wxCommandEvent &event);
-    void ChooseDestinationFolder(wxCommandEvent &event);
-    void SaveSettings(wxCommandEvent &event);
-private:
-    wxTextCtrl * m_source_field;
-    wxTextCtrl * m_destination_field;
-    wxTextCtrl * m_volumename_field;
-    wxTextCtrl * m_pass1;
-    wxTextCtrl * m_pass2;
-    wxCheckBox * m_chkbx_automount;
-    wxCheckBox * m_chkbx_prevent_autounmount;
-    wxCheckBox * m_chkbx_save_password;
-    wxDECLARE_EVENT_TABLE();
-};
-
-
-// event table
-wxBEGIN_EVENT_TABLE(frmOpenDialog, wxDialog)
-    EVT_BUTTON(ID_BTN_CHOOSE_SOURCE,  frmOpenDialog::ChooseSourceFolder)
-    EVT_BUTTON(ID_BTN_CHOOSE_DESTINATION,  frmOpenDialog::ChooseDestinationFolder)
-    EVT_BUTTON(wxID_APPLY, frmOpenDialog::SaveSettings)
-wxEND_EVENT_TABLE()
+// ----------------------------------------------------------------------------
+// frmOpenDialog
+// ----------------------------------------------------------------------------
 
 // constructor
 frmOpenDialog::frmOpenDialog(wxWindow *parent, 
@@ -732,7 +672,7 @@ frmOpenDialog::frmOpenDialog(wxWindow *parent,
     
 }
 
-// event functions
+// event & member functions
 
 void frmOpenDialog::ChooseSourceFolder(wxCommandEvent& WXUNUSED(event))
 {
@@ -976,9 +916,11 @@ void frmOpenDialog::Create()
 }
 
 
+
 // ----------------------------------------------------------------------------
 // helper functions
 // ----------------------------------------------------------------------------
+
 
 void createNewEncFSFolder(wxWindow *parent)
 {

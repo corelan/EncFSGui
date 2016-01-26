@@ -129,12 +129,11 @@ frmMain * g_frmMain;
 
 
 // ----------------------------------------------------------------------------
-// event tables and other macros for wxWidgets
+// event tables 
 // ----------------------------------------------------------------------------
 
-// the event tables connect the wxWidgets events with the functions (event
-// handlers) which process them. It can be also done at run-time, but for the
-// simple menu events like this the static method is much simpler.
+// frmMain
+
 wxBEGIN_EVENT_TABLE(frmMain, wxFrame)
     EVT_MENU(ID_Menu_Quit,  frmMain::OnQuit)
     EVT_MENU(ID_Menu_About, frmMain::OnAbout)
@@ -153,23 +152,17 @@ wxBEGIN_EVENT_TABLE(mainListCtrl, wxListCtrl)
 wxEND_EVENT_TABLE()
 
 
-// Create a new application object: this macro will allow wxWidgets to create
-// the application object during program execution (it's better than using a
-// static object for many reasons) and also implements the accessor function
-// wxGetApp() which will return the reference of the right type (i.e. encFSGuiApp and
-// not wxApp)
+// ----------------------------------------------------------------------------
+// IMPLEMENTATION
+// ----------------------------------------------------------------------------
+
 wxIMPLEMENT_APP(encFSGuiApp);
 
 
-// ============================================================================
-// implementation
-// ============================================================================
-
 // ----------------------------------------------------------------------------
-// the application class
-// ----------------------------------------------------------------------------
-
 // 'Main program' equivalent: the program execution "starts" here
+// ----------------------------------------------------------------------------
+
 bool encFSGuiApp::OnInit()
 {
     // call the base class initialization method, currently it only parses a
@@ -1326,9 +1319,6 @@ void frmMain::RefreshAll()
 
 
 
-
-
-
 // ----------------------------------------------------------------------------
 // CDBEntry member functions
 // ----------------------------------------------------------------------------
@@ -1390,9 +1380,12 @@ wxString DBEntry::getVolName()
     return m_volname;
 }
 
-//
-//  ListCtrl member functions
-//
+
+
+// ----------------------------------------------------------------------------
+// mainListCtrl member functions
+// ----------------------------------------------------------------------------
+
 
 void mainListCtrl::LinkToolbar(wxToolBarBase * toolbar)
 {
