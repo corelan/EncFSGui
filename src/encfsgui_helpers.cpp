@@ -463,7 +463,7 @@ wxString getLaunchAgentContents()
         "    <key>KeepAlive</key>\n"
         "    <false/>\n"
         "</dict>\n"
-        "</plist>";
+        "</plist>\n";
     return scriptcontents;
 }
 
