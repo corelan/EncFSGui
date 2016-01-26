@@ -121,133 +121,11 @@ std::map<wxString, DBEntry*> m_VolumeData;
 //
 // -----------------------------------------------
 
-
-
-class mainListCtrl: public wxListCtrl
-{
-public:
-    // ctor
-    mainListCtrl(wxWindow *parent, 
-                 const wxWindowID id, 
-                 const wxPoint& pos, 
-                 const wxSize& size, 
-                 long style, 
-                 wxStatusBar * statusbar);
-    // event handlers
-    //void OnMouseEvent(wxMouseEvent& event);
-    void OnItemSelected(wxListEvent& event);
-    void OnItemDeSelected(wxListEvent& event);
-    void OnItemActivated(wxListEvent& event);
-    void SetSelectedIndex(int);
-    void LinkToolbar(wxToolBarBase*);
-    void UpdateToolBarButtons();
-
-private:
-    wxDECLARE_EVENT_TABLE();
-    wxToolBarBase *m_toolBar;
-    wxStatusBar *m_statusBar;
-};
-
-
-// constructor
-mainListCtrl::mainListCtrl(wxWindow *parent, 
-                           const wxWindowID id, 
-                           const wxPoint& pos, 
-                           const wxSize& size, 
-                           long style, 
-                           wxStatusBar * statusbar) : wxListCtrl(parent, id, pos, size, style)
-{
-    m_statusBar = statusbar;   
-}
+// keep ref to main form
+frmMain * g_frmMain;
 
 
 
-//
-// -----------------------------------------
-//
-
-class encFSGuiApp : public wxApp
-{
-public:
-    bool OnInit();
-};
-
-// Define a new frame type: this is going to be our main frame
-class frmMain : public wxFrame
-{
-public:
-    // ctor(s)
-    frmMain(const wxString& title, 
-            const wxPoint& pos, 
-            const wxSize& size, 
-            long style);
-	// dtor
-    virtual ~frmMain();
-
-    // event handlers (these functions should _not_ be virtual)
-    void OnQuit(wxCommandEvent& event);
-    void OnAbout(wxCommandEvent& event);
-    void OnNewFolder(wxCommandEvent& event);
-    void OnAddExistingFolder(wxCommandEvent& event);
-    void OnBrowseFolder(wxCommandEvent& event);
-    void OnEditFolder(wxCommandEvent& event);
-    void OnSettings(wxCommandEvent& event);
-    void OnMount(wxCommandEvent& event);
-    void OnUnMount(wxCommandEvent& event);
-    void OnInfo(wxCommandEvent& event);
-    void OnRemoveFolder(wxCommandEvent& event);
-
-    // generic routine
-    bool unmountVolumeAsk(wxString& volumename);   // ask for confirmation
-    // function that does actual unmount is not a member function
-
-    int mountFolder(wxString& volumename, wxString& pw);
-
-    // override default OnExit handler (so we can run code when user clicks close button on frame)
-    virtual int OnExit(wxCommandEvent& event);
-
-    // handle clicks on toolbar
-    void OnToolLeftClick(wxCommandEvent& event);
-
-    // auto mount routine
-    void AutoMountVolumes();
-    // FYI -  auto unmount routine is not a member function
-
-
-private:
-    wxString m_datadir;
-	// toolbar stuff
-    size_t              m_rows;             // 1
-    wxPanel            *m_panel;
-
-    // statusbar
-#if wxUSE_STATUSBAR
-    wxStatusBar* m_statusBar;
-#endif
-
-    void PopulateVolumes();
-    void PopulateToolbar(wxToolBarBase* toolBar);
-    void CreateToolbar();  
-    void RecreateStatusbar(); 
-    void RefreshAll();
-    //void UpdateToolBarButtons();  // 
-    void SetToolBarButtonState(int, bool);
-    void DoSize();
-    int mountSelectedFolder(wxString& pw);
-
-    wxString getPassWord(wxString&, wxString&);
-
-    // list stuff
-    void RecreateList();
-    // fill the control with items
-    void FillListWithVolumes();
-    
-    // ListView stuff
-    mainListCtrl *m_listCtrl;
-
-    // any class wishing to process wxWidgets events must use this macro
-    wxDECLARE_EVENT_TABLE();
-};
 
 
 // ----------------------------------------------------------------------------
@@ -320,6 +198,8 @@ bool encFSGuiApp::OnInit()
                                  frmMainSize, 
                                  framestyle );
 
+    g_frmMain = frame;
+
     frame->EnableCloseButton(false);
     // and show it (the frames, unlike simple controls, are not shown when
     // created initially)
@@ -334,12 +214,10 @@ bool encFSGuiApp::OnInit()
     return true;
 }
 
-// ----------------------------------------------------------------------------
-// main frame
-// ----------------------------------------------------------------------------
 
 
-// frame constructor, overload built-in wxFrame
+// main frame constructor, overload built-in wxFrame
+
 frmMain::frmMain(const wxString& title, 
                  const wxPoint &pos, 
                  const wxSize &size, 
@@ -408,7 +286,7 @@ frmMain::frmMain(const wxString& title,
                                   wxDefaultPosition, 
                                   wxDefaultSize, 
                                   flags, 
-                                  m_statusBar );
+                                  m_statusBar);
     
     RecreateList();
 
@@ -416,6 +294,22 @@ frmMain::frmMain(const wxString& title,
     m_listCtrl->UpdateToolBarButtons();
 
 }
+
+
+// constructor mainListCtrl
+
+mainListCtrl::mainListCtrl(wxWindow *parent, 
+                           const wxWindowID id, 
+                           const wxPoint& pos, 
+                           const wxSize& size, 
+                           long style, 
+                           wxStatusBar * statusbar) : wxListCtrl(parent, id, pos, size, style)
+{
+    m_statusBar = statusbar;
+}
+
+
+// member functions
 
 
 void frmMain::PopulateVolumes()
@@ -1569,6 +1463,12 @@ void mainListCtrl::OnItemActivated(wxListEvent& WXUNUSED(event))
             // open
             wxString mountpath = thisvol->getMountPath();
             BrowseFolder(mountpath);
+        }
+        else
+        {
+            // edit
+            editExistingEncFSFolder(this, g_selectedVolume, m_VolumeData);
+            g_frmMain->RefreshAll();
         }
     }
 }

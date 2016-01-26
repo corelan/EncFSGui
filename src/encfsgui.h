@@ -14,6 +14,9 @@
 #endif
 
 #include <wx/config.h>
+
+#include <wx/listctrl.h>
+
 #include <map>
 
 
@@ -55,6 +58,118 @@ private:
     wxString m_mount_path;
 };
 
+
+// mainListCtrl - Class for the list control inside the main window
+
+class mainListCtrl: public wxListCtrl
+{
+public:
+    // ctor
+    mainListCtrl(wxWindow *parent, 
+                 const wxWindowID id, 
+                 const wxPoint& pos, 
+                 const wxSize& size, 
+                 long style, 
+                 wxStatusBar * statusbar);
+    // event handlers
+    //void OnMouseEvent(wxMouseEvent& event);
+    void OnItemSelected(wxListEvent& event);
+    void OnItemDeSelected(wxListEvent& event);
+    void OnItemActivated(wxListEvent& event);
+    void SetSelectedIndex(int);
+    void LinkToolbar(wxToolBarBase*);
+    void UpdateToolBarButtons();
+
+private:
+    wxDECLARE_EVENT_TABLE();
+    wxToolBarBase *m_toolBar;
+    wxStatusBar *m_statusBar;
+};
+
+
+
+// encFSGuiApp - main Class
+
+class encFSGuiApp : public wxApp
+{
+public:
+    bool OnInit();
+};
+
+// Define a new frame type: this is going to be our main frame
+class frmMain : public wxFrame
+{
+public:
+    // ctor(s)
+    frmMain(const wxString& title, 
+            const wxPoint& pos, 
+            const wxSize& size, 
+            long style);
+    // dtor
+    virtual ~frmMain();
+
+    // event handlers (these functions should _not_ be virtual)
+    void OnQuit(wxCommandEvent& event);
+    void OnAbout(wxCommandEvent& event);
+    void OnNewFolder(wxCommandEvent& event);
+    void OnAddExistingFolder(wxCommandEvent& event);
+    void OnBrowseFolder(wxCommandEvent& event);
+    void OnEditFolder(wxCommandEvent& event);
+    void OnSettings(wxCommandEvent& event);
+    void OnMount(wxCommandEvent& event);
+    void OnUnMount(wxCommandEvent& event);
+    void OnInfo(wxCommandEvent& event);
+    void OnRemoveFolder(wxCommandEvent& event);
+
+    // generic routine
+    bool unmountVolumeAsk(wxString& volumename);   // ask for confirmation
+    // function that does actual unmount is not a member function
+
+    int mountFolder(wxString& volumename, wxString& pw);
+
+    // override default OnExit handler (so we can run code when user clicks close button on frame)
+    virtual int OnExit(wxCommandEvent& event);
+
+    // handle clicks on toolbar
+    void OnToolLeftClick(wxCommandEvent& event);
+
+    // auto mount routine
+    void AutoMountVolumes();
+    // FYI -  auto unmount routine is not a member function
+
+    void PopulateVolumes();
+    void PopulateToolbar(wxToolBarBase* toolBar);
+    void CreateToolbar();  
+    void RecreateStatusbar(); 
+    void RefreshAll();
+    //void UpdateToolBarButtons();  // 
+    void SetToolBarButtonState(int, bool);
+    void DoSize();
+
+private:
+    wxString m_datadir;
+    // toolbar stuff
+    size_t              m_rows;             // 1
+    wxPanel            *m_panel;
+
+        // statusbar
+    wxStatusBar* m_statusBar;
+
+    int mountSelectedFolder(wxString& pw);
+
+    wxString getPassWord(wxString&, wxString&);
+
+    // list stuff
+    void RecreateList();
+    // fill the control with items
+    void FillListWithVolumes();
+    
+    // ListView stuff
+    mainListCtrl *m_listCtrl;
+
+    // any class wishing to process wxWidgets events must use this macro
+    wxDECLARE_EVENT_TABLE();
+};
 
 
 // ----------------------------------------------------------------------------
