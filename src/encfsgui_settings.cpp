@@ -31,6 +31,7 @@ enum
     ID_BTN_CHOOSE_MOUNT,
     ID_BTN_CHOOSE_UMOUNT,
     ID_CHECK_STARTATLOGIN,
+    ID_CHECK_STARTASICON,
     ID_CHECK_UNMOUNT_ON_QUIT
 };
 
@@ -65,6 +66,7 @@ private:
     wxTextCtrl * m_mountbin_field;
     wxTextCtrl * m_umountbin_field;
     wxCheckBox * m_chkbx_startatlogin;
+    wxCheckBox * m_chkbx_startasicon;
     wxCheckBox * m_chkbx_unmount_on_quit;
 };
 
@@ -180,6 +182,7 @@ void frmSettingsDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     pConfig->Write(wxT("mountbinpath"), m_mountbin_field->GetValue());
     pConfig->Write(wxT("umountbinpath"), m_umountbin_field->GetValue());
     pConfig->Write(wxT("startatlogin"), m_chkbx_startatlogin->GetValue());
+    pConfig->Write(wxT("startasicon"), m_chkbx_startasicon->GetValue());
     pConfig->Write(wxT("autounmount"), m_chkbx_unmount_on_quit->GetValue());
     pConfig->Flush();
 
@@ -277,12 +280,19 @@ void frmSettingsDialog::Create()
 
 
     // start at login
-    wxSizer * const sizerStartup = new wxStaticBoxSizer(wxVERTICAL, this, "Startup & exit options");
+    wxSizer * const sizerStartup = new wxStaticBoxSizer(wxVERTICAL, this, "Startup && exit options");
     m_chkbx_startatlogin  = new wxCheckBox(this, ID_CHECK_STARTATLOGIN, "Start encfsgui at login");
     // 0l = disabled by default
     // 1l = enabled by default
     m_chkbx_startatlogin->SetValue(pConfig->Read(wxT("startatlogin"), 0l) != 0);
     sizerStartup->Add(m_chkbx_startatlogin);
+
+    m_chkbx_startasicon  = new wxCheckBox(this, ID_CHECK_STARTASICON, "Start encfsgui as icon in taskbar");
+    // 0l = disabled by default
+    // 1l = enabled by default
+    m_chkbx_startasicon->SetValue(pConfig->Read(wxT("startasicon"), 0l) != 0);
+    sizerStartup->Add(m_chkbx_startasicon);
+
 
     // unmount when exit
     m_chkbx_unmount_on_quit  = new wxCheckBox(this, ID_CHECK_UNMOUNT_ON_QUIT, "Auto unmount volumes when closing app");

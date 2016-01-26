@@ -18,6 +18,8 @@
 
 #include <wx/listctrl.h>
 
+#include <wx/taskbar.h>
+
 #include <map>
 
 
@@ -26,6 +28,23 @@
 // ----------------------------------------------------------------------------
 // Classes
 // ----------------------------------------------------------------------------
+
+
+// TaskBar Icon
+
+
+class TaskBarIcon : public wxTaskBarIcon
+{
+public:
+    TaskBarIcon(wxTaskBarIconType iconType);
+    void OnLeftButtonDClick(wxTaskBarIconEvent&);
+    void OnMenuExit(wxCommandEvent& event);
+    void OnMenuShow(wxCommandEvent& event);
+    void OnMenuHide(wxCommandEvent& event);
+    virtual wxMenu *CreatePopupMenu() wxOVERRIDE;
+    wxDECLARE_EVENT_TABLE();
+};
+
 
 // DBEntry - Class for volume entry from DB
 
@@ -170,6 +189,12 @@ private:
 
     // any class wishing to process wxWidgets events must use this macro
     wxDECLARE_EVENT_TABLE();
+
+protected:
+    TaskBarIcon   *m_taskBarIcon;
+#if defined(__WXOSX__) && wxOSX_USE_COCOA
+    TaskBarIcon   *m_dockIcon;
+#endif
 };
 
 

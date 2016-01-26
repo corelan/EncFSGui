@@ -21,6 +21,7 @@
 #include <wx/utils.h>
 #include <vector>
 #include <map>
+#include "wx/taskbar.h"
 
 #include "encfsgui.h"
 
@@ -35,10 +36,7 @@
 // ----------------------------------------------------------------------------
 
 
-#ifndef wxHAS_IMAGES_IN_RESOURCES
-    #include "encfsgui.xpm" 
-#endif
-
+#include "encfsgui.xpm" 
 
 #include "bitmaps/createfolder.xpm"
 #include "bitmaps/existingfolder.xpm"
@@ -98,6 +96,9 @@ enum
     ID_Toolbar_Settings,
     ID_Toolbar_Quit,
     ID_TOOLBAR,
+    ID_Taskbar_Exit,
+    ID_Taskbar_Show,
+    ID_Taskbar_Hide,
     ID_List_Ctrl                   = 1000
 };
 
@@ -125,9 +126,6 @@ std::map<wxString, DBEntry*> m_VolumeData;
 frmMain * g_frmMain;
 
 
-
-
-
 // ----------------------------------------------------------------------------
 // event tables 
 // ----------------------------------------------------------------------------
@@ -149,6 +147,15 @@ wxBEGIN_EVENT_TABLE(mainListCtrl, wxListCtrl)
     EVT_LIST_ITEM_SELECTED(ID_List_Ctrl, mainListCtrl::OnItemSelected)
     EVT_LIST_ITEM_DESELECTED(ID_List_Ctrl, mainListCtrl::OnItemDeSelected)
     EVT_LIST_ITEM_ACTIVATED(ID_List_Ctrl, mainListCtrl::OnItemActivated)    // double-click/enter
+wxEND_EVENT_TABLE()
+
+
+// TaskBarIcon events
+wxBEGIN_EVENT_TABLE(TaskBarIcon, wxTaskBarIcon)
+    EVT_MENU(ID_Taskbar_Exit, TaskBarIcon::OnMenuExit)
+    EVT_MENU(ID_Taskbar_Show, TaskBarIcon::OnMenuShow)
+    EVT_MENU(ID_Taskbar_Hide, TaskBarIcon::OnMenuHide)
+    EVT_TASKBAR_LEFT_DCLICK  (TaskBarIcon::OnLeftButtonDClick)
 wxEND_EVENT_TABLE()
 
 
@@ -197,7 +204,17 @@ bool encFSGuiApp::OnInit()
     // and show it (the frames, unlike simple controls, are not shown when
     // created initially)
 
-    frame->Show(true);
+    pConfig->SetPath(wxT("/Config"));
+    bool startasicon = pConfig->Read(wxT("startasicon"), 0l);
+
+    if (startasicon)
+    {
+        frame->Show(false);
+    }
+    else
+    {
+        frame->Show(true);
+    }
 
     wxInitAllImageHandlers();
     
@@ -207,6 +224,54 @@ bool encFSGuiApp::OnInit()
     return true;
 }
 
+
+// taskbaricon constructors
+
+
+TaskBarIcon::TaskBarIcon(wxTaskBarIconType iconType) : wxTaskBarIcon(iconType)
+{
+
+}
+
+// Overridables
+wxMenu *TaskBarIcon::CreatePopupMenu()
+{
+    wxMenu *menu = new wxMenu;
+    menu->Append(ID_Taskbar_Show, wxT("&Show EncFSGui"));
+    menu->Append(ID_Taskbar_Hide, wxT("&Hide EncFSGui"));
+    /* OSX has built-in quit menu for the dock menu, but not for the status item */
+#ifdef __WXOSX__ 
+    if ( OSXIsStatusItem() )
+#endif
+    {
+        menu->AppendSeparator();
+        menu->Append(ID_Taskbar_Exit, wxT("E&xit"));
+    }
+    return menu;
+}
+
+
+
+// taskbaricon member functions
+void TaskBarIcon::OnMenuExit(wxCommandEvent& event)
+{
+    g_frmMain->OnQuit(event);
+}
+
+void TaskBarIcon::OnMenuShow(wxCommandEvent& WXUNUSED(event))
+{
+    g_frmMain->Show(true);
+}
+
+void TaskBarIcon::OnMenuHide(wxCommandEvent& WXUNUSED(event))
+{
+    g_frmMain->Show(false);
+}
+
+void TaskBarIcon::OnLeftButtonDClick(wxTaskBarIconEvent&)
+{
+    g_frmMain->Show(true);
+}
 
 
 // main frame constructor, overload built-in wxFrame
@@ -221,9 +286,7 @@ frmMain::frmMain(const wxString& title,
     m_listCtrl = NULL;
     m_datadir = stdp.GetUserDataDir();
 
-#if wxUSE_STATUSBAR
     m_statusBar = CreateStatusBar(2, wxSB_SUNKEN);
-#endif
 
     // set the frame icon
     SetIcon(wxICON(encfsgui_ico));
@@ -285,6 +348,22 @@ frmMain::frmMain(const wxString& title,
 
     m_listCtrl->LinkToolbar(GetToolBar());
     m_listCtrl->UpdateToolBarButtons();
+
+    // finally, add the app icon
+
+    m_taskBarIcon = new TaskBarIcon(wxTBI_DEFAULT_TYPE);
+
+    // we should be able to show up to 128 characters on Windows
+    m_taskBarIcon->SetIcon(wxICON(encfsgui_ico),
+                                 "EncFSGui\n"); 
+    
+    #if defined(__WXOSX__) && wxOSX_USE_COCOA
+        m_dockIcon = new TaskBarIcon(wxTBI_DOCK);
+        //if ( !m_dockIcon->SetIcon(wxICON(encfsgui_ico)) )
+        //{
+        //    wxLogError(wxT("Could not set icon."));
+        //}
+    #endif
 
 }
 
@@ -481,6 +560,7 @@ int frmMain::OnExit(wxCommandEvent& WXUNUSED(event))
 // destructor
 frmMain::~frmMain()
 {
+    delete m_taskBarIcon;
     this->Destroy();
     Close(true);
 }
