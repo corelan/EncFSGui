@@ -403,7 +403,7 @@ wxString getExpectScriptContents()
     newline.Printf(wxT("expect \"\\n\"\n"));
     scriptcontents << newline;    
     
-    newline.Printf(wxT("sleep 2\n"));
+    newline.Printf(wxT("sleep x\n"));  
     scriptcontents << newline;
 
     return scriptcontents;
@@ -539,7 +539,8 @@ std::map<wxString, wxString> getEncodingCapabilities()
         scriptcontents.Replace("$IVCHAINING","");
         scriptcontents.Replace("$PERFILEIV","");
         scriptcontents.Replace("$FILETOIVHEADERCHAINING","");
-        scriptcontents.Replace("$BLOCKAUTHCODEHEADERS","");    
+        scriptcontents.Replace("$BLOCKAUTHCODEHEADERS","");
+        scriptcontents.Replace("sleep x","sleep 1");    
 
         // run encfs, just to capture the output related with filename encoding mechanisms
         // write script to disk

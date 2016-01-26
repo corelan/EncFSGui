@@ -457,6 +457,8 @@ bool frmAddDialog::createEncFSFolder()
         scriptcontents.Replace("$BLOCKAUTHCODEHEADERS",""); // n is default here
     }
 
+    scriptcontents.Replace("sleep x","sleep 2");
+
     // write script to disk
     wxTempFile * tmpfile = new wxTempFile();
     tmpfile->Open(scriptfile);
