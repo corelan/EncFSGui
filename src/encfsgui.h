@@ -46,6 +46,9 @@ public:
     void OnMenuSettings(wxCommandEvent& event);
     virtual wxMenu *CreatePopupMenu() wxOVERRIDE;
     wxDECLARE_EVENT_TABLE();
+
+private:
+     wxMenu *m_taskBarMenu;
 };
 
 

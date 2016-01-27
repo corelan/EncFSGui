@@ -96,13 +96,14 @@ enum
     ID_Toolbar_Settings,
     ID_Toolbar_Quit,
     ID_TOOLBAR,
-    // taskbar icon
-    ID_Taskbar_Exit,
-    ID_Taskbar_Show,
-    ID_Taskbar_Hide,
-    ID_Taskbar_Settings,
     // list control
-    ID_List_Ctrl                   = 1000
+    ID_List_Ctrl                   = 1000,
+    // taskbar icon
+    // use higher range to avoid issues
+    ID_Taskbar_ShowGUI             = 2000,
+    ID_Taskbar_HideGUI,
+    ID_Taskbar_Settings,
+    ID_Taskbar_Exit
 };
 
 // enum for return codes related with mount success
@@ -156,8 +157,8 @@ wxEND_EVENT_TABLE()
 // TaskBarIcon events
 wxBEGIN_EVENT_TABLE(TaskBarIcon, wxTaskBarIcon)
     EVT_MENU(ID_Taskbar_Exit, TaskBarIcon::OnMenuExit)
-    EVT_MENU(ID_Taskbar_Show, TaskBarIcon::OnMenuShow)
-    EVT_MENU(ID_Taskbar_Hide, TaskBarIcon::OnMenuHide)
+    EVT_MENU(ID_Taskbar_ShowGUI, TaskBarIcon::OnMenuShow)
+    EVT_MENU(ID_Taskbar_HideGUI, TaskBarIcon::OnMenuHide)
     EVT_MENU(ID_Taskbar_Settings, TaskBarIcon::OnMenuSettings)
     EVT_TASKBAR_LEFT_DCLICK  (TaskBarIcon::OnLeftButtonDClick)
 wxEND_EVENT_TABLE()
@@ -240,11 +241,12 @@ TaskBarIcon::TaskBarIcon(wxTaskBarIconType iconType) : wxTaskBarIcon(iconType)
 wxMenu *TaskBarIcon::CreatePopupMenu()
 {
     wxMenu *menu = new wxMenu;
-    menu->Append(ID_Taskbar_Show, wxT("&Show EncFSGui"));
-    menu->Append(ID_Taskbar_Hide, wxT("&Hide EncFSGui"));
+    menu->Append(ID_Taskbar_ShowGUI, wxT("&Launch EncFSGui"));
+    menu->Append(ID_Taskbar_HideGUI, wxT("&Hide EncFSGui"));
     menu->AppendSeparator();
     menu->Append(ID_Taskbar_Settings, wxT("S&ettings"));
     /* OSX has built-in quit menu for the dock menu, but not for the status item */
+    
 #ifdef __WXOSX__ 
     if ( OSXIsStatusItem() )
 #endif
@@ -252,6 +254,13 @@ wxMenu *TaskBarIcon::CreatePopupMenu()
         menu->AppendSeparator();
         menu->Append(ID_Taskbar_Exit, wxT("E&xit"));
     }
+
+    menu->Enable(ID_Taskbar_HideGUI, true);
+    menu->Enable(ID_Taskbar_ShowGUI, true);
+    menu->Enable(ID_Taskbar_Settings, true);
+
+    m_taskBarMenu = menu;
+
     return menu;
 }
 
@@ -266,21 +275,42 @@ void TaskBarIcon::OnMenuExit(wxCommandEvent& event)
 void TaskBarIcon::OnMenuShow(wxCommandEvent& WXUNUSED(event))
 {
     g_frmMain->Show();
+    m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, false);
+    m_taskBarMenu->Enable(ID_Taskbar_HideGUI, true);
+    m_taskBarMenu->UpdateUI();
 }
 
 void TaskBarIcon::OnMenuHide(wxCommandEvent& WXUNUSED(event))
 {
     g_frmMain->Hide();
+    m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, true);
+    m_taskBarMenu->Enable(ID_Taskbar_HideGUI, false);
+    m_taskBarMenu->UpdateUI();
 }
 
 void TaskBarIcon::OnLeftButtonDClick(wxTaskBarIconEvent&)
 {
-    g_frmMain->Show();
+    if (g_frmMain->IsShown())
+    {
+        g_frmMain->Hide();
+        m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, true);
+        m_taskBarMenu->Enable(ID_Taskbar_HideGUI, false);            
+    }
+    else
+    {
+        g_frmMain->Show();
+        m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, false);
+        m_taskBarMenu->Enable(ID_Taskbar_HideGUI, true);    
+    }
+    m_taskBarMenu->UpdateUI();
 }
 
 void TaskBarIcon::OnMenuSettings(wxCommandEvent& event)
 {
     g_frmMain->Show();
+    m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, false);
+    m_taskBarMenu->Enable(ID_Taskbar_HideGUI, true);
+    m_taskBarMenu->UpdateUI();  
     g_frmMain->OnSettings(event);
 }
 
@@ -302,29 +332,28 @@ frmMain::frmMain(const wxString& title,
     // set the frame icon
     SetIcon(wxICON(encfsgui_ico));
 
-    #if wxUSE_MENUS
-        // create a menu bar
-        wxMenu *fileMenu = new wxMenu;
+    // create a menu bar
+    wxMenu *fileMenu = new wxMenu;
 
-        // the "About" item should be in the help menu
-        wxMenu *helpMenu = new wxMenu;
-        helpMenu->Append(ID_Menu_About, "&About\tF1", "Show about dialog");
+    // the "About" item should be in the help menu
+    wxMenu *helpMenu = new wxMenu;
+    helpMenu->Append(ID_Menu_About, "&About\tF1", "Show about dialog");
 
-        // create application-specific menu items
-        fileMenu->Append(ID_Menu_New, "&Create a new EncFS folder\tF2","Create a new EncFS folder");
-        fileMenu->Append(ID_Menu_Existing, "&Open existing EncFS folder\tF4","Open an existing encFS folder");
-        fileMenu->AppendSeparator();
-        fileMenu->Append(ID_Menu_Settings, "&Settings\tF6","Edit global settings");
-        fileMenu->Append(ID_Menu_Quit, "E&xit\tAlt-X", "Quit this program");
+    // create application-specific menu items
+    fileMenu->Append(ID_Menu_New, "&Create a new EncFS folder\tF2","Create a new EncFS folder");
+    fileMenu->Append(ID_Menu_Existing, "&Open existing EncFS folder\tF4","Open an existing encFS folder");
+    fileMenu->AppendSeparator();
+    fileMenu->Append(ID_Menu_Settings, "&Settings\tF6","Edit global settings");
+    fileMenu->Append(ID_Menu_Quit, "E&xit\tAlt-X", "Quit this program");
 
-        // now append the freshly created menu to the menu bar...
-        wxMenuBar *menuBar = new wxMenuBar();
-        menuBar->Append(fileMenu, "&File");
-        menuBar->Append(helpMenu, "&Help");
+    // now append the freshly created menu to the menu bar...
+    wxMenuBar *menuBar = new wxMenuBar();
+    menuBar->Append(fileMenu, "&File");
+    menuBar->Append(helpMenu, "&Help");
 
-        // ... and attach this menu bar to the frame
-        SetMenuBar(menuBar);
-    #endif // wxUSE_MENUS
+    // ... and attach this menu bar to the frame
+    SetMenuBar(menuBar);
+
 
     // update the StatusBar
     RecreateStatusbar();
@@ -361,19 +390,12 @@ frmMain::frmMain(const wxString& title,
     m_listCtrl->UpdateToolBarButtons();
 
     // finally, add the app icon
-
     m_taskBarIcon = new TaskBarIcon(wxTBI_DEFAULT_TYPE);
-
-    // we should be able to show up to 128 characters on Windows
     m_taskBarIcon->SetIcon(wxICON(encfsgui_ico),
                                  "EncFSGui\n"); 
     
     #if defined(__WXOSX__) && wxOSX_USE_COCOA
         m_dockIcon = new TaskBarIcon(wxTBI_DOCK);
-        //if ( !m_dockIcon->SetIcon(wxICON(encfsgui_ico)) )
-        //{
-        //    wxLogError(wxT("Could not set icon."));
-        //}
     #endif
 
 }
@@ -531,7 +553,7 @@ bool QuitApp(wxWindow * parent)
     hdr << msg;
 
     // ask if user is sure to exit
-    int res = wxMessageBox(hdr, wxT("Quit ?"), wxYES_NO, parent);
+    int res = wxMessageBox(hdr, wxT("Quit EncFSGui?"), wxYES_NO, parent);
     
     if (res == wxYES)
     {
@@ -615,6 +637,7 @@ void frmMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 
 void frmMain::OnNewFolder(wxCommandEvent& WXUNUSED(event))
 {
+    Show();
     createNewEncFSFolder(this);
     RefreshAll();
 }
@@ -622,6 +645,7 @@ void frmMain::OnNewFolder(wxCommandEvent& WXUNUSED(event))
 
 void frmMain::OnAddExistingFolder(wxCommandEvent& WXUNUSED(event))
 {
+    Show();
     openExistingEncFSFolder(this);
     RefreshAll();
 }
@@ -1013,6 +1037,7 @@ void frmMain::OnRemoveFolder(wxCommandEvent& WXUNUSED(event))
 
 void frmMain::OnSettings(wxCommandEvent& WXUNUSED(event))
 {
+    Show();
     openSettings(this);
     RefreshAll();
 }
