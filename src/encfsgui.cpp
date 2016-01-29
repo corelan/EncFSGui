@@ -392,7 +392,7 @@ frmMain::frmMain(const wxString& title,
     // finally, add the app icon
     m_taskBarIcon = new TaskBarIcon(wxTBI_DEFAULT_TYPE);
     m_taskBarIcon->SetIcon(wxICON(encfsgui_ico),
-                                 "EncFSGui\n"); 
+                                 "EncFSGui"); 
     
     #if defined(__WXOSX__) && wxOSX_USE_COCOA
         m_dockIcon = new TaskBarIcon(wxTBI_DOCK);
@@ -535,7 +535,9 @@ bool QuitApp(wxWindow * parent)
     wxConfigBase *pConfig = wxConfigBase::Get();
     pConfig->SetPath(wxT("/Config"));
     bool autounmount;
+    bool nopromptonquit;
     autounmount = pConfig->Read(wxT("autounmount"), 0l);
+    nopromptonquit =  pConfig->Read(wxT("nopromptonquit"), 0l);
 
     wxString hdr;
     hdr.Printf(wxT("Are you sure you want to exit this program?\n"));
@@ -553,7 +555,18 @@ bool QuitApp(wxWindow * parent)
     hdr << msg;
 
     // ask if user is sure to exit
-    int res = wxMessageBox(hdr, wxT("Quit EncFSGui?"), wxYES_NO, parent);
+
+    int res;
+
+    if (nopromptonquit)
+    {
+            res = wxYES;
+    }
+    else
+    {
+        res = wxMessageBox(hdr, wxT("Quit EncFSGui?"), wxYES_NO, parent);
+    }
+
     
     if (res == wxYES)
     {

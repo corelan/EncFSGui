@@ -68,6 +68,7 @@ private:
     wxCheckBox * m_chkbx_startatlogin;
     wxCheckBox * m_chkbx_startasicon;
     wxCheckBox * m_chkbx_unmount_on_quit;
+    wxCheckBox * m_chkbx_prompt_on_quit;
 };
 
 
@@ -184,6 +185,7 @@ void frmSettingsDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     pConfig->Write(wxT("startatlogin"), m_chkbx_startatlogin->GetValue());
     pConfig->Write(wxT("startasicon"), m_chkbx_startasicon->GetValue());
     pConfig->Write(wxT("autounmount"), m_chkbx_unmount_on_quit->GetValue());
+    pConfig->Write(wxT("nopromptonquit"), m_chkbx_prompt_on_quit->GetValue());
     pConfig->Flush();
 
     // set app to run at login if needed
@@ -301,6 +303,10 @@ void frmSettingsDialog::Create()
     m_chkbx_unmount_on_quit->SetValue(pConfig->Read(wxT("autounmount"), 0l) != 0);
     sizerStartup->Add(m_chkbx_unmount_on_quit);
 
+    m_chkbx_prompt_on_quit = new wxCheckBox(this, ID_CHECK_UNMOUNT_ON_QUIT, "Do not ask for confirmation on exit");
+    m_chkbx_prompt_on_quit->SetValue(pConfig->Read(wxT("nopromptonquit"), 0l) != 0);
+    sizerStartup->Add(m_chkbx_prompt_on_quit);
+
     // glue together
     sizerTop->Add(sizerGlobal, wxSizerFlags(1).Expand().Border());
     sizerTop->Add(sizerStartup, wxSizerFlags(1).Expand().Border());
@@ -324,7 +330,7 @@ void openSettings(wxWindow *parent)
 {   
     wxSize dlgSettingsSize;
     // make height larger when adding more options
-    dlgSettingsSize.Set(400,450);
+    dlgSettingsSize.Set(400,485);
 
     long style = wxDEFAULT_DIALOG_STYLE;// | wxRESIZE_BORDER;
 
