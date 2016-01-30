@@ -149,7 +149,7 @@ If you want to try the application, you'll need a number of dependencies install
   sudo make install
   ```
 
-  The `make install`will put the header files into
+  The `make install` command will put the header files into
   ```
   /usr/local/include/curl
   ```
@@ -157,7 +157,7 @@ If you want to try the application, you'll need a number of dependencies install
   ```
   /usr/local/lib/libcurl.a
   /usr/local/lib/libcurl.dylib
-  ``
+  ```
 
   Run `curl --version` to confirm that everything works correctly.
 
