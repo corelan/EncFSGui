@@ -115,16 +115,16 @@ void frmEditDialog::Create()
     sizerPassword->Add(m_chkbx_save_password);
 
     sizerPassword->Add(new wxStaticText(this, wxID_ANY, "Set/update keychain password: (this won't change the password of encfs itself)"));
-
+    sizerPassword->AddSpacer(5);
     wxSizer * const sizerPW1 = new wxBoxSizer(wxHORIZONTAL);
     sizerPW1->Add(new wxStaticText(this, wxID_ANY, "Enter password:"));
-    m_pass1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    m_pass1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(200,22), wxTE_PASSWORD);
     sizerPW1->Add(m_pass1, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
     sizerPassword->Add(sizerPW1, wxSizerFlags(1).Expand().Border());
 
     wxSizer * const sizerPW2 = new wxBoxSizer(wxHORIZONTAL);
     sizerPW2->Add(new wxStaticText(this, wxID_ANY, "Enter password again:"));
-    m_pass2 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    m_pass2 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(200,22), wxTE_PASSWORD);
     sizerPW2->Add(m_pass2, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
     sizerPassword->Add(sizerPW2, wxSizerFlags(1).Expand().Border());
 
@@ -364,7 +364,10 @@ void frmEditDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
                 {
                     wxString cmd;
                     wxString pwaddoutput;
-                    cmd.Printf(wxT("sh -c \"security add-generic-password -U -a 'EncFSGUI_%s' -s 'EncFSGUI_%s' -w '%s' login.keychain\""), newvolname, newvolname, m_pass1->GetValue());
+                    wxString pw;
+                    pw = m_pass1->GetValue();
+                    cmd.Printf(wxT("sh -c \"security add-generic-password -U -a 'EncFSGUI_%s' -s 'EncFSGUI_%s' -w '%s' login.keychain\""), newvolname, newvolname, pw);
+                    pw = "";
                     pwaddoutput = StrRunCMDSync(cmd);
                     pConfig->SetPath(config_volname);
                     pConfig->Write(wxT("passwordsaved"), true);
@@ -388,7 +391,10 @@ void frmEditDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
                 {
                     wxString cmd;
                     wxString pwaddoutput;
-                    cmd.Printf(wxT("sh -c \"security add-generic-password -U -a 'EncFSGUI_%s' -s 'EncFSGUI_%s' -w '%s' login.keychain\""), newvolname, newvolname, m_pass1->GetValue());
+                    wxString pw;
+                    pw = m_pass1->GetValue();
+                    cmd.Printf(wxT("sh -c \"security add-generic-password -U -a 'EncFSGUI_%s' -s 'EncFSGUI_%s' -w '%s' login.keychain\""), newvolname, newvolname, pw);
+                    pw = "";
                     pwaddoutput = StrRunCMDSync(cmd);
                     pConfig->SetPath(config_volname);
                     pConfig->Write(wxT("passwordsaved"), true);

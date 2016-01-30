@@ -699,7 +699,6 @@ int frmMain::mountFolder(wxString& volumename, wxString& pw)
     cmdoutput = StrRunCMDSync(cmd);
 
     // mount
-    // TO DO : figure out a way to allow the use of single quotes in password (and other characters that would break the command below if not properly handled)
     cmd.Printf(wxT("sh -c \"echo '%s' | %s -v -S -o volname='%s' '%s' '%s'\""), pw, encfsbin, volumename, encvol, mountvol);
 
     cmdoutput = StrRunCMDSync(cmd);
