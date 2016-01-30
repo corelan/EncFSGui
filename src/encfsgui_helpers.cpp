@@ -728,3 +728,107 @@ wxString getLatestVersion()
     return g_latestversion;
 }
 
+
+std::map<wxString, long> VersionTokenizerToVersionMap(wxStringTokenizer tokenizer)
+{
+    std::map<wxString, long> m_returnval;
+
+    int tokenindex = 0;
+    while ( tokenizer.HasMoreTokens() )
+    {
+        wxString thistoken = tokenizer.GetNextToken();
+        wxString tokenkey = "";
+        long value;
+        if(!thistoken.ToLong(&value))
+        {
+            value = 0;
+        }
+        if (tokenindex == 0)
+        {
+            tokenkey = "major";
+        }
+        else if (tokenindex == 1)
+        {
+            tokenkey = "minor";
+        }
+        else if (tokenindex == 2)
+        {
+            tokenkey = "revision";
+        }
+        m_returnval[tokenkey] = value;
+        tokenindex++;
+    }
+    return m_returnval;
+}
+
+
+bool IsLatestVersionNewer(const wxString& currentversion, wxString& latestversion)
+{
+
+    bool isnewer = false;
+
+    if (!(currentversion == latestversion))
+    {
+        wxStringTokenizer tokenizer_current(currentversion, ".");
+        wxStringTokenizer tokenizer_latest(latestversion, ".");
+        // both should have at least 3 tokens
+        // if not, one of them may not be a real version
+        // which may indicate the app was not able to retrieve the latest version
+        // in that case, we'll assume the current version is ok
+        size_t nrTokens_current = tokenizer_current.CountTokens();
+        size_t nrTokens_latest = tokenizer_latest.CountTokens();
+
+        if ((nrTokens_current < 3) || (nrTokens_latest < 3))
+        {
+            return false;   // current version is considered to be up-to-date
+        }
+
+        // put tokens in maps first
+        std::map<wxString, long> m_tokenscurrent = VersionTokenizerToVersionMap(tokenizer_current);
+        std::map<wxString, long> m_tokenslatest = VersionTokenizerToVersionMap(tokenizer_latest);
+
+        // check, starting with major first
+        if ( (m_tokenscurrent.count("major") > 0) && (m_tokenslatest.count("major") > 0) )
+        {
+            long currmajor = m_tokenscurrent["major"];
+            long latestmajor = m_tokenslatest["major"];
+            if (latestmajor > currmajor)
+            {
+                return true;
+            }
+            else if (currmajor > latestmajor)
+            {
+                return false;
+            }
+        }
+
+        if ( (m_tokenscurrent.count("minor") > 0) && (m_tokenslatest.count("minor") > 0) )
+        {
+            long currminor = m_tokenscurrent["minor"];
+            long latestminor = m_tokenslatest["minor"];
+            if (latestminor > currminor)
+            {
+                return true;
+            }
+            else if (currminor > latestminor)
+            {
+                return false;
+            }
+        }
+
+        if ( (m_tokenscurrent.count("revision") > 0) && (m_tokenslatest.count("revision") > 0) )
+        {
+            long currrevision = m_tokenscurrent["revision"];
+            long latestrevision = m_tokenslatest["revision"];
+            if (latestrevision > currrevision)
+            {
+                return true;
+            }
+        }        
+
+    }
+
+    return isnewer;
+
+}
+

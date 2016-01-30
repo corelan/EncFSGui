@@ -44,6 +44,7 @@ public:
     void OnMenuShow(wxCommandEvent& event);
     void OnMenuHide(wxCommandEvent& event);
     void OnMenuSettings(wxCommandEvent& event);
+    void OnMenuUpdate(wxCommandEvent& event);
     virtual wxMenu *CreatePopupMenu() wxOVERRIDE;
     wxDECLARE_EVENT_TABLE();
 
@@ -172,6 +173,7 @@ public:
     void SetToolBarButtonState(int, bool);
     void DoSize();
     void CheckUpdates();
+    void CheckUpdates(bool);
 
 private:
     wxString m_datadir;
@@ -349,6 +351,7 @@ wxString getExpectScriptContents(bool);
 wxString getChangePasswordScriptContents(wxString&);
 wxString getLaunchAgentContents();
 wxString getLatestVersion();
+bool IsLatestVersionNewer(const wxString&, wxString&);
 
 //encfsgui_settings.cpp
 void openSettings(wxWindow *);

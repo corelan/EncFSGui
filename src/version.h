@@ -1,1 +1,1 @@
-static const wxString g_encfsguiversion = "1.0.38";
+static const wxString g_encfsguiversion = "1.0.40";

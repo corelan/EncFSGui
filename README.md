@@ -184,12 +184,7 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
 
 ## TO DO
 
-  - [X] Add code to edit a (non-mounted) volume
-    - [X] Rename volume
-    - [X] Select a different mount point
-    - [X] Unsave password from Keychain (if saved)
-    - [X] Save password to Keychain (if not saved already)
-    - [ ] Change password of encfs volume (routine already exists) (& update Keychain if needed)
+  - [ ] Change password of encfs volume (routine already exists) (& update Keychain if needed)
   - [X] Implement 'Start application at login'
   - [ ] Allow use of master password
   - [X] Check how to launch as an icon and add as an option
@@ -206,8 +201,17 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
   - [ ] Move installation instructions to wiki
   - [ ] Add pictures
   - [ ] Add license information everywhere, as needed
+  - [ ] Check if it would be possible to statically compile the app with encfs, osxfuse and openssl
+  
+### DONE
+
   - [X] Updates
     - [X] Code to check for updates
     - [X] Option to "auto check for updates"
-    - improve mechanism to compare version info (only report on higher version numbers, ignore lower numbers)
-  - [ ] Check if it would be possible to statically compile the app with encfs, osxfuse and openssl
+    - [X] improve mechanism to compare version info (only report on higher version numbers, ignore lower numbers)
+  - [X] Add code to edit a (non-mounted) volume
+    - [X] Rename volume
+    - [X] Select a different mount point
+    - [X] Unsave password from Keychain (if saved)
+    - [X] Save password to Keychain (if not saved already)
+

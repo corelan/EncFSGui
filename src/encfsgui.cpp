@@ -103,7 +103,8 @@ enum
     ID_Taskbar_ShowGUI             = 2000,
     ID_Taskbar_HideGUI,
     ID_Taskbar_Settings,
-    ID_Taskbar_Exit
+    ID_Taskbar_Exit,
+    ID_Taskbar_Update
 };
 
 // enum for return codes related with mount success
@@ -160,6 +161,7 @@ wxBEGIN_EVENT_TABLE(TaskBarIcon, wxTaskBarIcon)
     EVT_MENU(ID_Taskbar_ShowGUI, TaskBarIcon::OnMenuShow)
     EVT_MENU(ID_Taskbar_HideGUI, TaskBarIcon::OnMenuHide)
     EVT_MENU(ID_Taskbar_Settings, TaskBarIcon::OnMenuSettings)
+    EVT_MENU(ID_Taskbar_Update, TaskBarIcon::OnMenuUpdate)
     EVT_TASKBAR_LEFT_DCLICK  (TaskBarIcon::OnLeftButtonDClick)
 wxEND_EVENT_TABLE()
 
@@ -256,6 +258,9 @@ wxMenu *TaskBarIcon::CreatePopupMenu()
     menu->Append(ID_Taskbar_HideGUI, wxT("&Hide EncFSGui"));
     menu->AppendSeparator();
     menu->Append(ID_Taskbar_Settings, wxT("S&ettings"));
+    menu->AppendSeparator();
+    menu->Append(ID_Taskbar_Update, wxT("&Check for updates"));
+
     /* OSX has built-in quit menu for the dock menu, but not for the status item */
     
 #ifdef __WXOSX__ 
@@ -282,6 +287,12 @@ void TaskBarIcon::OnMenuExit(wxCommandEvent& event)
 {
     g_frmMain->OnQuit(event);
 }
+
+void TaskBarIcon::OnMenuUpdate(wxCommandEvent& WXUNUSED(event))
+{
+    g_frmMain->CheckUpdates(true);
+}
+
 
 void TaskBarIcon::OnMenuShow(wxCommandEvent& WXUNUSED(event))
 {
@@ -490,19 +501,24 @@ void frmMain::PopulateVolumes()
 
 void frmMain::CheckUpdates()
 {
+    CheckUpdates(false);
+}
+
+void frmMain::CheckUpdates(bool showIfNoUpdate)
+{
     wxString latestversion = getLatestVersion();     
     if (!latestversion.IsEmpty() && latestversion.Find("error") == -1)
     {
         // to do: implement proper version comparison check
         // ignore if you are running a newer version
-        if (!(latestversion == g_encfsguiversion))
+        if (IsLatestVersionNewer(g_encfsguiversion, latestversion))
         {
             wxString dlurl = "https://github.com/corelan/EncFSGui/raw/master/release/EncFSGUI.dmg";
             wxMessageBox(wxString::Format
              (
                 "You are running an outdated version of EncFSGui!\n"
                 "Current version: %s\n"
-                "Latest version: %s\n"
+                "Latest version released: %s\n"
                 "\nYou can download the latest version from\n%s\n",
                 g_encfsguiversion,
                 latestversion,
@@ -512,8 +528,21 @@ void frmMain::CheckUpdates()
              wxOK | wxICON_INFORMATION,
              this);
         }
+        else if (showIfNoUpdate)
+        {
+            wxMessageBox(wxString::Format
+             (
+                "You are running the most up-to-date version of EncFSGui!\n"
+                "Current version: %s\n"
+                "Latest version released: %s\n",
+                g_encfsguiversion,
+                latestversion
+             ),
+             "All good",
+             wxOK | wxICON_INFORMATION,
+             this);
+        }
     }
-    // to do: activate a timer to check once per day
 }
 
 
