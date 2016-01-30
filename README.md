@@ -206,7 +206,8 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
   - [ ] Move installation instructions to wiki
   - [ ] Add pictures
   - [ ] Add license information everywhere, as needed
-  - [ ] Updates
-    - [ ] Code to check for updates
-    - [ ] Option to "auto check for updates"
+  - [X] Updates
+    - [X] Code to check for updates
+    - [X] Option to "auto check for updates"
+    - improve mechanism to compare version info (only report on higher version numbers, ignore lower numbers)
   - [ ] Check if it would be possible to statically compile the app with encfs, osxfuse and openssl
