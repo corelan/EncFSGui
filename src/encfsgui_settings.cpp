@@ -32,7 +32,8 @@ enum
     ID_BTN_CHOOSE_UMOUNT,
     ID_CHECK_STARTATLOGIN,
     ID_CHECK_STARTASICON,
-    ID_CHECK_UNMOUNT_ON_QUIT
+    ID_CHECK_UNMOUNT_ON_QUIT,
+    ID_CHECK_UPDATES
 };
 
 // ----------------------------------------------------------------------------
@@ -69,6 +70,7 @@ private:
     wxCheckBox * m_chkbx_startasicon;
     wxCheckBox * m_chkbx_unmount_on_quit;
     wxCheckBox * m_chkbx_prompt_on_quit;
+    wxCheckBox * m_chkbx_check_updates;
 };
 
 
@@ -186,6 +188,9 @@ void frmSettingsDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     pConfig->Write(wxT("startasicon"), m_chkbx_startasicon->GetValue());
     pConfig->Write(wxT("autounmount"), m_chkbx_unmount_on_quit->GetValue());
     pConfig->Write(wxT("nopromptonquit"), m_chkbx_prompt_on_quit->GetValue());
+    pConfig->Write(wxT("checkupdates"), m_chkbx_check_updates->GetValue());
+    // to do: remove timer to check for updates, if option was deselected
+
     pConfig->Flush();
 
     // set app to run at login if needed
@@ -307,6 +312,11 @@ void frmSettingsDialog::Create()
     m_chkbx_prompt_on_quit->SetValue(pConfig->Read(wxT("nopromptonquit"), 0l) != 0);
     sizerStartup->Add(m_chkbx_prompt_on_quit);
 
+    m_chkbx_check_updates = new wxCheckBox(this, ID_CHECK_UPDATES, "Automatically check for updates at startup");
+    m_chkbx_check_updates->SetValue(pConfig->Read(wxT("checkupdates"), 0l) != 0);
+    sizerStartup->Add(m_chkbx_check_updates);
+
+
     // glue together
     sizerTop->Add(sizerGlobal, wxSizerFlags(1).Expand().Border());
     sizerTop->Add(sizerStartup, wxSizerFlags(1).Expand().Border());
@@ -330,7 +340,7 @@ void openSettings(wxWindow *parent)
 {   
     wxSize dlgSettingsSize;
     // make height larger when adding more options
-    dlgSettingsSize.Set(400,485);
+    dlgSettingsSize.Set(400,495);
 
     long style = wxDEFAULT_DIALOG_STYLE;// | wxRESIZE_BORDER;
 

@@ -401,6 +401,37 @@ frmMain::frmMain(const wxString& title,
         m_dockIcon = new TaskBarIcon(wxTBI_DOCK);
     #endif
 
+    // check for updates ?
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    bool checkupdates = pConfig->Read(wxT("checkupdates"), 0l);
+
+    if (checkupdates)
+    {
+        // check now
+        wxString latestversion = getLatestVersion();     
+        if (!latestversion.IsEmpty())
+        {
+            if (!(latestversion == g_encfsguiversion))
+            {
+                wxString dlurl = "https://github.com/corelan/EncFSGui/raw/master/release/EncFSGUI.dmg";
+                wxMessageBox(wxString::Format
+                 (
+                    "You are running an outdated version of EncFSGui!\n"
+                    "Current version: %s\n"
+                    "Latest version: %s\n"
+                    "\nYou can download the latest version from\n%s\n",
+                    g_encfsguiversion,
+                    latestversion,
+                    dlurl
+                 ),
+                 "An EncFSGui update was found",
+                 wxOK | wxICON_INFORMATION,
+                 this);
+            }
+        }
+        // to do: activate a timer to check once per day
+    }
+
 }
 
 

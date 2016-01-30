@@ -721,6 +721,10 @@ wxString getLatestVersion()
     }
     curl_global_cleanup();
 
+    g_latestversion.Replace(" ","");
+    g_latestversion.Replace("\r","");
+    g_latestversion.Replace("\n","");
+
     return g_latestversion;
 }
 
