@@ -4,8 +4,9 @@ WX_BUILD_DIR=/Users/corelanc0d3r/wxWidgets/wxWidgets-latest/build-release-static
 COMPILER=g++
 LINKER=g++
 MIN_MACOSX_VERSION=-mmacosx-version-min=10.5
-COMPFLAGS=`$(WX_BUILD_DIR)/wx-config --static=yes --cxxflags` -DFUSE_USE_VERSION=26 $(MIN_MACOSX_VERSION) -D__WXOSX_COCOA__  -DWXUSINGDLL -Wall -Wundef -Wunused-parameter -Wno-ctor-dtor-privacy -Woverloaded-virtual -Wno-deprecated-declarations  -D_FILE_OFFSET_BITS=64 -I$(WX_BUILD_DIR)/lib/wx/include/osx_cocoa-unicode-3.1 -I../../../include -DWX_PRECOMP -g -O0 -fno-common -fvisibility=hidden -fvisibility-inlines-hidden -I/usr/local/include
-LINKFLAGS=$(MIN_MACOSX_VERSION) `$(WX_BUILD_DIR)/wx-config --static=yes --libs`
+CPPFLAGS=`$(WX_BUILD_DIR)/wx-config --static=yes --cxxflags` -I$(CURL_INC_DIR) -DFUSE_USE_VERSION=26 $(MIN_MACOSX_VERSION) -DCURL_STATICLIB  -D__WXOSX_COCOA__  -DWXUSINGDLL -Wall -Wundef -Wunused-parameter -Wno-ctor-dtor-privacy -Woverloaded-virtual -Wno-deprecated-declarations  -D_FILE_OFFSET_BITS=64 -I$(WX_BUILD_DIR)/lib/wx/include/osx_cocoa-unicode-3.1 -I../../../include -DWX_PRECOMP -g -O0 -fno-common -fvisibility=hidden -fvisibility-inlines-hidden -I/usr/local/include
+LDFLAGS=$(MIN_MACOSX_VERSION) `$(WX_BUILD_DIR)/wx-config --static=yes --libs` -lcurl
+
 SOURCES=*.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=encfsgui
@@ -23,7 +24,7 @@ $(EXECUTABLE): $(OBJECTS)
 	@echo
 	@echo	[+] Step 2: Linking file to executable
 	@echo	--------------------------------------
-	$(LINKER) $(LINKFLAGS) $(OBJECTS) -o $@ 
+	$(LINKER) $(LDFLAGS) $(OBJECTS) -o $@ 
 	SetFile -t APPL encfsgui
 	@echo	    Step 2 Done
 
@@ -31,7 +32,7 @@ $(EXECUTABLE): $(OBJECTS)
 	@echo
 	@echo	[+] Step 1: Compiling source
 	@echo	----------------------------
-	$(COMPILER) $(COMPFLAGS) -c $(SOURCES)
+	$(COMPILER) $(CPPFLAGS) -c $(SOURCES)
 	rm -f *from*
 	@echo	    Step 1 Done
 	

@@ -26,6 +26,13 @@
 
 #include <fstream>
 
+#include <curl/curl.h>
+
+//
+// globals
+//
+wxString g_latestversion;
+
 // ----------------------------------------------------------------------------
 // helper functions
 // ----------------------------------------------------------------------------
@@ -667,8 +674,53 @@ void renameVolume(wxString& oldname, wxString& newname)
     pConfig->Flush();
 }
 
+
+
+// callback function to get curl content
+static size_t getHTTPContent(void* ptr, size_t size, size_t nmemb)
+{
+    size_t data_size = size * nmemb;
+    g_latestversion.Append((char *)ptr, data_size);
+    return data_size;
+}
+
+
 wxString getLatestVersion()
 {
+    g_latestversion = "";
+    wxString contentbuffer;
+    CURL *pCurlHandle;
+    CURLcode res;
+    curl_global_init(CURL_GLOBAL_DEFAULT);
 
+    pCurlHandle = curl_easy_init();
+    if(pCurlHandle)
+    {
+        curl_easy_setopt(pCurlHandle, CURLOPT_URL, "https://github.com/corelan/EncFSGui/raw/master/version.txt");
+        // force SSL peer verification
+        curl_easy_setopt(pCurlHandle, CURLOPT_SSL_VERIFYPEER, 1L);
+        // force hostname verification
+        curl_easy_setopt(pCurlHandle, CURLOPT_SSL_VERIFYHOST, 1L);
+        // no progress meter
+        curl_easy_setopt(pCurlHandle, CURLOPT_NOPROGRESS, 1L);
+        // there might be a redirect
+        curl_easy_setopt(pCurlHandle, CURLOPT_FOLLOWLOCATION, 1L);
+        // go get the data
+        curl_easy_setopt(pCurlHandle, CURLOPT_WRITEFUNCTION, getHTTPContent);
+
+
+        res = curl_easy_perform(pCurlHandle);
+        /* Check for errors */ 
+        if(res != CURLE_OK)
+        {
+            wxString msg;
+            msg.Printf(wxT("curl_easy_perform() failed: %s"), curl_easy_strerror(res));
+            wxLogDebug(msg);
+        }
+        curl_easy_cleanup(pCurlHandle);
+    }
+    curl_global_cleanup();
+
+    return g_latestversion;
 }
 

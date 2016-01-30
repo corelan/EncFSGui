@@ -24,7 +24,7 @@
 #include "wx/taskbar.h"
 
 #include "encfsgui.h"
-
+#include "version.h"
 
 // keep config files local
 #define wxCONFIG_USE_LOCAL_FILE 1
@@ -199,7 +199,10 @@ bool encFSGuiApp::OnInit()
 
     framestyle = wxDEFAULT_FRAME_STYLE ^ wxRESIZE_BORDER | wxFRAME_EX_METAL;
 
-    frmMain *frame = new frmMain("::[ EncFSGui ]::", 
+    wxString title;
+    title.Printf(wxT(":: [ EncFSGui v%s] ::"), g_encfsguiversion);
+
+    frmMain *frame = new frmMain(title, 
                                  wxDefaultPosition, 
                                  frmMainSize, 
                                  framestyle );
@@ -626,23 +629,32 @@ void frmMain::OnAbout(wxCommandEvent& WXUNUSED(event))
         msg = encfsbinpath;
     }
 
+    wxString latestversion;
+    wxString versionmessage;
+    latestversion = getLatestVersion();
+
     wxStandardPathsBase& stdp = wxStandardPaths::Get();
 
     wxMessageBox(wxString::Format
                  (
-                    "Welcome to encFSGui\n"
-                    "written by Corelan GCV\n\n"
+                    "EncFSGui - GUI Wrapper around encfs, for OSX\n"
+                    "Current version: %s\n"
+                    "Latest version: %s\n"
+                    "written by Peter Van Eeckhoutte (Corelan GCV)\n"
+                    "@corelanc0d3r\n\n"
                     "Project repository:\nhttps://github.com/corelan/EncFSGui\n\n"
                     "You are running %s\n\n"
                     "EncFS used: %s\n"
                     "EncFS version: %s\n"
                     "Config Folder: %s\n",
+                    g_encfsguiversion,
+                    latestversion,
                     wxGetOsDescription(),
                     msg,
                     getEncFSBinVersion(),
                     stdp.GetConfigDir()
                  ),
-                 "About encFSGui",
+                 "About EncFSGui",
                  wxOK | wxICON_INFORMATION,
                  this);
 }

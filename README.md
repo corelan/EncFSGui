@@ -136,12 +136,37 @@ If you want to try the application, you'll need a number of dependencies install
   cd demos;   make;cd ..
   ```
 
+4. Install libcurl & build for static linking
 
-### Before compiling EncFSGui
+  - Go to http://curl.haxx.se/download.html and download the latest 'source archive'. (Make sure to get the tar.gz version).  At the time of writing, the latest version is 7.47.0 (https://github.com/bagder/curl/releases/download/curl-7_47_0/curl-7.47.0.tar.gz)
+  - Extract into a folder (e.g. /Users/corelanc0d3r/dev/curl-7.47.0)
+  - From within the curl-7.47.0 folder, build static libraries, using OSX SSL modules
+  ```
+  export MACOSX_DEPLOYMENT_TARGET="10.6"
+  ./configure --with-darwinssl --disable-shared
+  make
+  make test
+  sudo make install
+  ```
+
+  The `make install`will put the header files into
+  ```
+  /usr/local/include/curl
+  ```
+  The libraries will be stored as
+  ```
+  /usr/local/lib/libcurl.a
+  /usr/local/lib/libcurl.dylib
+  ``
+
+  Run `curl --version` to confirm that everything works correctly.
+
+
+### Before compiling EncFSGui: update paths
 
 1. Edit Makefile
 
-  - update the `WX_BUILD_DIR` variable so it would contain the absolute path to the build-release-static folder on your own machine.
+  - update the `WX_BUILD_DIR` variable, so it would contain the absolute path to the `build-release-static` folder on your own machine.
 
 
 ### Compiling & linking EncFSGui
