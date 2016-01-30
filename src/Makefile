@@ -32,6 +32,8 @@ $(EXECUTABLE): $(OBJECTS)
 	@echo
 	@echo	[+] Step 1: Compiling source
 	@echo	----------------------------
+	chmod +x bumpversion.sh
+	./bumpversion.sh
 	$(COMPILER) $(CPPFLAGS) -c $(SOURCES)
 	rm -f *from*
 	@echo	    Step 1 Done
@@ -63,8 +65,8 @@ release:
 	mkdir -p $(APPNAME).app/Contents
 	mkdir -p $(APPNAME).app/Contents/MacOS
 	mkdir -p $(APPNAME).app/Contents/Resources
-	chmod +x bumpversion.sh
-	./bumpversion.sh $(APPNAME)
+	chmod +x storeversion.sh
+	./storeversion.sh $(APPNAME)
 	/bin/echo "APPL????" >$(APPNAME).app/Contents/PkgInfo
 	cp $(EXECUTABLE).icns $(APPNAME).app/Contents/Resources
 	cp $(EXECUTABLE) $(APPNAME).app/Contents/MacOS
