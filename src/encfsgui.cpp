@@ -491,7 +491,7 @@ void frmMain::PopulateVolumes()
 void frmMain::CheckUpdates()
 {
     wxString latestversion = getLatestVersion();     
-    if (!latestversion.IsEmpty())
+    if (!latestversion.IsEmpty() && latestversion.Find("error") == -1)
     {
         // to do: implement proper version comparison check
         // ignore if you are running a newer version
