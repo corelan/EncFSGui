@@ -667,3 +667,8 @@ void renameVolume(wxString& oldname, wxString& newname)
     pConfig->Flush();
 }
 
+wxString getLatestVersion()
+{
+
+}
+

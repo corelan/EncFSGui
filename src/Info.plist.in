@@ -28,15 +28,15 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.0</string>
+	<string>ENCFSGUIVERSION</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.0</string>
+	<string>ENCFSGUIVERSION</string>
 	<key>CFBundleGetInfoString</key>
-	<string>encfsgui version 1.0.0, (c) 2002-2016 Corelan GCV</string>
+	<string>encfsgui version ENCFSGUIVERSION, (c) 2002-2016 Corelan GCV</string>
 	<key>CFBundleLongVersionString</key>
-	<string>1.0.0, (c) 2002-2016 Corelan GCV</string>
+	<string>ENCFSGUIVERSION, (c) 2002-2016 Corelan GCV</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright 2002-2015 Corelan GCV</string>
+	<string>Copyright 2002-2016 Corelan GCV</string>
 	<key>LSRequiresCarbon</key>
 	<true/>
 	<key>CSResourcesFileMapped</key>

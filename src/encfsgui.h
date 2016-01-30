@@ -347,6 +347,7 @@ std::map<wxString, wxString> getEncodingCapabilities();
 wxString getExpectScriptContents(bool);
 wxString getChangePasswordScriptContents(wxString&);
 wxString getLaunchAgentContents();
+wxString getLatestVersion();
 
 //encfsgui_settings.cpp
 void openSettings(wxWindow *);

@@ -12,25 +12,6 @@ EXECUTABLE=encfsgui
 APPNAME=EncFSGui
 
 all:	$(SOURCES) $(EXECUTABLE)
-	@echo	[+] Step 3: Creating app bundle $(APPNAME).app
-	@echo	----------------------------------------------
-	rm -rf *.app
-	SetFile -t APPL $(EXECUTABLE)
-	mkdir -p $(APPNAME).app/Contents
-	mkdir -p $(APPNAME).app/Contents/MacOS
-	mkdir -p $(APPNAME).app/Contents/Resources
-	cp Info.plist.in $(APPNAME).app/Contents/Info.plist
-	/bin/echo "APPL????" >$(APPNAME).app/Contents/PkgInfo
-	cp $(EXECUTABLE).icns $(APPNAME).app/Contents/Resources
-	cp $(EXECUTABLE) $(APPNAME).app/Contents/MacOS
-	rm -rf *.o*
-	mv $(APPNAME).app Build/$(APPNAME).app
-	@echo
-	@echo Creating dmg into Releases folder
-	mkdir -p ../release
-	rm -rf ../release/*
-	hdiutil create -fs HFS+ -srcfolder ./Build -volname EncFSGui EncFSGui.dmg
-	mv EncFSGui.dmg ../release 
 	@echo
 	@echo	----------------------------------------
 	@echo	 The EncFSGUI project has been compiled
@@ -70,3 +51,28 @@ clean:
 	@echo	Done eating.
 	@echo	Run 'make' to compile the sources and create the application binary.
 	@echo
+
+release:
+	@echo	[+] Creating app bundle $(APPNAME).app
+	@echo	-----------------------------------------
+	rm -rf *.app
+	rm -rf Build/*
+	rm -rf ../release/*
+	SetFile -t APPL $(EXECUTABLE)
+	mkdir -p $(APPNAME).app/Contents
+	mkdir -p $(APPNAME).app/Contents/MacOS
+	mkdir -p $(APPNAME).app/Contents/Resources
+	chmod +x bumpversion.sh
+	./bumpversion.sh $(APPNAME)
+	/bin/echo "APPL????" >$(APPNAME).app/Contents/PkgInfo
+	cp $(EXECUTABLE).icns $(APPNAME).app/Contents/Resources
+	cp $(EXECUTABLE) $(APPNAME).app/Contents/MacOS
+	rm -rf *.o*
+	mv $(APPNAME).app Build/$(APPNAME).app
+	@echo
+	@echo Creating dmg into Releases folder
+	mkdir -p ../release
+	rm -rf ../release/*
+	hdiutil create -fs HFS+ -srcfolder ./Build -volname EncFSGui EncFSGui.dmg
+	mv EncFSGui.dmg ../release
+	cp version.txt .. 
