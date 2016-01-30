@@ -78,4 +78,4 @@ release:
 	rm -rf ../release/*
 	hdiutil create -fs HFS+ -srcfolder ./Build -volname EncFSGui EncFSGui.dmg
 	mv EncFSGui.dmg ../release
-	cp version.txt .. 
+	cp version.txt ../release 

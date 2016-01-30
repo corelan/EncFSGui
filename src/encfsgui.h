@@ -171,6 +171,7 @@ public:
     //void UpdateToolBarButtons();  // 
     void SetToolBarButtonState(int, bool);
     void DoSize();
+    void CheckUpdates();
 
 private:
     wxString m_datadir;

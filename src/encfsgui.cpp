@@ -213,6 +213,7 @@ bool encFSGuiApp::OnInit()
 
     pConfig->SetPath(wxT("/Config"));
     bool startasicon = pConfig->Read(wxT("startasicon"), 0l);
+    bool checkupdates = pConfig->Read(wxT("checkupdates"), 0l);
 
     if (startasicon)
     {
@@ -222,6 +223,13 @@ bool encFSGuiApp::OnInit()
     {
         frame->Show();
     }
+
+    // check for updates ?
+    if (checkupdates)
+    {
+        frame->CheckUpdates();
+    }
+
 
     wxInitAllImageHandlers();
     
@@ -401,37 +409,6 @@ frmMain::frmMain(const wxString& title,
         m_dockIcon = new TaskBarIcon(wxTBI_DOCK);
     #endif
 
-    // check for updates ?
-    wxConfigBase *pConfig = wxConfigBase::Get();
-    bool checkupdates = pConfig->Read(wxT("checkupdates"), 0l);
-
-    if (checkupdates)
-    {
-        // check now
-        wxString latestversion = getLatestVersion();     
-        if (!latestversion.IsEmpty())
-        {
-            if (!(latestversion == g_encfsguiversion))
-            {
-                wxString dlurl = "https://github.com/corelan/EncFSGui/raw/master/release/EncFSGUI.dmg";
-                wxMessageBox(wxString::Format
-                 (
-                    "You are running an outdated version of EncFSGui!\n"
-                    "Current version: %s\n"
-                    "Latest version: %s\n"
-                    "\nYou can download the latest version from\n%s\n",
-                    g_encfsguiversion,
-                    latestversion,
-                    dlurl
-                 ),
-                 "An EncFSGui update was found",
-                 wxOK | wxICON_INFORMATION,
-                 this);
-            }
-        }
-        // to do: activate a timer to check once per day
-    }
-
 }
 
 
@@ -509,6 +486,34 @@ void frmMain::PopulateVolumes()
     nr_vols = v_AllVolumes.size();
     wxString statustxt = wxString::Format(wxT("Nr of volumes : %d"), nr_vols);
     SetStatusText(statustxt,0);
+}
+
+void frmMain::CheckUpdates()
+{
+    wxString latestversion = getLatestVersion();     
+    if (!latestversion.IsEmpty())
+    {
+        // to do: implement proper version comparison check
+        // ignore if you are running a newer version
+        if (!(latestversion == g_encfsguiversion))
+        {
+            wxString dlurl = "https://github.com/corelan/EncFSGui/raw/master/release/EncFSGUI.dmg";
+            wxMessageBox(wxString::Format
+             (
+                "You are running an outdated version of EncFSGui!\n"
+                "Current version: %s\n"
+                "Latest version: %s\n"
+                "\nYou can download the latest version from\n%s\n",
+                g_encfsguiversion,
+                latestversion,
+                dlurl
+             ),
+             "An EncFSGui update was found",
+             wxOK | wxICON_INFORMATION,
+             this);
+        }
+    }
+    // to do: activate a timer to check once per day
 }
 
 

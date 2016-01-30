@@ -696,7 +696,7 @@ wxString getLatestVersion()
     pCurlHandle = curl_easy_init();
     if(pCurlHandle)
     {
-        curl_easy_setopt(pCurlHandle, CURLOPT_URL, "https://github.com/corelan/EncFSGui/raw/master/version.txt");
+        curl_easy_setopt(pCurlHandle, CURLOPT_URL, "https://github.com/corelan/EncFSGui/raw/master/release/version.txt");
         // force SSL peer verification
         curl_easy_setopt(pCurlHandle, CURLOPT_SSL_VERIFYPEER, 1L);
         // force hostname verification
