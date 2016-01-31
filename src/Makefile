@@ -72,6 +72,7 @@ release:
 	cp $(EXECUTABLE) $(APPNAME).app/Contents/MacOS
 	rm -rf *.o*
 	mv $(APPNAME).app Build/$(APPNAME).app
+	ln -s /Applications Build/Applications
 	@echo
 	@echo Creating dmg into Releases folder
 	mkdir -p ../release
