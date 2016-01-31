@@ -187,8 +187,6 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
   - [ ] Change password of encfs volume (routine already exists) (& update Keychain if needed)
   - [X] Implement 'Start application at login'
   - [ ] Allow use of master password
-  - [X] Check how to launch as an icon and add as an option
-    - [ ] Add context menu to icon, allow mount/unmount volumes
   - [ ] Implement overall error handling
   - [ ] Code cleanup & documentation
     - [ ] Create proper destructors where needed
@@ -202,7 +200,7 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
   - [ ] Add pictures
   - [ ] Add license information everywhere, as needed
   - [ ] Check if it would be possible to statically compile the app with encfs, osxfuse and openssl
-  
+
 ### DONE
 
   - [X] Updates
@@ -214,4 +212,5 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
     - [X] Select a different mount point
     - [X] Unsave password from Keychain (if saved)
     - [X] Save password to Keychain (if not saved already)
-
+  - [X] Check how to launch as an icon and add as an option
+    - [X] Add context menu to icon, allow mount/unmount volumes

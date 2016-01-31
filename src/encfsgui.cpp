@@ -261,7 +261,6 @@ wxMenu *TaskBarIcon::CreatePopupMenu()
     menu->AppendSeparator();
     menu->Append(ID_Taskbar_Settings, wxT("S&ettings"));
     menu->AppendSeparator();
-    menu->Append(ID_Taskbar_Update, wxT("&Check for updates"));
 
     /*
     if (g_frmMain->IsShown())
@@ -311,6 +310,9 @@ wxMenu *TaskBarIcon::CreatePopupMenu()
         ++submenuid;
     }
     menu->AppendSubMenu(volumesmenu, "&Volumes");
+    menu->AppendSeparator();
+    menu->Append(ID_Taskbar_Update, wxT("&Check for updates"));
+
     /* OSX has built-in quit menu for the dock menu, but not for the status item */
     
 #ifdef __WXOSX__ 
