@@ -69,7 +69,6 @@ enum Positions
 int g_selectedIndex;
 wxString g_selectedVolume;
 
-
 // IDs for toolbar controls and the menu commands
 enum
 {
@@ -162,7 +161,7 @@ wxBEGIN_EVENT_TABLE(TaskBarIcon, wxTaskBarIcon)
     EVT_MENU(ID_Taskbar_HideGUI, TaskBarIcon::OnMenuHide)
     EVT_MENU(ID_Taskbar_Settings, TaskBarIcon::OnMenuSettings)
     EVT_MENU(ID_Taskbar_Update, TaskBarIcon::OnMenuUpdate)
-    EVT_TASKBAR_LEFT_DCLICK  (TaskBarIcon::OnLeftButtonDClick)
+    EVT_MENU(wxID_ANY, TaskBarIcon::OnOtherMenuClick)
 wxEND_EVENT_TABLE()
 
 
@@ -219,11 +218,11 @@ bool encFSGuiApp::OnInit()
 
     if (startasicon)
     {
-        frame->Hide();
+        frame->HideWithEffect(wxSHOW_EFFECT_EXPAND);
     }
     else
     {
-        frame->Show();
+        frame->ShowWithEffect(wxSHOW_EFFECT_EXPAND);
     }
 
     // check for updates ?
@@ -251,6 +250,9 @@ TaskBarIcon::TaskBarIcon(wxTaskBarIconType iconType) : wxTaskBarIcon(iconType)
 }
 
 // Overridables
+// this function gets called each time user clicks the taskbar icon
+// in other words, menu gets populated dynamically every time
+
 wxMenu *TaskBarIcon::CreatePopupMenu()
 {
     wxMenu *menu = new wxMenu;
@@ -261,6 +263,54 @@ wxMenu *TaskBarIcon::CreatePopupMenu()
     menu->AppendSeparator();
     menu->Append(ID_Taskbar_Update, wxT("&Check for updates"));
 
+    /*
+    if (g_frmMain->IsShown())
+    {
+        menu->Enable(ID_Taskbar_ShowGUI, true);
+        menu->Enable(ID_Taskbar_HideGUI, false);
+    }
+    else
+    {
+        menu->Enable(ID_Taskbar_ShowGUI, false);
+        menu->Enable(ID_Taskbar_HideGUI, true);
+    }
+    */
+
+    wxMenu *volumesmenu = new wxMenu;
+    int submenuid = 5555;
+    for (std::vector<wxString>::iterator it = v_AllVolumes.begin(); it != v_AllVolumes.end(); ++it)
+    {
+        wxString voltitle;
+        wxString volname;
+        bool isMounted;
+        volname.Printf(wxT("%s"), *it);
+        DBEntry * thisvol = m_VolumeData[volname];
+        isMounted = thisvol->getMountState();
+        voltitle.Printf(wxT("Mount '%s'"), volname);
+        volumesmenu->Append(submenuid, voltitle);
+        if (isMounted)
+        {
+            volumesmenu->Enable(submenuid, false);
+        }
+        else
+        {
+            volumesmenu->Enable(submenuid, true);
+        }
+        ++submenuid;
+        voltitle.Printf(wxT("Unmount '%s'"), volname);
+        volumesmenu->Append(submenuid, voltitle);
+        if (isMounted)
+        {
+            volumesmenu->Enable(submenuid, true);
+        }
+        else
+        {
+            volumesmenu->Enable(submenuid, false);
+        }
+        volumesmenu->AppendSeparator();
+        ++submenuid;
+    }
+    menu->AppendSubMenu(volumesmenu, "&Volumes");
     /* OSX has built-in quit menu for the dock menu, but not for the status item */
     
 #ifdef __WXOSX__ 
@@ -271,11 +321,8 @@ wxMenu *TaskBarIcon::CreatePopupMenu()
         menu->Append(ID_Taskbar_Exit, wxT("E&xit"));
     }
 
-    menu->Enable(ID_Taskbar_HideGUI, true);
-    menu->Enable(ID_Taskbar_ShowGUI, true);
-    menu->Enable(ID_Taskbar_Settings, true);
-
     m_taskBarMenu = menu;
+    m_taskBarVolumesMenu = volumesmenu;
 
     return menu;
 }
@@ -296,45 +343,65 @@ void TaskBarIcon::OnMenuUpdate(wxCommandEvent& WXUNUSED(event))
 
 void TaskBarIcon::OnMenuShow(wxCommandEvent& WXUNUSED(event))
 {
-    g_frmMain->Show();
-    m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, false);
-    m_taskBarMenu->Enable(ID_Taskbar_HideGUI, true);
-    m_taskBarMenu->UpdateUI();
+    g_frmMain->ShowWithEffect(wxSHOW_EFFECT_EXPAND);
 }
 
 void TaskBarIcon::OnMenuHide(wxCommandEvent& WXUNUSED(event))
 {
-    g_frmMain->Hide();
-    m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, true);
-    m_taskBarMenu->Enable(ID_Taskbar_HideGUI, false);
-    m_taskBarMenu->UpdateUI();
+    g_frmMain->HideWithEffect(wxSHOW_EFFECT_EXPAND);
 }
 
-void TaskBarIcon::OnLeftButtonDClick(wxTaskBarIconEvent&)
-{
-    if (g_frmMain->IsShown())
-    {
-        g_frmMain->Hide();
-        m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, true);
-        m_taskBarMenu->Enable(ID_Taskbar_HideGUI, false);            
-    }
-    else
-    {
-        g_frmMain->Show();
-        m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, false);
-        m_taskBarMenu->Enable(ID_Taskbar_HideGUI, true);    
-    }
-    m_taskBarMenu->UpdateUI();
-}
 
 void TaskBarIcon::OnMenuSettings(wxCommandEvent& event)
 {
-    g_frmMain->Show();
-    m_taskBarMenu->Enable(ID_Taskbar_ShowGUI, false);
-    m_taskBarMenu->Enable(ID_Taskbar_HideGUI, true);
-    m_taskBarMenu->UpdateUI();  
+    g_frmMain->ShowWithEffect(wxSHOW_EFFECT_EXPAND);
     g_frmMain->OnSettings(event);
 }
+
+void TaskBarIcon::OnOtherMenuClick(wxCommandEvent& event)
+{
+    int clickedid = event.GetId();
+    wxString clickedtext = m_taskBarVolumesMenu->GetLabel(clickedid);
+
+    bool domount = false;
+    wxString reststr = "";
+    wxString volname = "";
+    if (clickedtext.StartsWith("Mount '", &reststr))
+    {
+        domount = true;
+        volname = reststr;
+        volname.Replace("'","");
+    }
+    else if (clickedtext.StartsWith("Unmount '", &reststr))
+    {
+        domount = false;
+        volname = reststr;
+        volname.Replace("'","");
+    }
+
+    if (!volname.IsEmpty())
+    {
+        wxString prevselectedvol = g_selectedVolume;
+        int prevselectedindex = g_selectedIndex;
+        g_selectedVolume = volname;
+        g_selectedIndex = g_frmMain->GetListCtrlIndex(volname);
+
+        if (domount)
+        {
+            g_frmMain->OnMount(event);
+        }
+        else
+        {
+            g_frmMain->OnUnMount(event);
+
+        }
+        g_selectedVolume = prevselectedvol;
+        g_selectedIndex = prevselectedindex;
+
+    }
+
+}
+
 
 
 // main frame constructor, overload built-in wxFrame
@@ -438,6 +505,20 @@ mainListCtrl::mainListCtrl(wxWindow *parent,
 
 // member functions
 
+int frmMain::GetListCtrlIndex(wxString& volname)
+{
+    int returnval = -1;
+    int itemcount = m_listCtrl->GetItemCount();
+    for (int i = 0; i < itemcount; ++i)
+    {
+        if (m_listCtrl->GetItemText(i, 1) == volname)
+        {
+            returnval = i;
+            break;
+        }
+    }
+    return returnval;
+}
 
 void frmMain::PopulateVolumes()
 {
@@ -878,7 +959,6 @@ int frmMain::mountSelectedFolder(wxString& pw)
         SetToolBarButtonState(ID_Toolbar_Browse, false);
         SetToolBarButtonState(ID_Toolbar_Edit, true);
     }
-
     PopStatusText(0);
     return mountstatus;
 }

@@ -39,17 +39,18 @@ public:
     //ctor
     TaskBarIcon(wxTaskBarIconType iconType);
 
-    void OnLeftButtonDClick(wxTaskBarIconEvent&);
     void OnMenuExit(wxCommandEvent& event);
     void OnMenuShow(wxCommandEvent& event);
     void OnMenuHide(wxCommandEvent& event);
     void OnMenuSettings(wxCommandEvent& event);
     void OnMenuUpdate(wxCommandEvent& event);
+    void OnOtherMenuClick(wxCommandEvent& event);
     virtual wxMenu *CreatePopupMenu() wxOVERRIDE;
     wxDECLARE_EVENT_TABLE();
 
 private:
      wxMenu *m_taskBarMenu;
+     wxMenu *m_taskBarVolumesMenu;
 };
 
 
@@ -174,6 +175,8 @@ public:
     void DoSize();
     void CheckUpdates();
     void CheckUpdates(bool);
+
+    int GetListCtrlIndex(wxString&);
 
 private:
     wxString m_datadir;
