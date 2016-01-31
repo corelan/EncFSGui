@@ -552,6 +552,8 @@ void frmMain::PopulateVolumes()
         bool alreadymounted;
         bool preventautounmount;
         bool pwsaved;
+        bool allowother;
+        bool mountaslocal;
         wxString volumename = v_AllVolumes.at(i);
         currentPath.Printf(wxT("/Volumes/%s"), volumename);
         pConfig->SetPath(currentPath);
@@ -561,6 +563,8 @@ void frmMain::PopulateVolumes()
         preventautounmount = pConfig->Read(wxT("preventautounmount"), 0l);
         alreadymounted = IsVolumeSystemMounted(mount_path, mount_output);
         pwsaved = pConfig->Read(wxT("passwordsaved"), 0l);
+        allowother = pConfig->Read(wxT("allowother"), 0l);
+        mountaslocal = pConfig->Read(wxT("mountaslocal"), 0l);
         if (not enc_path.IsEmpty() && not mount_path.IsEmpty())
         {
             DBEntry* thisvolume = new DBEntry(volumename, 
@@ -568,7 +572,9 @@ void frmMain::PopulateVolumes()
                                               mount_path, 
                                               automount, 
                                               preventautounmount, 
-                                              pwsaved);
+                                              pwsaved,
+                                              allowother,
+                                              mountaslocal);
             thisvolume->setMountState(alreadymounted);
             // add to map
             m_VolumeData[volumename] = thisvolume;       
@@ -842,24 +848,37 @@ int frmMain::mountFolder(wxString& volumename, wxString& pw)
 {
     wxString mountvol;
     wxString encvol;
+    bool allowother;
+    bool mountaslocal;
     wxString buf;
     
     bool beenmounted;
     DBEntry *thisvol = m_VolumeData[volumename];
     mountvol = thisvol->getMountPath();
     encvol = thisvol->getEncPath();
+    allowother = thisvol->getAllowOther();
+    mountaslocal = thisvol->getMountAsLocal();
 
     // run encfs command
     wxString cmd;
     wxString cmdoutput;
     wxString encfsbin = getEncFSBinPath();
-    
+    wxString extra_osxfuse_opts = "";
+    if (allowother)
+    {
+        extra_osxfuse_opts << "-o allow_other ";
+    }
+    if (mountaslocal)
+    {
+        extra_osxfuse_opts << "-o local ";
+    }
+
     // first, create mount point if necessary
     cmd.Printf(wxT("mkdir -p '%s'"), mountvol);
     cmdoutput = StrRunCMDSync(cmd);
 
     // mount
-    cmd.Printf(wxT("sh -c \"echo '%s' | %s -v -S -o volname='%s' '%s' '%s'\""), pw, encfsbin, volumename, encvol, mountvol);
+    cmd.Printf(wxT("sh -c \"echo '%s' | %s -v -S %s -o volname='%s' '%s' '%s'\""), pw, encfsbin, extra_osxfuse_opts, volumename, encvol, mountvol);
 
     cmdoutput = StrRunCMDSync(cmd);
 
@@ -1616,7 +1635,9 @@ DBEntry::DBEntry(wxString volname,
                  wxString mount_path, 
                  bool automount, 
                  bool preventautounmount, 
-                 bool pwsaved)
+                 bool pwsaved,
+                 bool allowother,
+                 bool mountaslocal)
 {
     m_automount = automount;
     m_volname = volname;
@@ -1624,6 +1645,8 @@ DBEntry::DBEntry(wxString volname,
     m_mount_path = mount_path;
     m_preventautounmount = preventautounmount;
     m_pwsaved = pwsaved;
+    m_allowother = allowother;
+    m_mountaslocal = mountaslocal;
 }
 
 
@@ -1667,6 +1690,15 @@ wxString DBEntry::getVolName()
     return m_volname;
 }
 
+bool DBEntry::getAllowOther()
+{
+    return m_allowother;
+}
+
+bool DBEntry::getMountAsLocal()
+{
+    return m_mountaslocal;
+}
 
 
 // ----------------------------------------------------------------------------

@@ -498,8 +498,6 @@ std::map<wxString, wxString> getEncodingCapabilities()
         wxString msg="";
         wxString cmd="";
 
-        bool createdok = false;
-
         wxString enc_path;
         wxString plain_path;
         enc_path.Printf(wxT("%s/%s"), tmp_dir, enc_dir);
@@ -555,73 +553,70 @@ std::map<wxString, wxString> getEncodingCapabilities()
         cmd.Printf(wxT("expect '%s' '%s'"), scriptfile, pw);
         // run command synchronously this time, it shouldn't take long :)
         wxArrayString arroutput = ArrRunCMDSync(cmd);
-        createdok = true;
-
-        if (createdok)
+        
+        // parse the output, look for information about available file encoding mechanisms
+        // and add them to map
+        bool startfound = false;
+        bool endfound = false;
+        wxArrayString rawCaps;
+        size_t count = arroutput.GetCount();
+        for ( size_t n = 0; n < count; n++ )
         {
-            // parse the output, look for information about available file encoding mechanisms
-            // and add them to map
-            bool startfound = false;
-            bool endfound = false;
-            wxArrayString rawCaps;
-            size_t count = arroutput.GetCount();
-            for ( size_t n = 0; n < count; n++ )
+            wxString thisline = arroutput[n];
+            if (!startfound)
             {
-                wxString thisline = arroutput[n];
-                if (!startfound)
+                if (thisline.Find("The following filename encoding algorithms are available") > -1)
                 {
-                    if (thisline.Find("The following filename encoding algorithms are available") > -1)
-                    {
-                        startfound = true;
-                    }
+                    startfound = true;
+                }
+            }
+            else
+            {
+                if (thisline.Find(".") == -1)
+                {
+                    endfound = true;
                 }
                 else
                 {
-                    if (thisline.Find(".") == -1)
-                    {
-                        endfound = true;
-                    }
-                    else
-                    {
-                        rawCaps.Add(thisline);
-                    }
-                }
-                if (startfound && endfound)
-                {
-                    break;
+                    rawCaps.Add(thisline);
                 }
             }
-
-            for (size_t n = 0; n < rawCaps.GetCount(); n++)
+            if (startfound && endfound)
             {
-                wxString rawline = rawCaps[n];
-                // Tokenize the string
-                wxStringTokenizer tokenizer(rawline, " ");
-                int tokenindex = 0;
-                wxString encodingnr="";
-                wxString encodingname="";
-                while ( tokenizer.HasMoreTokens() )
-                {
-                    wxString thistoken = tokenizer.GetNextToken();
-                    if (tokenindex == 0)
-                    {
-                        thistoken.Replace(".","");
-                        encodingnr = thistoken;
-                    }
-                    else if (tokenindex == 1)
-                    {
-                        encodingname = thistoken;
-                    }
-                    tokenindex++;
-                }
-                // save into map
-                if (!encodingnr.IsEmpty() && !encodingname.IsEmpty())
-                {
-                    encodingcaps[encodingname] = encodingnr;
-                }
+                break;
             }
-
         }
+
+        for (size_t n = 0; n < rawCaps.GetCount(); n++)
+        {
+            wxString rawline = rawCaps[n];
+            // Tokenize the string
+            wxStringTokenizer tokenizer(rawline, " ");
+            int tokenindex = 0;
+            wxString encodingnr="";
+            wxString encodingname="";
+            while ( tokenizer.HasMoreTokens() )
+            {
+                wxString thistoken = tokenizer.GetNextToken();
+                if (tokenindex == 0)
+                {
+                    thistoken.Replace(".","");
+                    encodingnr = thistoken;
+                }
+                else if (tokenindex == 1)
+                {
+                    encodingname = thistoken;
+                }
+                tokenindex++;
+            }
+            // save into map
+            if (!encodingnr.IsEmpty() && !encodingname.IsEmpty())
+            {
+                encodingcaps[encodingname] = encodingnr;
+            }
+        }
+
+        
 
         // clean up again
         if (dirEnc->Exists(enc_path))

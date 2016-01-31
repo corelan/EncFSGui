@@ -338,6 +338,16 @@ void frmAddDialog::Create()
     m_chkbx_prevent_autounmount->SetValue(false);
     sizerOptions->Add(m_chkbx_prevent_autounmount);
 
+    // allow_other
+    m_chkbx_allow_other  = new wxCheckBox(this, wxID_ANY, "Allow access to 'other' users (you must be root/admin) - Needed for Spotlight to work");
+    m_chkbx_allow_other->SetValue(false);
+    sizerOptions->Add(m_chkbx_allow_other);
+
+    // mount_as_local
+    m_chkbx_mount_as_local  = new wxCheckBox(this, wxID_ANY, "Mount as a local volume");
+    m_chkbx_mount_as_local->SetValue(false);
+    sizerOptions->Add(m_chkbx_mount_as_local);    
+
     // glue together
     sizerMaster->Add(sizerVolume, wxSizerFlags(1).Expand().Border());
     sizerMaster->Add(sizerEncFS, wxSizerFlags(1).Expand().Border());
@@ -652,6 +662,8 @@ void frmAddDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
             pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
             pConfig->Write(wxT("preventautounmount"), m_chkbx_prevent_autounmount->GetValue());
             pConfig->Write(wxT("passwordsaved"), m_chkbx_save_password->GetValue());
+            pConfig->Write(wxT("allowother"),m_chkbx_allow_other->GetValue());
+            pConfig->Write(wxT("mountaslocal"),m_chkbx_mount_as_local->GetValue());            
             pConfig->Flush();
             // save password in KeyChain, if needed
             if (m_chkbx_save_password->GetValue())
@@ -851,6 +863,8 @@ void frmOpenDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
         pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
         pConfig->Write(wxT("preventautounmount"), m_chkbx_prevent_autounmount->GetValue());
         pConfig->Write(wxT("passwordsaved"), m_chkbx_save_password->GetValue());
+        pConfig->Write(wxT("allowother"),m_chkbx_allow_other->GetValue());
+        pConfig->Write(wxT("mountaslocal"),m_chkbx_mount_as_local->GetValue());        
         pConfig->Flush();
         // save password in KeyChain, if needed
         if (m_chkbx_save_password->GetValue())
@@ -881,7 +895,7 @@ void frmOpenDialog::Create()
     sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Encrypted encfs source folder:"));
 
     wxSizer * const sizerSRC = new wxBoxSizer(wxHORIZONTAL);
-    m_source_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(370,22));
+    m_source_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(470,22));
     sizerSRC->Add(m_source_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
     sizerSRC->Add(new wxButton( this , ID_BTN_CHOOSE_SOURCE, wxT("Select")));
     sizerVolume->Add(sizerSRC,wxSizerFlags(1).Expand().Border());
@@ -891,7 +905,7 @@ void frmOpenDialog::Create()
     // mount point
     sizerVolume->Add(new wxStaticText(this, wxID_ANY, "&Destination (mount) folder:"));
     wxSizer * const sizerDST = new wxBoxSizer(wxHORIZONTAL);
-    m_destination_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(370,22));
+    m_destination_field = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(470,22));
     sizerDST->Add(m_destination_field, wxSizerFlags().Border(wxLEFT|wxBOTTOM|wxRIGHT, 5).Expand());
     sizerDST->Add(new wxButton( this , ID_BTN_CHOOSE_DESTINATION, wxT("Select")));
     sizerVolume->Add(sizerDST,wxSizerFlags(1).Expand().Border());
@@ -925,6 +939,16 @@ void frmOpenDialog::Create()
     m_chkbx_prevent_autounmount->SetValue(false);
     sizerOptions->Add(m_chkbx_prevent_autounmount);
 
+    // allow_other
+    m_chkbx_allow_other  = new wxCheckBox(this, wxID_ANY, "Allow access to 'other' users (you must be root/admin) - Needed for Spotlight to work");
+    m_chkbx_allow_other->SetValue(false);
+    sizerOptions->Add(m_chkbx_allow_other);
+
+    // mount_as_local
+    m_chkbx_mount_as_local  = new wxCheckBox(this, wxID_ANY, "Mount as a local volume");
+    m_chkbx_mount_as_local->SetValue(false);
+    sizerOptions->Add(m_chkbx_mount_as_local);    
+
     // glue together
     sizerMaster->Add(sizerVolume, wxSizerFlags(1).Expand().Border());
     sizerMaster->Add(sizerPassword, wxSizerFlags(1).Expand().Border());
@@ -948,7 +972,7 @@ void frmOpenDialog::Create()
 void createNewEncFSFolder(wxWindow *parent)
 {
     wxSize frmAddSize;
-    frmAddSize.Set(600,680);
+    frmAddSize.Set(600,700);
     long framestyle;
     framestyle = wxDEFAULT_FRAME_STYLE | wxFRAME_EX_METAL;
 
@@ -969,7 +993,7 @@ void createNewEncFSFolder(wxWindow *parent)
 void openExistingEncFSFolder(wxWindow *parent)
 {
     wxSize frmOpenSize;
-    frmOpenSize.Set(500,500);
+    frmOpenSize.Set(600,580);
     long framestyle;
     framestyle = wxDEFAULT_FRAME_STYLE | wxFRAME_EX_METAL;
 

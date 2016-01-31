@@ -25,6 +25,8 @@ EncFSGui was written for OSX, but it might compile/run on Linux as well (some ch
 If you are looking for an EncFS tool for Windows, check out the EncFSMP project on sourceforge.<br>
 I am fully aware that EncFSMP runs on OSX too, but unfortunately the performance of the embedded file system engine was not so good on OSX.<br>
 
+You can find more information about EncFSGui at https://www.corelan.be/index.php/2016/01/31/encfsgui-gui-wrapper-around-encfs-for-osx/ 
+
 
 ## How does it work ?
 EncFSGui is a wrapper around encfs, encfsctl and mount, and relies on OSXFuse to provide a filesystem.<br>
@@ -185,9 +187,9 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
 ## TO DO
 
   - [ ] Change password of encfs volume (routine already exists) (& update Keychain if needed)
-  - [X] Implement 'Start application at login'
   - [ ] Allow use of master password
   - [ ] Implement overall error handling
+  - [ ] Remove temp files when they are no longer needed
   - [ ] Code cleanup & documentation
     - [ ] Create proper destructors where needed
     - [ ] Add proper documentation for functions & classes
@@ -197,7 +199,6 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
   - [ ] Prevent Command+C (Copy) to trigger 'Cancel' button in dialogs
   - [ ] Allow use of passwords that contain quotes (single and double)
   - [ ] Move installation instructions to wiki
-  - [ ] Add pictures
   - [ ] Add license information everywhere, as needed
   - [ ] Check if it would be possible to statically compile the app with encfs, osxfuse and openssl
 
@@ -214,3 +215,4 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
     - [X] Save password to Keychain (if not saved already)
   - [X] Check how to launch as an icon and add as an option
     - [X] Add context menu to icon, allow mount/unmount volumes
+  - [X] Implement 'Start application at login'

@@ -65,7 +65,9 @@ public:
             wxString mount_path, 
             bool automount, 
             bool preventautounmount, 
-            bool pwsaved);
+            bool pwsaved,
+            bool allowother,
+            bool mountaslocal);
 
     void setMountState(bool);
     bool getMountState();
@@ -75,12 +77,16 @@ public:
     wxString getMountPath();
     wxString getVolName();
     bool getPreventAutoUnmount();
+    bool getAllowOther();
+    bool getMountAsLocal();
 
 private:
     bool m_mountstate;
     bool m_automount;
     bool m_preventautounmount;
     bool m_pwsaved;
+    bool m_allowother;
+    bool m_mountaslocal;
     wxString m_volname;
     wxString m_enc_path;
     wxString m_mount_path;
@@ -237,6 +243,8 @@ private:
     wxCheckBox * m_chkbx_automount;
     wxCheckBox * m_chkbx_prevent_autounmount;
     wxCheckBox * m_chkbx_save_password;
+    wxCheckBox * m_chkbx_allow_other;
+    wxCheckBox * m_chkbx_mount_as_local;    
     wxCheckBox * m_chkbx_perfile_iv;
     wxCheckBox * m_chkbx_iv_chaining;
     wxCheckBox * m_chkbx_filename_to_iv_header_chaining;
@@ -278,6 +286,8 @@ private:
     wxCheckBox * m_chkbx_automount;
     wxCheckBox * m_chkbx_prevent_autounmount;
     wxCheckBox * m_chkbx_save_password;
+    wxCheckBox * m_chkbx_allow_other;
+    wxCheckBox * m_chkbx_mount_as_local;    
     wxDECLARE_EVENT_TABLE();
 };
 
@@ -309,6 +319,8 @@ private:
     wxCheckBox * m_chkbx_automount;
     wxCheckBox * m_chkbx_prevent_autounmount;
     wxCheckBox * m_chkbx_save_password;
+    wxCheckBox * m_chkbx_allow_other;
+    wxCheckBox * m_chkbx_mount_as_local;
     wxButton * m_selectdst_button;
     std::map<wxString, DBEntry*> m_editVolumeData;
     bool m_mounted;

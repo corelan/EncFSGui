@@ -71,6 +71,8 @@ void frmEditDialog::Create()
     bool automount;
     bool prevent_autounmount;
     bool savedpassword;
+    bool allow_other;
+    bool mount_as_local;
 
     wxConfigBase *pConfig = wxConfigBase::Get();
     config_volname.Printf(wxT("/Volumes/%s"), m_volumename);
@@ -79,6 +81,8 @@ void frmEditDialog::Create()
     dstfolder = pConfig->Read(wxT("mount_path"));
     automount = pConfig->ReadBool(wxT("automount"), 0l);
     prevent_autounmount = pConfig->ReadBool(wxT("preventautounmount"),0l);
+    allow_other = pConfig->ReadBool(wxT("allowother"),0l);
+    mount_as_local = pConfig->ReadBool(wxT("mountaslocal"),0l);
     savedpassword = pConfig->ReadBool(wxT("passwordsaved"),0l);
     m_pwsaved = savedpassword;
 
@@ -138,6 +142,16 @@ void frmEditDialog::Create()
     m_chkbx_prevent_autounmount  = new wxCheckBox(this, wxID_ANY, "Prevent auto-unmounting this volume on application exit");
     m_chkbx_prevent_autounmount->SetValue(prevent_autounmount);
     sizerMount->Add(m_chkbx_prevent_autounmount);
+
+    // allow_other
+    m_chkbx_allow_other  = new wxCheckBox(this, wxID_ANY, "Allow access to 'other' users (you must be root/admin) - Needed for Spotlight to work");
+    m_chkbx_allow_other->SetValue(allow_other);
+    sizerMount->Add(m_chkbx_allow_other);
+
+    // mount_as_local
+    m_chkbx_mount_as_local  = new wxCheckBox(this, wxID_ANY, "Mount as a local volume");
+    m_chkbx_mount_as_local->SetValue(mount_as_local);
+    sizerMount->Add(m_chkbx_mount_as_local);
 
     sizerMaster->Add(sizerVolume, wxSizerFlags(1).Expand().Border());
     sizerMaster->Add(sizerPassword, wxSizerFlags(1).Expand().Border());
@@ -320,6 +334,8 @@ void frmEditDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
         pConfig->Write(wxT("mount_path"), mount_path );
         pConfig->Write(wxT("automount"), m_chkbx_automount->GetValue());
         pConfig->Write(wxT("preventautounmount"),m_chkbx_prevent_autounmount->GetValue());
+        pConfig->Write(wxT("allowother"),m_chkbx_allow_other->GetValue());
+        pConfig->Write(wxT("mountaslocal"),m_chkbx_mount_as_local->GetValue());
         pConfig->Flush();
 
         bool okToClose = true;
