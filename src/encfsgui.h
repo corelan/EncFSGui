@@ -110,6 +110,8 @@ public:
     void OnItemSelected(wxListEvent& event);
     void OnItemDeSelected(wxListEvent& event);
     void OnItemActivated(wxListEvent& event);
+    void OnRightClick(wxListEvent& event);
+    void OnPopupMenuClick(wxCommandEvent& event);
     void SetSelectedIndex(int);
     void LinkToolbar(wxToolBarBase*);
     void UpdateToolBarButtons();

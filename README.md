@@ -216,3 +216,4 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
     - [X] Add context menu to icon, allow mount/unmount volumes
   - [X] Implement 'Start application at login'
   - [X] Remove temp files when they are no longer needed
+  - [X] Add right-click context menu to List Control

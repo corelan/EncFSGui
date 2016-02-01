@@ -103,7 +103,14 @@ enum
     ID_Taskbar_HideGUI,
     ID_Taskbar_Settings,
     ID_Taskbar_Exit,
-    ID_Taskbar_Update
+    ID_Taskbar_Update,
+    ID_List_Menu_Create         = 2500,
+    ID_List_Menu_Open,
+    ID_List_Menu_Mount,
+    ID_List_Menu_Unmount,
+    ID_List_Menu_Edit,
+    ID_List_Menu_Info,
+    ID_List_Menu_Browse
 };
 
 // enum for return codes related with mount success
@@ -150,6 +157,8 @@ wxEND_EVENT_TABLE()
 wxBEGIN_EVENT_TABLE(mainListCtrl, wxListCtrl)
     EVT_LIST_ITEM_SELECTED(ID_List_Ctrl, mainListCtrl::OnItemSelected)
     EVT_LIST_ITEM_DESELECTED(ID_List_Ctrl, mainListCtrl::OnItemDeSelected)
+    EVT_LIST_ITEM_RIGHT_CLICK(ID_List_Ctrl, mainListCtrl::OnRightClick)
+    EVT_MENU(wxID_ANY, mainListCtrl::OnPopupMenuClick)
     EVT_LIST_ITEM_ACTIVATED(ID_List_Ctrl, mainListCtrl::OnItemActivated)    // double-click/enter
 wxEND_EVENT_TABLE()
 
@@ -522,7 +531,10 @@ void frmMain::SetVisibleState(bool newstate)
 {
     if (newstate)
     {
-        ShowWithEffect(wxSHOW_EFFECT_EXPAND);
+        if (!m_visible)
+        {
+            ShowWithEffect(wxSHOW_EFFECT_EXPAND);            
+        }
         SetFocus();
         Raise();
     }
@@ -1511,6 +1523,8 @@ void mainListCtrl::UpdateToolBarButtons()
 
 }
 
+
+
 // in case we want to flip state of a specific button
 void frmMain::SetToolBarButtonState(int ButtonID, bool newstate)
 {
@@ -1770,11 +1784,77 @@ void mainListCtrl::OnItemSelected(wxListEvent& WXUNUSED(event))
 
     while ((itemIndex = GetNextItem(itemIndex, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != wxNOT_FOUND) 
     {
-        // Got the selected item index
-        //wxLogDebug(GetItemText(itemIndex));
         SetSelectedIndex(itemIndex);
     }
 }
+
+void mainListCtrl::OnPopupMenuClick(wxCommandEvent& event)
+{
+    // see what we have clicked
+    if (event.GetId() == ID_List_Menu_Create)
+    {
+        g_frmMain->OnNewFolder(event);
+    }
+    else if (event.GetId() == ID_List_Menu_Open)
+    {
+        g_frmMain->OnAddExistingFolder(event);
+    }
+    else if (event.GetId() == ID_List_Menu_Unmount)
+    {
+        g_frmMain->OnUnMount(event);
+    }
+    else if (event.GetId() == ID_List_Menu_Mount)
+    {
+        g_frmMain->OnMount(event);
+    }
+    else if (event.GetId() == ID_List_Menu_Edit)
+    {
+        g_frmMain->OnEditFolder(event);
+    }
+    else if (event.GetId() == ID_List_Menu_Info)
+    {
+        g_frmMain->OnInfo(event);
+    }
+    else if (event.GetId() == ID_List_Menu_Browse)
+    {
+        g_frmMain->OnBrowseFolder(event);
+    }
+}
+
+void mainListCtrl::OnRightClick(wxListEvent& event)
+{
+    wxMenu *menu = new wxMenu();
+    if (g_selectedIndex > -1)
+    {
+        DBEntry * thisvol = m_VolumeData[g_selectedVolume];
+        bool isMounted = thisvol->getMountState();
+        wxString msg;
+        if (isMounted)
+        {
+            msg.Printf(wxT("Unmount '%s'"), g_selectedVolume);
+            menu->Append(ID_List_Menu_Unmount, msg);
+            menu->AppendSeparator();
+            msg.Printf(wxT("Browse '%s'"), g_selectedVolume);
+            menu->Append(ID_List_Menu_Browse, msg);
+        }
+        else
+        {
+            msg.Printf(wxT("Mount '%s'"), g_selectedVolume);
+            menu->Append(ID_List_Menu_Mount, msg);
+            menu->AppendSeparator();
+        }
+        
+        msg.Printf(wxT("Edit '%s'"), g_selectedVolume);
+        menu->Append(ID_List_Menu_Edit, msg);
+        msg.Printf(wxT("Show info about '%s'"), g_selectedVolume);
+        menu->Append(ID_List_Menu_Info, msg);
+        menu->AppendSeparator();
+    }
+    menu->Append(ID_List_Menu_Create, wxT("Create a new encfs folder"));
+    menu->Append(ID_List_Menu_Open, wxT("Open an existing encfs folder"));    
+    PopupMenu(menu, event.GetPoint());
+}
+
 
 
 void mainListCtrl::OnItemDeSelected(wxListEvent& WXUNUSED(event))
