@@ -213,17 +213,7 @@ bool encFSGuiApp::OnInit()
     frame->EnableCloseButton(false);
 
     pConfig->SetPath(wxT("/Config"));
-    bool startasicon = pConfig->Read(wxT("startasicon"), 0l);
     bool checkupdates = pConfig->Read(wxT("checkupdates"), 0l);
-
-    if (startasicon)
-    {
-        frame->HideWithEffect(wxSHOW_EFFECT_EXPAND);
-    }
-    else
-    {
-        frame->ShowWithEffect(wxSHOW_EFFECT_EXPAND);
-    }
 
     // check for updates ?
     if (checkupdates)
@@ -256,24 +246,24 @@ TaskBarIcon::TaskBarIcon(wxTaskBarIconType iconType) : wxTaskBarIcon(iconType)
 wxMenu *TaskBarIcon::CreatePopupMenu()
 {
     wxMenu *menu = new wxMenu;
-    menu->Append(ID_Taskbar_ShowGUI, wxT("&Launch EncFSGui"));
+    menu->Append(ID_Taskbar_ShowGUI, wxT("&Show EncFSGui"));
     menu->Append(ID_Taskbar_HideGUI, wxT("&Hide EncFSGui"));
     menu->AppendSeparator();
     menu->Append(ID_Taskbar_Settings, wxT("S&ettings"));
     menu->AppendSeparator();
 
-    /*
-    if (g_frmMain->IsShown())
-    {
-        menu->Enable(ID_Taskbar_ShowGUI, true);
-        menu->Enable(ID_Taskbar_HideGUI, false);
-    }
-    else
+
+    if (g_frmMain->GetVisibleState())
     {
         menu->Enable(ID_Taskbar_ShowGUI, false);
         menu->Enable(ID_Taskbar_HideGUI, true);
     }
-    */
+    else
+    {
+        menu->Enable(ID_Taskbar_ShowGUI, true);
+        menu->Enable(ID_Taskbar_HideGUI, false);
+    }
+    
 
     wxMenu *volumesmenu = new wxMenu;
     int submenuid = 5555;
@@ -345,18 +335,21 @@ void TaskBarIcon::OnMenuUpdate(wxCommandEvent& WXUNUSED(event))
 
 void TaskBarIcon::OnMenuShow(wxCommandEvent& WXUNUSED(event))
 {
-    g_frmMain->ShowWithEffect(wxSHOW_EFFECT_EXPAND);
+    g_frmMain->SetVisibleState(true);
 }
 
 void TaskBarIcon::OnMenuHide(wxCommandEvent& WXUNUSED(event))
 {
-    g_frmMain->HideWithEffect(wxSHOW_EFFECT_EXPAND);
+    g_frmMain->SetVisibleState(false);
 }
 
 
 void TaskBarIcon::OnMenuSettings(wxCommandEvent& event)
 {
-    g_frmMain->ShowWithEffect(wxSHOW_EFFECT_EXPAND);
+    if (!g_frmMain->GetVisibleState())
+    {
+        g_frmMain->SetVisibleState(true);        
+    }
     g_frmMain->OnSettings(event);
 }
 
@@ -480,6 +473,19 @@ frmMain::frmMain(const wxString& title,
     m_listCtrl->LinkToolbar(GetToolBar());
     m_listCtrl->UpdateToolBarButtons();
 
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    pConfig->SetPath(wxT("/Config"));
+    bool startasicon = pConfig->Read(wxT("startasicon"), 0l);
+
+    if (startasicon)
+    {
+        SetVisibleState(false);
+    }
+    else
+    {
+        SetVisibleState(true);
+    }
+
     // finally, add the app icon
     m_taskBarIcon = new TaskBarIcon(wxTBI_DEFAULT_TYPE);
     m_taskBarIcon->SetIcon(wxICON(encfsgui_ico),
@@ -506,6 +512,25 @@ mainListCtrl::mainListCtrl(wxWindow *parent,
 
 
 // member functions
+
+bool frmMain::GetVisibleState()
+{
+    return m_visible;
+}
+
+void frmMain::SetVisibleState(bool newstate)
+{
+    if (newstate)
+    {
+        ShowWithEffect(wxSHOW_EFFECT_EXPAND);
+        SetFocus();
+    }
+    else
+    {
+        HideWithEffect(wxSHOW_EFFECT_EXPAND);
+    }
+    m_visible = newstate;
+}
 
 int frmMain::GetListCtrlIndex(wxString& volname)
 {
@@ -816,7 +841,7 @@ void frmMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 
 void frmMain::OnNewFolder(wxCommandEvent& WXUNUSED(event))
 {
-    Show();
+    SetVisibleState(true);
     createNewEncFSFolder(this);
     RefreshAll();
 }
@@ -824,7 +849,7 @@ void frmMain::OnNewFolder(wxCommandEvent& WXUNUSED(event))
 
 void frmMain::OnAddExistingFolder(wxCommandEvent& WXUNUSED(event))
 {
-    Show();
+    SetVisibleState(true);
     openExistingEncFSFolder(this);
     RefreshAll();
 }
@@ -1227,7 +1252,10 @@ void frmMain::OnRemoveFolder(wxCommandEvent& WXUNUSED(event))
 
 void frmMain::OnSettings(wxCommandEvent& WXUNUSED(event))
 {
-    Show();
+    if (!m_visible)
+    {
+        SetVisibleState(true);        
+    }
     openSettings(this);
     RefreshAll();
 }

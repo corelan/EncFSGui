@@ -184,17 +184,21 @@ public:
 
     int GetListCtrlIndex(wxString&);
 
+    bool GetVisibleState();
+    void SetVisibleState(bool);
+
 private:
+    bool m_visible;
     wxString m_datadir;
     // toolbar stuff
     size_t              m_rows;             // 1
     wxPanel            *m_panel;
 
-        // statusbar
+    // statusbar
     wxStatusBar* m_statusBar;
 
+    // private member functions
     int mountSelectedFolder(wxString& pw);
-
     wxString getPassWord(wxString&, wxString&);
 
     // list stuff
@@ -205,7 +209,6 @@ private:
     // ListView stuff
     mainListCtrl *m_listCtrl;
 
-    // any class wishing to process wxWidgets events must use this macro
     wxDECLARE_EVENT_TABLE();
 
 protected:
