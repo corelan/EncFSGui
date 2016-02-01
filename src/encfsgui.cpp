@@ -406,7 +406,7 @@ frmMain::frmMain(const wxString& title,
                  const wxSize &size, 
                  long style) : wxFrame(NULL, wxID_ANY, title, pos, size, style)
 {
-    
+    m_visible = true;
     wxStandardPathsBase& stdp = wxStandardPaths::Get();
     m_listCtrl = NULL;
     m_datadir = stdp.GetUserDataDir();
@@ -524,6 +524,7 @@ void frmMain::SetVisibleState(bool newstate)
     {
         ShowWithEffect(wxSHOW_EFFECT_EXPAND);
         SetFocus();
+        Raise();
     }
     else
     {
