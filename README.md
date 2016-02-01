@@ -189,18 +189,17 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
   - [ ] Change password of encfs volume (routine already exists) (& update Keychain if needed)
   - [ ] Allow use of master password
   - [ ] Implement overall error handling
-  - [ ] Remove temp files when they are no longer needed
   - [ ] Code cleanup & documentation
     - [ ] Create proper destructors where needed
     - [ ] Add proper documentation for functions & classes
-    - [ ] Review variable names
+    - [ ] Review variable & function naming conventions
     - [ ] Adopt a better coding style
-    - [ ] Learn how to write proper C++
-  - [ ] Prevent Command+C (Copy) to trigger 'Cancel' button in dialogs
+    - [ ] Learn how to write proper C++ (hah - this will never work !)
+  - [ ] Prevent Command+C (Copy) to trigger 'Cancel' button in dialogs (known issue, so it seems: http://trac.wxwidgets.org/ticket/14954 // http://trac.wxwidgets.org/ticket/15678)
   - [ ] Allow use of passwords that contain quotes (single and double)
   - [ ] Move installation instructions to wiki
   - [ ] Add license information everywhere, as needed
-  - [ ] Check if it would be possible to statically compile the app with encfs, osxfuse and openssl
+  - [ ] Check if it would be possible to statically compile the app with encfs, osxfuse and openssl, without giving up on the ability to close the app (without unmounting volumes)
 
 ### DONE
 
@@ -216,3 +215,4 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
   - [X] Check how to launch as an icon and add as an option
     - [X] Add context menu to icon, allow mount/unmount volumes
   - [X] Implement 'Start application at login'
+  - [X] Remove temp files when they are no longer needed
