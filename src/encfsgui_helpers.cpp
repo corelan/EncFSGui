@@ -617,8 +617,14 @@ std::map<wxString, wxString> getEncodingCapabilities()
         }
 
         
-
         // clean up again
+        tmpfile->Open(scriptfile);
+        if (tmpfile->IsOpened())
+        {
+            tmpfile->Write("#cleaned");
+        }
+        tmpfile->Commit();
+
         if (dirEnc->Exists(enc_path))
         {
             dirEnc->Remove(enc_path, wxPATH_RMDIR_RECURSIVE);

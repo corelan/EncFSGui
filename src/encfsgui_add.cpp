@@ -527,6 +527,15 @@ bool frmAddDialog::createEncFSFolder()
         wxSleep(1);
         ++nrruns;
     }
+
+    // clean
+    tmpfile->Open(scriptfile);
+    if (tmpfile->IsOpened())
+    {
+        tmpfile->Write("#cleaned");
+    }
+    tmpfile->Commit();
+
     return createdok;
 }
 
