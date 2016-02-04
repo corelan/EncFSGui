@@ -110,7 +110,8 @@ enum
     ID_List_Menu_Unmount,
     ID_List_Menu_Edit,
     ID_List_Menu_Info,
-    ID_List_Menu_Browse
+    ID_List_Menu_Browse,
+    ID_List_Menu_ForceUnmountAll
 };
 
 // enum for return codes related with mount success
@@ -704,18 +705,16 @@ bool unmountVolume(wxString& volumename)
 
 
 
-void AutoUnmountVolumes()
+void AutoUnmountVolumes(bool forced)
 {
-    // check all volumes
     for (std::map<wxString, DBEntry*>::iterator it= m_VolumeData.begin(); it != m_VolumeData.end(); it++)
     {
         wxString volumename = it->first;
         DBEntry * thisvol = it->second;
-        if (thisvol->getMountState() && !thisvol->getPreventAutoUnmount())
+        if ( (thisvol->getMountState() && !thisvol->getPreventAutoUnmount()) || forced)
         {
             unmountVolume(volumename);
         }
-
     }
 }
 
@@ -771,7 +770,8 @@ bool QuitApp(wxWindow * parent)
         // if autounmount, dismount volumes first
         if (autounmount)
         {
-            AutoUnmountVolumes();
+            // do not force
+            AutoUnmountVolumes(false);
         }
         return true;
     }
@@ -1097,6 +1097,29 @@ void frmMain::AutoMountVolumes()
     // mount when needed
 }
 
+void frmMain::OnForceUnMountAll(wxCommandEvent& WXUNUSED(event))
+{
+    wxString msg;
+    wxString title;
+    bool unmountok;
+    unmountok = false;
+
+    msg.Printf(wxT("Are you sure you want to unmount ALL volumes at once?\n\nNote: make sure to close all open files\nbefore clicking 'Yes'."));
+    title.Printf(wxT("Unmount ALL volumes?"));
+
+    wxMessageDialog * dlg = new wxMessageDialog(this, 
+                                                msg, 
+                                                title, 
+                                                wxYES_NO|wxCENTRE|wxNO_DEFAULT|wxICON_QUESTION);
+    if (dlg->ShowModal() == wxID_YES)
+    {
+        // force unmount on all mounted volumes
+        AutoUnmountVolumes(true);
+        RefreshAll();
+    }
+    dlg->Destroy();
+    
+} 
 
 void frmMain::OnUnMount(wxCommandEvent& WXUNUSED(event))
 {
@@ -1819,6 +1842,10 @@ void mainListCtrl::OnPopupMenuClick(wxCommandEvent& event)
     {
         g_frmMain->OnBrowseFolder(event);
     }
+    else if (event.GetId() == ID_List_Menu_ForceUnmountAll)
+    {
+        g_frmMain->OnForceUnMountAll(event);
+    }    
 }
 
 void mainListCtrl::OnRightClick(wxListEvent& event)
@@ -1850,8 +1877,12 @@ void mainListCtrl::OnRightClick(wxListEvent& event)
         menu->Append(ID_List_Menu_Info, msg);
         menu->AppendSeparator();
     }
+
     menu->Append(ID_List_Menu_Create, wxT("Create a new encfs folder"));
-    menu->Append(ID_List_Menu_Open, wxT("Open an existing encfs folder"));    
+    menu->Append(ID_List_Menu_Open, wxT("Open an existing encfs folder"));
+    menu->AppendSeparator();    
+    menu->Append(ID_List_Menu_ForceUnmountAll, wxT("Force unmount all"));
+
     PopupMenu(menu, event.GetPoint());
 }
 

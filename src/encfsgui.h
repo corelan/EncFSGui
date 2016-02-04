@@ -154,6 +154,7 @@ public:
     void OnSettings(wxCommandEvent& event);
     void OnMount(wxCommandEvent& event);
     void OnUnMount(wxCommandEvent& event);
+    void OnForceUnMountAll(wxCommandEvent& event);
     void OnInfo(wxCommandEvent& event);
     void OnRemoveFolder(wxCommandEvent& event);
 
