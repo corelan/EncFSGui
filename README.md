@@ -178,6 +178,23 @@ If you want to try the application, you'll need a number of dependencies install
 2. run `make` to compile and link
 
 
+### After upgrading from Yosemite to El Capitan
+
+If you have upgraded your development machine from Yosemite to El Capitan, you may need to run the fix some permissions:
+
+```
+sudo chown -R $(whoami) /usr/local/lib
+sudo chown -R $USER:admin /usr/local/include
+sudo chown -R $USER:admin /usr/local/lib/pkgconfig
+```
+
+It's also a good idea to update brew at the same time
+```
+brew update
+
+```
+
+
 ## Contribute
 
 If you would like to contribute, please create a new branch first.  Do NOT submit pull requests against the master branch.<br>
@@ -193,8 +210,8 @@ All initiatives to improve the code / app are more than welcome.  Alternatively,
     - [ ] Create proper destructors where needed
     - [ ] Add proper documentation for functions & classes
     - [ ] Review variable & function naming conventions
-    - [ ] Adopt a better coding style
-    - [ ] Learn how to write proper C++ (hah - this will never work !)
+    - [ ] Adopt a better coding style (a.k.a rewrite the entire thing damnit)
+    - [ ] Learn how to write proper C++ (hah - this will never happen!)
   - [ ] Prevent Command+C (Copy) to trigger 'Cancel' button in dialogs (known issue, so it seems: http://trac.wxwidgets.org/ticket/14954 // http://trac.wxwidgets.org/ticket/15678)
   - [ ] Allow use of passwords that contain quotes (single and double)
   - [ ] Move installation instructions to wiki

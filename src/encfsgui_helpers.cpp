@@ -662,6 +662,8 @@ void renameVolume(wxString& oldname, wxString& newname)
     bool automount = pConfig->ReadBool(wxT("automount"), 0l);
     bool preventautounmount = pConfig->ReadBool(wxT("preventautounmount"), 0l);
     bool passwordsaved = pConfig->ReadBool(wxT("passwordsaved"), 0l);
+    bool allowother = pConfig->ReadBool(wxT("allowother"), 0l);
+    bool mountaslocal = pConfig->ReadBool(wxT("mountaslocal"), 0l);
     // delete old group
     pConfig->DeleteGroup(currentvol);
     // create a new one
@@ -671,6 +673,8 @@ void renameVolume(wxString& oldname, wxString& newname)
     pConfig->Write("automount", automount);
     pConfig->Write("preventautounmount", preventautounmount);
     pConfig->Write("passwordsaved", passwordsaved);
+    pConfig->Write(wxT("allowother"),allowother);
+    pConfig->Write(wxT("mountaslocal"),mountaslocal);            
     
     pConfig->Flush();
 }

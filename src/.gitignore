@@ -31,3 +31,5 @@
 .DS_Store
 encfsgui
 Build/
+*.sublime-project
+*.sublime-workspace
