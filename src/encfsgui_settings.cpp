@@ -70,6 +70,7 @@ private:
     wxCheckBox * m_chkbx_startasicon;
     wxCheckBox * m_chkbx_unmount_on_quit;
     wxCheckBox * m_chkbx_prompt_on_quit;
+    wxCheckBox * m_chkbx_prompt_on_unmount;
     wxCheckBox * m_chkbx_check_updates;
 };
 
@@ -188,6 +189,7 @@ void frmSettingsDialog::SaveSettings(wxCommandEvent& WXUNUSED(event))
     pConfig->Write(wxT("startasicon"), m_chkbx_startasicon->GetValue());
     pConfig->Write(wxT("autounmount"), m_chkbx_unmount_on_quit->GetValue());
     pConfig->Write(wxT("nopromptonquit"), m_chkbx_prompt_on_quit->GetValue());
+    pConfig->Write(wxT("nopromptonunmount"), m_chkbx_prompt_on_unmount->GetValue());
     pConfig->Write(wxT("checkupdates"), m_chkbx_check_updates->GetValue());
     // to do: remove timer to check for updates, if option was deselected
 
@@ -308,6 +310,11 @@ void frmSettingsDialog::Create()
     m_chkbx_unmount_on_quit->SetValue(pConfig->Read(wxT("autounmount"), 0l) != 0);
     sizerStartup->Add(m_chkbx_unmount_on_quit);
 
+
+    m_chkbx_prompt_on_unmount = new wxCheckBox(this, ID_CHECK_UNMOUNT_ON_QUIT, "Do not prompt for confirmation on unmount");
+    m_chkbx_prompt_on_unmount->SetValue(pConfig->Read(wxT("nopromptonunmount"), 0l) != 0);
+    sizerStartup->Add(m_chkbx_prompt_on_unmount);
+
     m_chkbx_prompt_on_quit = new wxCheckBox(this, ID_CHECK_UNMOUNT_ON_QUIT, "Do not ask for confirmation on exit");
     m_chkbx_prompt_on_quit->SetValue(pConfig->Read(wxT("nopromptonquit"), 0l) != 0);
     sizerStartup->Add(m_chkbx_prompt_on_quit);
@@ -340,7 +347,7 @@ void openSettings(wxWindow *parent)
 {   
     wxSize dlgSettingsSize;
     // make height larger when adding more options
-    dlgSettingsSize.Set(400,495);
+    dlgSettingsSize.Set(400,510);
 
     long style = wxDEFAULT_DIALOG_STYLE;// | wxRESIZE_BORDER;
 

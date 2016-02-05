@@ -46,6 +46,7 @@
 #include "bitmaps/folderinfo.xpm"
 #include "bitmaps/mountfolder.xpm"
 #include "bitmaps/unmountfolder.xpm"
+#include "bitmaps/unmountfolder_all.xpm"    
 #include "bitmaps/settings.xpm"
 #include "bitmaps/quit.xpm"
 #include "bitmaps/ico_ok.xpm"
@@ -92,6 +93,7 @@ enum
     ID_Toolbar_Info,
     ID_Toolbar_Mount,
     ID_Toolbar_Unmount,
+    ID_Toolbar_UnmountAll,
     ID_Toolbar_Settings,
     ID_Toolbar_Quit,
     ID_TOOLBAR,
@@ -203,10 +205,8 @@ bool encFSGuiApp::OnInit()
    
     // create the main application window
     wxSize frmMainSize;
-    frmMainSize.Set(880,340);
+    frmMainSize.Set(920,340);
     long framestyle;
-
-    //framestyle = wxDEFAULT_FRAME_STYLE ^ wxRESIZE_BORDER | wxFRAME_EX_METAL | wxICONIZE | wxMINIMIZE; 
 
     framestyle = wxDEFAULT_FRAME_STYLE ^ wxRESIZE_BORDER | wxFRAME_EX_METAL;
 
@@ -711,7 +711,7 @@ void AutoUnmountVolumes(bool forced)
     {
         wxString volumename = it->first;
         DBEntry * thisvol = it->second;
-        if ( (thisvol->getMountState() && !thisvol->getPreventAutoUnmount()) || forced)
+        if (thisvol->getMountState() && (!thisvol->getPreventAutoUnmount() || forced)) 
         {
             unmountVolume(volumename);
         }
@@ -965,18 +965,29 @@ bool frmMain::unmountVolumeAsk(wxString& volumename)
     DBEntry *thisvol = m_VolumeData[volumename];
     mountvol = thisvol->getMountPath();
 
-    msg.Printf(wxT("Are you sure you want to unmount\n'%s' ?\n\nNote: make sure to close all open files\nbefore clicking 'Yes'."),mountvol);
-    title.Printf(wxT("Unmount '%s' ?"), volumename);
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    pConfig->SetPath(wxT("/Config"));
+    bool skippromptunmount = pConfig->Read(wxT("nopromptonunmount"), 0l);
 
-    wxMessageDialog * dlg = new wxMessageDialog(this, 
-                                                msg, 
-                                                title, 
-                                                wxYES_NO|wxCENTRE|wxNO_DEFAULT|wxICON_QUESTION);
-    if (dlg->ShowModal() == wxID_YES)
+    if (skippromptunmount)
     {
         unmountok = unmountVolume(volumename);
     }
-    dlg->Destroy();
+    else
+    {
+        msg.Printf(wxT("Are you sure you want to unmount\n'%s' ?\n\nNote: make sure to close all open files\nbefore clicking 'Yes'."),mountvol);
+        title.Printf(wxT("Unmount '%s' ?"), volumename);
+
+        wxMessageDialog * dlg = new wxMessageDialog(this, 
+                                                    msg, 
+                                                    title, 
+                                                    wxYES_NO|wxCENTRE|wxNO_DEFAULT|wxICON_QUESTION);
+        if (dlg->ShowModal() == wxID_YES)
+        {
+            unmountok = unmountVolume(volumename);
+        }
+        dlg->Destroy();
+    }
     return unmountok; // unmount did not work, or not selected 
 }
 
@@ -1102,24 +1113,53 @@ void frmMain::OnForceUnMountAll(wxCommandEvent& WXUNUSED(event))
     wxString msg;
     wxString title;
     bool unmountok;
+    int nrmounted = 0;
     unmountok = false;
 
-    msg.Printf(wxT("Are you sure you want to unmount ALL volumes at once?\n\nNote: make sure to close all open files\nbefore clicking 'Yes'."));
-    title.Printf(wxT("Unmount ALL volumes?"));
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    pConfig->SetPath(wxT("/Config"));
+    bool skippromptunmount = pConfig->Read(wxT("nopromptonunmount"), 0l);
 
-    wxMessageDialog * dlg = new wxMessageDialog(this, 
-                                                msg, 
-                                                title, 
-                                                wxYES_NO|wxCENTRE|wxNO_DEFAULT|wxICON_QUESTION);
-    if (dlg->ShowModal() == wxID_YES)
+
+    // count how many volumes are mounted
+    for (std::map<wxString, DBEntry*>::iterator it= m_VolumeData.begin(); it != m_VolumeData.end(); it++)
     {
-        // force unmount on all mounted volumes
-        AutoUnmountVolumes(true);
-        RefreshAll();
+        wxString volumename = it->first;
+        DBEntry * thisvol = it->second;
+        if (thisvol->getMountState()) 
+        {
+            ++nrmounted;
+        }
     }
-    dlg->Destroy();
-    
+
+    if (nrmounted > 0)
+    {
+        if (skippromptunmount)
+        {
+            // force unmount
+            AutoUnmountVolumes(true);
+            RefreshAll();
+        }
+        else
+        {
+            msg.Printf(wxT("There are currently %d mounted volumes.\n\nAre you sure you want to unmount ALL those volumes at once?\n\nNote: make sure to close all open files\nbefore clicking 'Yes'."), nrmounted);
+            title.Printf(wxT("Unmount ALL volumes?"));
+            wxMessageDialog * dlg = new wxMessageDialog(this, 
+                                                        msg, 
+                                                        title, 
+                                                        wxYES_NO|wxCENTRE|wxNO_DEFAULT|wxICON_QUESTION);
+            if (dlg->ShowModal() == wxID_YES)
+            {
+                // force unmount on all mounted volumes
+                AutoUnmountVolumes(true);
+                RefreshAll();
+            }
+            dlg->Destroy();
+        }   
+    }
 } 
+
+
 
 void frmMain::OnUnMount(wxCommandEvent& WXUNUSED(event))
 {
@@ -1334,6 +1374,10 @@ void frmMain::OnToolLeftClick(wxCommandEvent& event)
     {
         OnUnMount(event);
     }
+    else if (event.GetId() == ID_Toolbar_UnmountAll)
+    {
+        OnForceUnMountAll(event);
+    }    
     else if (event.GetId() == ID_Toolbar_Info)
     {
         OnInfo(event);
@@ -1403,6 +1447,7 @@ void frmMain::PopulateToolbar(wxToolBarBase* toolBar)
         Tool_folderinfo,
         Tool_mountfolder,
         Tool_unmountfolder,
+        Tool_unmountfolder_all,
         Tool_settings,
         Tool_quit,
         Tool_Max
@@ -1421,6 +1466,7 @@ void frmMain::PopulateToolbar(wxToolBarBase* toolBar)
     INIT_TOOL_BMP(folderinfo);
     INIT_TOOL_BMP(mountfolder);
     INIT_TOOL_BMP(unmountfolder);
+    INIT_TOOL_BMP(unmountfolder_all);
     INIT_TOOL_BMP(settings);
     INIT_TOOL_BMP(quit);
 
@@ -1471,6 +1517,10 @@ void frmMain::PopulateToolbar(wxToolBarBase* toolBar)
     toolBar->AddTool(ID_Toolbar_Unmount, wxT("Unmount && lock"),
                      toolBarBitmaps[Tool_unmountfolder], wxNullBitmap, wxITEM_NORMAL,
                      wxT("Unmount and protect a mounted encfs folder"), wxT("Unmount and protect a mounted encfs folder"));
+
+    toolBar->AddTool(ID_Toolbar_UnmountAll, wxT("Force Unmount all"),
+                     toolBarBitmaps[Tool_unmountfolder_all], wxNullBitmap, wxITEM_NORMAL,
+                     wxT("Unmount and protect all mounted encfs folders"), wxT("Unmount and protect all mounted encfs folders"));
 
     toolBar->AddSeparator();
 
@@ -1610,7 +1660,7 @@ void frmMain::FillListWithVolumes()
     // Volume Name
     m_listCtrl->SetColumnWidth(1,120);
     // EncryptedFolder
-    m_listCtrl->SetColumnWidth(2,300);
+    m_listCtrl->SetColumnWidth(2,320);
     // Mounted At
     m_listCtrl->SetColumnWidth(3,300);
     // Automount
