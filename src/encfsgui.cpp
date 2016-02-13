@@ -1281,6 +1281,7 @@ wxString frmMain::getPassWord(wxString& title, wxString& prompt)
     if (dlg->ShowModal() == wxID_OK)
     {
         pw = dlg->GetValue();
+        dlg->Destroy();
         return pw;
     }
     dlg->Destroy();
