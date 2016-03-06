@@ -209,6 +209,8 @@ bool IsVolumeSystemMounted(wxString volpath, wxArrayString mountinfo)
     bool matchfound = false;
     size_t count = mountinfo.GetCount();
     wxString encmarker = "encfs";
+    // add a space to volpath, to make sure we have an exact match
+    wxString volpathsearch = volpath + " ";
     for ( size_t n = 0; n < count; n++ )
     {
         signed int checkval = -1;
@@ -218,7 +220,7 @@ bool IsVolumeSystemMounted(wxString volpath, wxArrayString mountinfo)
         {
             signed int pos1;
             signed int pos2;
-            pos1 = thisline.Find(volpath);
+            pos1 = thisline.Find(volpathsearch);
             pos2 = thisline.Find(encmarker);
             if ( (pos1 > checkval) && (pos2 > checkval) )
             {

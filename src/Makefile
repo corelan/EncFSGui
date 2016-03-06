@@ -11,6 +11,8 @@ SOURCES=*.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=encfsgui
 APPNAME=EncFSGui
+DMG_FINAL=$(APPNAME).dmg
+DMG_TMP=$(APPNAME)_tmp.dmg
 
 all:	$(SOURCES) $(EXECUTABLE)
 	@echo
@@ -72,11 +74,29 @@ release:
 	cp $(EXECUTABLE) $(APPNAME).app/Contents/MacOS
 	rm -rf *.o*
 	mv $(APPNAME).app Build/$(APPNAME).app
-	ln -s /Applications Build/Applications
-	@echo
+
 	@echo Creating dmg into Releases folder
 	mkdir -p ../release
 	rm -rf ../release/*
-	hdiutil create -fs HFS+ -srcfolder ./Build -volname EncFSGui EncFSGui.dmg
+
+	rm $(DMG_TMP)
+	hdiutil create -fs HFS+ -srcfolder ./Build -volname $(APPNAME) -format UDRW $(DMG_TMP)
+	@echo DMG created, now mounting file
+	DEVICE=`hdiutil attach -readwrite -noverify $(DMG_TMP) | egrep '^/dev/' | sed 1q | awk '{print $1}'`
+	@echo Wait 5 seconds
+	sleep 5
+
+	@echo Add link to /Applications
+
+	#pushd /Volumes/$(APPNAME)
+	ln -s /Applications /Volumes/$(APPNAME)/Applications
+	#popd
+
+	hdiutil detach /Volumes/$(APPNAME)
+
+	echo "Creating compressed image"
+	hdiutil convert "${DMG_TMP}" -format UDZO -imagekey zlib-level=9 -o "${DMG_FINAL}" 
+	
 	mv EncFSGui.dmg ../release
 	cp version.txt ../release 
+	rm $(DMG_TMP)
