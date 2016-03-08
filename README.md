@@ -7,7 +7,7 @@ This application is still missing some (minor) features, but it should now be re
 It is still under active development and will be updated on a regular basis.<br>
 
 
-If you don't feel like compiling stuff yourself today, feel free to grab the most recent compiled version of the app from here: https://github.com/corelan/EncFSGui/raw/master/release/EncFSGUI.dmg<br>
+If you don't feel like compiling stuff yourself today, feel free to grab the most recent compiled version of the app from here: https://github.com/corelan/EncFSGui/blob/master/release/EncFSGui.dmg<br>
 Open the dmg file, and drag encfsgui.app into /Applications.<br>
 Note: To run the app, check the "Installing dependencies on OSX" section below.  You must install the dependencies in order to use the app !!<br>
 
