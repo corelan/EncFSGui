@@ -79,7 +79,7 @@ release:
 	mkdir -p ../release
 	rm -rf ../release/*
 
-	rm $(DMG_TMP)
+	rm -f *.dmg
 	hdiutil create -fs HFS+ -srcfolder ./Build -volname $(APPNAME) -format UDRW $(DMG_TMP)
 	@echo DMG created, now mounting file
 	DEVICE=`hdiutil attach -readwrite -noverify $(DMG_TMP) | egrep '^/dev/' | sed 1q | awk '{print $1}'`

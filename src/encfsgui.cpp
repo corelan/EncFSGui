@@ -641,7 +641,7 @@ void frmMain::CheckUpdates(bool showIfNoUpdate)
         // ignore if you are running a newer version
         if (IsLatestVersionNewer(g_encfsguiversion, latestversion))
         {
-            wxString dlurl = "https://github.com/corelan/EncFSGui/raw/master/release/EncFSGUI.dmg";
+            wxString dlurl = "https://github.com/corelan/EncFSGui/raw/master/release/EncFSGui.dmg";
             wxMessageBox(wxString::Format
              (
                 "You are running an outdated version of EncFSGui!\n"
@@ -1278,6 +1278,8 @@ wxString frmMain::getPassWord(wxString& title, wxString& prompt)
                                                             wxEmptyString, 
                                                             wxTextEntryDialogStyle, 
                                                             wxDefaultPosition);
+    dlg->SetFocus();
+    dlg->Raise();
     if (dlg->ShowModal() == wxID_OK)
     {
         pw = dlg->GetValue();

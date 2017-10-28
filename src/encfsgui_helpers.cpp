@@ -50,7 +50,7 @@ wxString getEncFSBinPath()
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
     pConfig->SetPath(wxT("/Config"));
-    return pConfig->Read(wxT("mountbin_path"), "/usr/local/bin/encfs");
+    return pConfig->Read(wxT("encfsbinpath"), "/usr/local/bin/encfs");
 }
 
 wxString getEncFSCTLBinPath()
@@ -65,14 +65,14 @@ wxString getMountBinPath()
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
     pConfig->SetPath(wxT("/Config"));
-    return pConfig->Read(wxT("mountbin_path"), "/sbin/mount");
+    return pConfig->Read(wxT("mountbinpath"), "/sbin/mount");
 }
 
 wxString getUMountBinPath()
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
     pConfig->SetPath(wxT("/Config"));
-    return pConfig->Read(wxT("umountbin_path"), "/sbin/umount");
+    return pConfig->Read(wxT("umountbinpath"), "/sbin/umount");
 }
 
 
