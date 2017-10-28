@@ -19,6 +19,9 @@ all:	$(SOURCES) $(EXECUTABLE)
 	@echo	----------------------------------------
 	@echo	 The EncFSGUI project has been compiled
 	@echo	 Enjoy
+	@echo	
+	@echo	 Run 'make release' to create the dmg package.
+	@echo
 	@echo	----------------------------------------
 	@echo
 
