@@ -67,7 +67,7 @@ If you want to try the application, you'll need a number of dependencies install
 
   Verify that the command line tools are installed correctly:<br>
   `xcode-select -p` 	(should print out a path that ends with 'Developer', but this will only work if you have xcode installed)<br>
-  `gcc -version`		(should print out version information)<br>
+  `gcc --version`		(should print out version information)<br>
 
 
 3. Install homebrew
