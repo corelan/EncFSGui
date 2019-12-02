@@ -2,6 +2,8 @@
 
 Public repository for the EncFSGui project, an OSX GUI wrapper around encfs
 
+NOTE: This project has been abandoned. Please check out https://github.com/corelan/pyencfsgui instead
+
 ## Warning 
 This application is still missing some (minor) features, but it should now be ready for use.<br>
 It is still under active development and will be updated on a regular basis.<br>
